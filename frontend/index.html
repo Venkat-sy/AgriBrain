@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriBrain - Smart Fertilizer Recommendation</title>
+    <meta name="description" content="AI-driven fertilizer recommendation and predictive soil analysis platform.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-mesh"></div>
+    
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🌿</span>
+            <h1>AgriBrain</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="active">Dashboard</a>
+            <a href="#">History</a>
+            <a href="#">Simulations</a>
+            <a href="#">Settings</a>
+        </nav>
+        <button class="btn-primary" id="connect-sensor-btn">Connect IoT Sensors</button>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Input Section -->
+        <section class="glass-panel input-section">
+            <div class="section-header">
+                <h2>Soil Data Input</h2>
+                <p>Enter current soil metrics or sync from sensors.</p>
+            </div>
+            
+            <form class="soil-form" action="#" onsubmit="event.preventDefault();">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="nitrogen">Nitrogen (N)</label>
+                        <input type="number" id="nitrogen" placeholder="e.g. 90" required>
+                        <span class="unit">mg/kg</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="phosphorus">Phosphorus (P)</label>
+                        <input type="number" id="phosphorus" placeholder="e.g. 42" required>
+                        <span class="unit">mg/kg</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="potassium">Potassium (K)</label>
+                        <input type="number" id="potassium" placeholder="e.g. 43" required>
+                        <span class="unit">mg/kg</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="ph">pH Level</label>
+                        <input type="number" step="0.1" id="ph" placeholder="e.g. 6.5" required>
+                        <span class="unit">pH</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="rainfall">Rainfall</label>
+                        <input type="number" id="rainfall" placeholder="e.g. 200" required>
+                        <span class="unit">mm</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="temperature">Temperature</label>
+                        <input type="number" step="0.1" id="temperature" placeholder="e.g. 28.5" required>
+                        <span class="unit">°C</span>
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="crop-type">Target Crop</label>
+                    <select id="crop-type">
+                        <option value="rice">Rice (Kharif)</option>
+                        <option value="wheat">Wheat (Rabi)</option>
+                        <option value="maize">Maize</option>
+                        <option value="cotton">Cotton</option>
+                        <option value="sugarcane">Sugarcane</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    Generate AI Recommendation
+                    <span class="arrow">→</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Visualization & Results Section -->
+        <section class="results-section">
+            <div class="glass-panel chart-panel">
+                <div class="section-header">
+                    <h2>Nutrient Analysis Chart</h2>
+                    <p>Current vs. Optimal Levels</p>
+                </div>
+                <!-- Blueprint chart using CSS -->
+                <div class="css-chart">
+                    <div class="bar-group">
+                        <div class="bar target" style="height: 100%;"></div>
+                        <div class="bar current low" style="height: 60%;"></div>
+                        <span class="label">N</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar target" style="height: 100%;"></div>
+                        <div class="bar current optimal" style="height: 95%;"></div>
+                        <span class="label">P</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar target" style="height: 100%;"></div>
+                        <div class="bar current low" style="height: 45%;"></div>
+                        <span class="label">K</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar target" style="height: 100%;"></div>
+                        <div class="bar current high" style="height: 110%;"></div>
+                        <span class="label">pH</span>
+                    </div>
+                </div>
+                <div class="legend">
+                    <span class="legend-item"><span class="box target-box"></span> Optimal Level</span>
+                    <span class="legend-item"><span class="box current-box"></span> Current Level</span>
+                </div>
+            </div>
+
+            <div class="glass-panel recommendation-panel">
+                <div class="status-badge success">
+                    <span class="dot"></span> AI Analysis Complete
+                </div>
+                <h2>Urea & DAP Blend Recommended</h2>
+                <div class="confidence-score">
+                    <strong>94.2%</strong> Confidence Score
+                </div>
+                <p class="description">
+                    Based on your low Nitrogen (N) and Potassium (K) levels, combined with the forecasted rainfall, the model suggests applying <strong>45kg of Urea</strong> and <strong>20kg of DAP</strong> per acre within the next 48 hours.
+                </p>
+                <div class="action-buttons">
+                    <button class="btn-secondary">View Explainable AI Details</button>
+                    <button class="btn-secondary">Simulate Weather Shift</button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
