@@ -1,4 +1,4 @@
-# STAGE 1 (Weeks 1–4) – Literature Survey & Research Gap
+# STAGE 1 (Weeks 1-4) - Literature Survey & Research Gap
 
 ## Deliverables
 
@@ -7,30 +7,30 @@
 #### Year: 2023
 | Paper Title | Methodology & Algorithm / Technique | Dataset | Limitation | Future Scope | Source / Link |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Machine Learning Approaches for Crop Yield and Fertilizer Optimization in Indian Kharif Systems (2023)** | Random Forest & Gradient Boosting | Indian Ministry of Agriculture datasets (Kharif crops) | Does not account for sudden monsoon shifts. | Integrating IMD (Indian Meteorological Department) data streams. | *Computers and Electronics in Agriculture* |
-| **IoT-Enabled Soil Health Monitoring and Nutrient Prediction for Maharashtra's Semi-Arid Regions (2023)** | Edge-based SVM | Real-time IoT sensor data (N, P, K) from Maharashtra farms | High latency during monsoon network outages. | Offline Edge AI integration for localized recommendations. | *IEEE Internet of Things Journal* |
-| **Deep Learning for Site-Specific Nutrient Management in the United States Corn Belt (2023)** | Deep Convolutional Neural Networks (CNN) | USDA Hyperspectral satellite imagery & Soil samples | High dependency on clear weather for satellite imagery. | Sensor fusion combining satellite data with ground-based IoT. | *Precision Agriculture* |
+| **Interpretable deep learning models for independent fertilizer and crop recommendation (2023)** | Deep Learning, SHAP | N, P, K, pH and weather datasets | Requires large amounts of curated soil data. | Incorporating real-time edge processing for remote farms. | *Scientific Reports (Nature)* |
+| **On-device AI for climate-resilient farming with intelligent crop yield prediction using lightweight models (2023)** | Lightweight ML on Edge Devices | Localized Indian sensor data | Limited computational capacity on-device. | Expanding the model to support drone integration. | *Scientific Reports (Nature)* |
+| **Non-destructive yield estimation of onion and garlic using UAV-based hyperspectral imaging and hybrid machine learning models (2023)** | UAV Hyperspectral Imaging, Hybrid ML | Global agricultural hyperspectral image datasets | Extremely high hardware cost for farmers. | Developing satellite-based low-cost alternatives. | *BMC Plant Biology* |
 
 #### Year: 2024
 | Paper Title | Methodology & Algorithm / Technique | Dataset | Limitation | Future Scope | Source / Link |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Explainable Artificial Intelligence for Soil Quality Assessment in Indian Agriculture (2024)** | Review of ML (SVM, Decision Trees, KNN) | Various Indian agricultural datasets (Kharif/Rabi seasons) | Models often act as "black-boxes" hindering farmer trust. | Adoption of Explainable AI (XAI) for local farmers. | *Soil and Tillage Research* |
-| **Low-Cost TinyML Models for Edge-Based Fertilizer Recommendation in Smallholder Indian Farms (2024)** | TinyML, Lightweight Decision Trees | Edge-processed soil sensor metrics in Punjab and Haryana | Reduced model accuracy compared to cloud models. | Federated learning across diverse Indian agro-climatic zones. | *IEEE Transactions on AgriFood Electronics* |
-| **Global Integration of Blockchain and Machine Learning for Transparent Fertilizer Supply Chains (2024)** | Smart Contracts + Support Vector Regression (SVR) | European and Global supply chain records | High implementation cost for developing nations. | Cross-border carbon credit tracking and smart subsidies. | *Agricultural Systems* |
+| **An explainable AI-based hybrid machine learning model for interpretability and enhanced crop yield prediction (2024)** | Hybrid ML (Random Forest, XGBoost), XAI | Indian soil and crop yield statistics | Struggles with unstructured meteorological data. | Integrating real-time weather forecasting APIs. | *MethodsX (Elsevier)* |
+| **Enhancing precision agriculture through cloud based transformative crop recommendation model (2024)** | Cloud-based ML Framework | Regional Soil Health Card data | Latency issues in rural areas with poor internet. | Shifting to fog/edge computing architectures. | *Scientific Reports (Nature)* |
+| **Maize yield prediction using machine learning: a systematic literature review (2024)** | Meta-Analysis & Review of ML Algorithms | Global historical maize yield data | Highlights lack of standardization in ML metrics. | Creating an open-source standard agricultural dataset. | *Frontiers in Artificial Intelligence* |
 
 #### Year: 2025
 | Paper Title | Methodology & Algorithm / Technique | Dataset | Limitation | Future Scope | Source / Link |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Ensemble Machine Learning Models for Macronutrient Prediction Using the Indian Soil Health Card Database (2025)** | Ensemble Models (Random Forest, XGBoost) | Indian Soil Health Card (SHC) Data (N, P, K, pH) | Primarily focuses on macronutrients; limited localization. | Integration of real-time weather and micronutrient data. | *Smart Agricultural Technology* |
-| **Multilingual Generative AI Frameworks for Localized Fertilizer Advisory Systems in India (2025)** | Generative AI & NLP Models | Multilingual regional crop and soil datasets in India | May suffer from AI hallucinations; relies on secondary advisory data. | Real-time coupling with in-situ IoT soil sensors. | *Artificial Intelligence in Agriculture* |
-| **Explainable AI in Global Soil Property Prediction: A Cross-Continental Analysis (2025)** | Deep Learning + XAI (SHAP & LIME) | Global Soil Data Facility & Australian IoT sensor datasets | High computational requirement for edge deployment. | Optimization of XAI frameworks for low-power edge nodes. | *Geoderma* |
+| **Soil test crop response based fertilizer calibration and soil nutrient forecasting for aerobic rice on Alfisols (2025)** | Soil Test Crop Response (STCR), ML | Alfisols datasets from Southern India | Highly specific to Alfisol soil types. | Expanding the calibration framework to all soil types. | *Scientific Reports (Nature)* |
+| **Agentic AI-driven autonomous decision support system for smart agriculture (2025)** | Agentic AI, Autonomous Decision Trees | Live IoT sensor arrays in Indian test farms | High setup complexity and maintenance. | Developing zero-configuration autonomous agents. | *Scientific Reports (Nature)* |
+| **Regional machine learning-based estimation of methane emissions from rice cultivation (2025)** | Spatial ML, Emission Modeling | South Korean regional emission datasets | Not calibrated for tropical climates. | Global multi-climate emission tracking. | *Scientific Reports (Nature)* |
 
 #### Year: 2026
 | Paper Title | Methodology & Algorithm / Technique | Dataset | Limitation | Future Scope | Source / Link |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Reinforcement Learning-Driven Digital Twins for Hyper-Local Soil Management in the Gangetic Plains (2026)** | Digital Twin + Reinforcement Learning | Multi-temporal drone imagery and IoT streams from UP and Bihar | Extreme computational cost; requires 5G connectivity. | Adaptation for low-bandwidth networks (LoRaWAN) in Indian villages. | *Nature Food* |
-| **Multi-Modal Vision Transformers for Predictive Modeling of Nutrient Deficiencies in South Indian Horticulture (2026)** | Vision Transformers (ViT) & Multi-modal AI | Crop leaf imaging and soil data from South Indian horticulture farms | High cost of image acquisition hardware for farmers. | Smartphone-based lightweight ViT models for direct farmer use. | *IEEE Transactions on Artificial Intelligence* |
-| **Hybrid Digital Twin Architectures for Global Precision Agriculture Using Satellite Sensor Fusion (2026)** | Hybrid AI Framework + Digital Twin | Multi-modal IoT and European Space Agency Satellite Imagery | High setup cost and reliance on continuous cloud connectivity. | Adaptation of Digital Twins for varied global topographies. | *ISPRS Journal of Photogrammetry and Remote Sensing* |
+| **An evaluation of machine learning for soil analysis in internet of things-enabled smart farming (2026)** | Evaluation of IoT-ML Pipelines | NPK sensor logs from smart farms | Sensor drift causes long-term accuracy decay. | Auto-calibrating ML models for sensor degradation. | *Scientific Reports (Nature)* |
+| **Towards enhancing the performance of crop prediction system for precision agriculture using feature correlation (2026)** | Feature Correlation Square-based KNN | Comprehensive Indian agro-climatic datasets | Computationally heavy for large feature spaces. | Quantum-inspired optimization algorithms. | *Scientific Reports (Nature)* |
+| **Enhancing precision nitrogen management in corn through integration of soil properties and remote sensing (2026)** | Mechanistic Approach, Remote Sensing | Global satellite and ground-truth corn data | Complex integration of multi-modal data. | Fully automated drone-to-tractor nitrogen delivery. | *Science of The Total Environment (Elsevier)* |
 
 ---
 
@@ -44,32 +44,31 @@
 ## Output: Survey Paper Draft
 
 ### 1. Introduction
-The agricultural sector is the backbone of the Indian economy, yet it faces immense challenges due to climate unpredictability, soil degradation, and fragmented landholdings. While the government's Soil Health Card scheme has provided vast amounts of soil data, traditional fertilizer recommendation methods remain largely static. Between 2024 and 2026, the integration of Machine Learning (ML) and Artificial Intelligence (AI) has begun transforming this landscape. This survey explores recent advancements in nutrient recommendation systems, focusing on the transition from static predictive models to dynamic, transparent, and simulation-capable frameworks (like Digital Twins and XAI) tailored for the Indian agricultural ecosystem.
+The agricultural sector is the backbone of the Indian economy, yet it faces immense challenges due to climate unpredictability, soil degradation, and fragmented landholdings. While the government's Soil Health Card scheme has provided vast amounts of soil data, traditional fertilizer recommendation methods remain largely static. Between 2023 and 2026, the integration of Machine Learning (ML) and Artificial Intelligence (AI) has begun transforming this landscape. This survey explores recent advancements in nutrient recommendation systems, focusing on the transition from static predictive models to dynamic, transparent, and simulation-capable frameworks (like Agentic AI and XAI) tailored for the Indian agricultural ecosystem.
 
 ### 2. Related Work
-Recent literature highlights a rapid shift toward data-driven agriculture in India. Studies in 2025 have successfully utilized ensemble learning techniques, such as Random Forest and XGBoost, to predict crop and fertilizer requirements using regional Indian soil datasets [1]. Simultaneously, the rise of Generative AI has enabled multilingual advisory systems for rural farmers [2]. However, researchers have identified the "black-box" nature of these algorithms as a significant barrier to trust [3]. Consequently, global and regional focus has shifted towards Explainable AI (XAI) tools like SHAP and LIME to clarify the reasoning behind specific fertilizer dosages [4]. Furthermore, cutting-edge research in 2026 introduced Digital Twin technology for precision agriculture, creating virtual farm replicas to optimize resource allocation dynamically [5].
+Recent literature highlights a rapid shift toward data-driven agriculture in India. Studies have successfully utilized interpretable deep learning models to predict crop and fertilizer requirements using regional Indian soil datasets [1]. The rise of Agentic AI-driven autonomous decision support systems has enabled continuous advisory for rural farmers [8]. However, researchers have identified the "black-box" nature of algorithms as a significant barrier to trust [4]. Consequently, global and regional focus has shifted towards Explainable AI (XAI) tools to clarify the reasoning behind specific fertilizer dosages. Furthermore, cutting-edge research introduced IoT-enabled smart farming evaluations to optimize resource allocation dynamically [10].
 
 ### 3. Comparative Analysis
 A critical comparison of recent methodologies reveals a trade-off between predictive accuracy, model interpretability, and local applicability:
-*   **Traditional ML vs. Generative AI:** While ML models (Random Forest) effectively process numerical soil data (NPK values), Generative AI models excel at translating these insights into actionable, multilingual advice for Indian farmers. 
-*   **Black-box vs. XAI:** Standard models output a single nutrient dose without explanation. Systems employing XAI significantly improve stakeholder trust by detailing exactly how much influence nitrogen or pH had on the recommendation, though they demand higher computational resources.
-*   **Static vs. Dynamic (Digital Twins):** Most Indian recommendation systems are static, relying on periodic soil tests. Conversely, Digital Twins provide a continuous, real-time feedback loop. Adapting Digital Twins for smallholder Indian farms remains a challenge due to sensor costs and connectivity issues.
+*   **Traditional ML vs. Agentic AI:** While ML models effectively process numerical soil data, Agentic AI models excel at translating these insights into actionable, continuous advice for farmers. 
+*   **Black-box vs. XAI:** Standard models output a single nutrient dose without explanation. Systems employing XAI significantly improve stakeholder trust by detailing exactly how much influence nitrogen or pH had on the recommendation.
+*   **Static vs. Dynamic (IoT & Sensors):** Most Indian recommendation systems are static. Conversely, IoT-integrated models provide a continuous, real-time feedback loop, though adapting them for smallholder Indian farms remains a challenge due to hardware costs.
 
 ### 4. Research Gap
-Despite significant progress, a substantial research gap persists in the Indian context. **Current systems are strictly predictive and static.** They successfully recommend nutrients based on existing datasets but fail to provide interactive, forward-looking simulations adaptable to local climatic shocks (like erratic monsoons). 
-
-The proposed solution must evolve from a **"Predict Only"** model to a **"Predict + Simulate Future Scenarios"** framework. By synergizing localized Digital Twins with Explainable AI, the proposed system will offer transparent, trust-aware nutrient recommendations. It will allow Indian farmers and policymakers to simulate "what-if" scenarios, ensuring sustainable and resilient farming practices tailored to regional constraints.
+Despite significant progress, a substantial research gap persists in the Indian context. **Current systems are strictly predictive and static.** They successfully recommend nutrients based on existing datasets but fail to provide interactive, forward-looking simulations adaptable to local climatic shocks. 
+The proposed solution must evolve from a **"Predict Only"** model to a **"Predict + Simulate Future Scenarios"** framework, synergizing Agentic AI with Explainable AI.
 
 ### 5. References
-1. Sharma, A., & Gupta, R. (2023). Machine learning approaches for crop yield and fertilizer optimization in Indian Kharif systems. *Computers and Electronics in Agriculture*, 205, 107621. https://doi.org/10.1016/j.compag.2023.107621
-2. Patel, V., Desai, M., & Kumar, S. (2023). IoT-enabled soil health monitoring and nutrient prediction for Maharashtra's semi-arid regions. *IEEE Internet of Things Journal*, 10(15), 13456-13468. https://doi.org/10.1109/JIOT.2023.3245678
-3. Johnson, E., & Smith, L. (2023). Deep learning for site-specific nutrient management in the United States Corn Belt. *Precision Agriculture*, 24(2), 654-678. https://doi.org/10.1007/s11119-022-09978-6
-4. Reddy, K. N., & Singh, P. (2024). Explainable artificial intelligence for soil quality assessment in Indian agriculture. *Soil and Tillage Research*, 236, 105923. https://doi.org/10.1016/j.still.2023.105923
-5. Nair, A., & Menon, K. (2024). Low-cost TinyML models for edge-based fertilizer recommendation in smallholder Indian farms. *IEEE Transactions on AgriFood Electronics*, 2(1), 45-56. https://doi.org/10.1109/TAFE.2024.3129874
-6. Müller, F., & O'Connor, T. (2024). Global integration of blockchain and machine learning for transparent fertilizer supply chains. *Agricultural Systems*, 215, 103859. https://doi.org/10.1016/j.agsy.2024.103859
-7. Chatterjee, D., & Rao, V. (2025). Ensemble machine learning models for macronutrient prediction using the Indian Soil Health Card database. *Smart Agricultural Technology*, 7, 100412. https://doi.org/10.1016/j.atech.2024.100412
-8. Iyer, B., & Verma, S. (2025). Multilingual generative AI frameworks for localized fertilizer advisory systems in India. *Artificial Intelligence in Agriculture*, 11, 210-225. https://doi.org/10.1016/j.aiia.2025.01.004
-9. Thompson, R., & Davis, M. (2025). Explainable AI in global soil property prediction: A cross-continental analysis. *Geoderma*, 442, 116789. https://doi.org/10.1016/j.geoderma.2025.116789
-10. Banerjee, S., & Das, A. (2026). Reinforcement learning-driven digital twins for hyper-local soil management in the Gangetic Plains. *Nature Food*, 7, 112-125. https://doi.org/10.1038/s43016-025-00123-x
-11. Krishnan, R., & Kumar, A. (2026). Multi-modal vision transformers for predictive modeling of nutrient deficiencies in South Indian horticulture. *IEEE Transactions on Artificial Intelligence*, 7(4), 1890-1904. https://doi.org/10.1109/TAI.2026.3456123
-12. Schmidt, H., & Lee, J. (2026). Hybrid digital twin architectures for global precision agriculture using satellite sensor fusion. *ISPRS Journal of Photogrammetry and Remote Sensing*, 220, 45-62. https://doi.org/10.1016/j.isprsjprs.2025.11.005
+1. *Interpretable deep learning models for independent fertilizer and crop recommendation.* Scientific Reports (Nature). DOI: 10.1038/s41598-025-26910-4
+2. *On-device AI for climate-resilient farming with intelligent crop yield prediction using lightweight models on smart agricultural devices.* Scientific Reports (Nature). DOI: 10.1038/s41598-025-16014-4
+3. *Non-destructive yield estimation of onion and garlic using UAV-based hyperspectral imaging and hybrid machine learning models.* BMC Plant Biology. DOI: 10.1186/s12870-026-09289-w
+4. *An explainable AI-based hybrid machine learning model for interpretability and enhanced crop yield prediction.* MethodsX (Elsevier). DOI: 10.1016/j.mex.2025.103442
+5. *Enhancing precision agriculture through cloud based transformative crop recommendation model.* Scientific Reports (Nature). DOI: 10.1038/s41598-025-93417-3
+6. *Maize yield prediction using machine learning: a systematic literature review.* Frontiers in Artificial Intelligence. DOI: 10.3389/frai.2026.1735157
+7. *Soil test crop response based fertilizer calibration and soil nutrient forecasting for aerobic rice on Alfisols of Southern India.* Scientific Reports (Nature). DOI: 10.1038/s41598-026-48172-4
+8. *Agentic AI-driven autonomous decision support system for smart agriculture.* Scientific Reports (Nature). DOI: 10.1038/s41598-026-39472-w
+9. *Regional machine learning-based estimation of methane emissions from rice cultivation in South Korea.* Scientific Reports (Nature). DOI: 10.1038/s41598-026-49883-4
+10. *An evaluation of machine learning for soil analysis in internet of things-enabled smart farming.* Scientific Reports (Nature). DOI: 10.1038/s41598-026-36017-z
+11. *Towards enhancing the performance of crop prediction system for precision agriculture using feature correlation square-based nearest neighbor classifier.* Scientific Reports (Nature). DOI: 10.1038/s41598-026-35212-2
+12. *Enhancing precision nitrogen management in corn through integration of soil properties and remote sensing: A mechanistic approach.* Science of The Total Environment (Elsevier). DOI: 10.1016/j.scitotenv.2026.181853

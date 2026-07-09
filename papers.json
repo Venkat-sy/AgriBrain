@@ -1,0 +1,792 @@
+{
+  "2023": {
+    "india": [],
+    "global": []
+  },
+  "2024": {
+    "india": [],
+    "global": []
+  },
+  "2025": {
+    "india": [
+      {
+        "paperId": "dc15a8b7427046d0739d47e83a606abb2555d5e6",
+        "externalIds": {
+          "DOI": "10.36893/fssc.2025.v20.006",
+          "CorpusId": 276819840
+        },
+        "publicationVenue": {
+          "id": "ce1f5797-2f8d-4c41-b7de-4ce2f769212d",
+          "name": "Fuzzy Systems and Soft Computing",
+          "alternate_names": [
+            "Fuzzy Syst Soft Comput"
+          ],
+          "issn": "1819-4362"
+        },
+        "url": "https://www.semanticscholar.org/paper/dc15a8b7427046d0739d47e83a606abb2555d5e6",
+        "title": "FARM GUIDE:INTELLIGENT CROP SELECTION, FERTILIZER RECOMMENDATION AND DISEASE PREDICTION USING MACHINE LEARNING",
+        "venue": "Fuzzy Systems and Soft Computing",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "https://doi.org/10.36893/fssc.2025.v20.006",
+          "status": "GOLD",
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.36893/fssc.2025.v20.006?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.36893/fssc.2025.v20.006, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2347841130",
+            "name": "Dr. Bala Brahmeswara Kadaru"
+          },
+          {
+            "authorId": "2348866973",
+            "name": "Addepalli Aditya LAKSHMI NARASIMHA VYAS"
+          },
+          {
+            "authorId": "2348800342",
+            "name": "Ande Bulli DURGA RAO"
+          },
+          {
+            "authorId": "2348798543",
+            "name": "Badampudi Satya"
+          },
+          {
+            "authorId": "2379865748",
+            "name": "B. Priyanka"
+          }
+        ],
+        "abstract": "Agriculture plays a crucial role in India\u2019s economy, employing 48 percent of the population and contributing significantly to national growth. Despite its importance, many farmers continue to use traditional farming methods, often neglecting essential factors like soil health and crop compatibility. Farmers face the challenge of making critical decisions that directly affect their productivity and income. A single misstep can lead to poor yields and financial losses. This project aims to assist farmers by utilizing machine learning to analyze soil quality and pH data, providing tailored recommendations for suitable crops and fertilizers. By adopting this data-driven approach, farmers can make informed decisions, reducing risks and improving outcomes. A key component of the project is an accessible website where farmers can input soil data and receive customized insights. This platform not only offers practical solutions but also serves as an educational resource for less-experienced farmers, fostering better agricultural practices. By blending advanced technology with traditional farming, this initiative promotes sustainable agriculture, enhances rural development, and bolsters food security. Ultimately, the project supports long-term growth in India\u2019s agricultural sector by increasing productivity and economic resilience."
+      },
+      {
+        "paperId": "43aa455164727fc0c19656d6af7dbbd4a4b50e71",
+        "externalIds": {
+          "DOI": "10.1109/DELCON68055.2025.11400155",
+          "CorpusId": 286135236
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/43aa455164727fc0c19656d6af7dbbd4a4b50e71",
+        "title": "Crop Recommendation and Yield Prediction Using Ensemble Machine Learning Technique",
+        "venue": "2025 IEEE DELCON - International Conference on Recent Smart Technologies in Engineering for Sustainable Development",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/DELCON68055.2025.11400155?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/DELCON68055.2025.11400155, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2335553379",
+            "name": "A. Padmavathi"
+          },
+          {
+            "authorId": "2309841749",
+            "name": "K. Bhanu"
+          },
+          {
+            "authorId": "2286291256",
+            "name": "S. Prakash"
+          },
+          {
+            "authorId": "2110046999",
+            "name": "Arnab Gupta"
+          },
+          {
+            "authorId": "2420913930",
+            "name": "Sanjay Siddharthan"
+          }
+        ],
+        "abstract": "Agriculture is one of India's main economic sectors. It is essential for a nation's economic growth. However, due to a lack of knowledge, the farmers grow crops in their region, ignoring soil and climatic conditions such as PH, humidity, pesticide, and fertilizer content. This results in lower yields and huge losses. Machine learning has transformed agriculture with trained sets of models to improve results. In this paper, we have compared some ensemble machine learning techniques such as boosting, stacking, bagging, and voting. Through this analysis, we hope to shed light on the effectiveness of crop suggestion and yield prediction systems, helping farmers reduce losses and make informed decisions."
+      },
+      {
+        "paperId": "4e34d4cc57c14c4f77e09655653043137c4b1f98",
+        "externalIds": {
+          "DOI": "10.1109/ICoICC64033.2025.11052204",
+          "CorpusId": 279800823
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/4e34d4cc57c14c4f77e09655653043137c4b1f98",
+        "title": "Intelligent Crop Recommendation Using IoT Sensors and Machine Learning Techniques",
+        "venue": "2025 International Conference on Intelligent and Cloud Computing (ICoICC)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/ICoICC64033.2025.11052204?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/ICoICC64033.2025.11052204, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2214156135",
+            "name": "S. Naik"
+          },
+          {
+            "authorId": "31296602",
+            "name": "Shatarupa Dash"
+          },
+          {
+            "authorId": "2100547109",
+            "name": "Ishan Ayus"
+          }
+        ],
+        "abstract": "India is an agricultural dominated country where agriculture contribute major source of income and livelihood for people. Agriculture contributes major factor to the India\u2019s Gross Domestic Product (GDP). However, the crop yields per hectares is very less if we compare it to international standard. It can be due to various reason as India is also a country which suffer natural calamities and flood every year which affect the crop production which indirectly or directly leads a huge loss for farmers which leads to increase suicide case of most of the farmers in India. So, deciding the correct crop in correct time with a correct amount of fertilizer can help the farmers to come out of difficulties. If farmer can predict the crop in advance, then it will be easy and beneficial to farmer. Government can also take proper planning and action if they can know the crop yield in advance. Government has various types of data available in terms of soil type, rainfall, natural calamities predictions which can be used to decide a proper recommendation system which can help the farmer to decide which crop will be beneficial for him based on the various deciding criteria like soil colour, pH, Nitrogen, Phosphorous, Potassium etc. For collecting the real-time data related to soil like composition of soil, humidity content of soil, temperature of the soil and nutrient available in the soil, system can utilize various sensors like FC-28 sensor, DHT11 sensor and JXBS-3001 sensor [6]. Along with the real time data from the field, system can also use data available on government like rainfall, calamities prediction to predict the best suitable crop for that soil condition This research paper summarizes the results obtained by various machine learning algorithm which are most commonly used method to predict the crop with their accuracy and suggested the best recommendation system."
+      },
+      {
+        "paperId": "b72942926d505065bc6675c8278706344b7de9d1",
+        "externalIds": {
+          "DOI": "10.4108/eai.28-4-2025.2357858",
+          "CorpusId": 282338432
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/b72942926d505065bc6675c8278706344b7de9d1",
+        "title": "ML-Based Soil Analysis for Crop Suggestion and Fertilizer Recommendation",
+        "venue": "Proceedings of the 4th International Conference on Information Technology, Civil Innovation, Science, and Management, ICITSM 2025, 28-29 April 2025, Tiruchengode, Tamil Nadu, India, Part I",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "http://eudl.eu/pdf/10.4108/eai.28-4-2025.2357858",
+          "status": "GOLD",
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.4108/eai.28-4-2025.2357858?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.4108/eai.28-4-2025.2357858, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2215013202",
+            "name": "G. Chandraiah"
+          },
+          {
+            "authorId": "2421981629",
+            "name": "D. Divya"
+          },
+          {
+            "authorId": "73621109",
+            "name": "G. Susmitha"
+          },
+          {
+            "authorId": "2387500790",
+            "name": "G. Kuladeep"
+          },
+          {
+            "authorId": "2422236275",
+            "name": "G. Bhavana"
+          },
+          {
+            "authorId": "2387493338",
+            "name": "K. Ganesh Reddy"
+          }
+        ],
+        "abstract": ". Contemporary agriculture requires intelligent responses to the issues of resource utilization and unforeseeable environmental conditions. We propose a 6-wheel autonomous agriculture vehicle system, through in situ sensing, machine learning (ML) and cloud-based visualization system, to achieve more efficient and environmentally friendly agriculture activities. It uses an ESP32 WROOM microcontroller for obtaining information from a series of environmental sensors like DHT22 (temperature & humidity), LDR (light intensity), along with individual soil moisture and NPK (nitrogen, phosphorus, potassium) sensors. The NPK sensor data is handled by an RS485 module. This extensive network of sensors forms an integrated view on the subsurface and atmospheric conditions. In order to facilitate intelligent decision making, the proposed system makes use of ML models for rainfall prediction (Linear Regression) and crop recommendation (Random Forest) and fertilizer recommendation (Random Forest). These models are trained on useful datasets to give precise and context-based information. The system is cloud-connected and includes a local web server for easy remote monitoring and control. It is built on PHP, HTML, CSS, Javascript and JSON, and acts as a server that runs on \u201chttp\u201d and has elaborate visualizations of sensor data and ML suggestions in a more digestible manner. The server has its own IP address, so it can be accessed from any Web-connected computer. The objective of this project is to establish a process to reduce the amount of manual adjustment of the system in order to increase the efficiency of the use of resources and become better at predicting the crops in agriculture. The solution has been robustly implemented and scalable using integration of autonomous navigation, real-time data collection, powerful ML algorithms and intuitive web-based interfacing for attainment of precision and sustainable agriculture. This methodology provides farmers with data-backed insights for higher outputs, less environmental impact and better resource management."
+      },
+      {
+        "paperId": "5f6b48e1a0a4330397f7665a490c42b7ddad4a35",
+        "externalIds": {
+          "DOI": "10.55041/ijsrem43149",
+          "CorpusId": 277397036
+        },
+        "publicationVenue": {
+          "id": "44d20e21-d424-4f58-87fb-3aeb82f85a83",
+          "name": "INTERANTIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT",
+          "type": "journal",
+          "alternate_names": [
+            "INTERANTIONAL J SCI RES ENG MANAG"
+          ],
+          "issn": "2582-3930"
+        },
+        "url": "https://www.semanticscholar.org/paper/5f6b48e1a0a4330397f7665a490c42b7ddad4a35",
+        "title": "Smart Farming System for Price Prediction and Resource Optimization Using Machine Learning",
+        "venue": "INTERANTIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.55041/ijsrem43149?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.55041/ijsrem43149, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2218804559",
+            "name": "R. P"
+          },
+          {
+            "authorId": "2352551637",
+            "name": "Santhosh E G,"
+          },
+          {
+            "authorId": "2352541534",
+            "name": "Vengata Subiramani K S,"
+          },
+          {
+            "authorId": "2220233952",
+            "name": "V. R."
+          }
+        ],
+        "abstract": "India's agriculture faces challenges like fluctuating crop prices, unpredictable weather, and limited resources, affecting farmers' productivity and income. To address this, our smart farming system uses machine learning algorithms like Decision Tree, Random Forest, and K-Nearest Neighbors to predict crop prices and optimize resource usage. It also offers weather predictions, crop recommendations, and fertilizer suggestions to help farmers plan activities effectively. Interactive land maps assist in identifying optimal farming locations, enhancing resource management. Additionally, a chatbot provides real-time advice on crop selection, pest control, and market trends. This system empowers farmers with data-driven insights, boosting productivity and economic growth.\n\nKey Words: Ensembled Learning, Crop price prediction, Resource Optimization, Fertilizer Recommendation."
+      },
+      {
+        "paperId": "e7873e8b2b32ed3e7d8c6d8f26e4b40c4a6f8d91",
+        "externalIds": {
+          "DOI": "10.62823/ijgrit/03.04.8220",
+          "CorpusId": 283956719
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/e7873e8b2b32ed3e7d8c6d8f26e4b40c4a6f8d91",
+        "title": "AgriTech: Advanced Farming Using Machine Learning",
+        "venue": "International Journal of Global Research Innovations &amp; Technology",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.62823/ijgrit/03.04.8220?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.62823/ijgrit/03.04.8220, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2319022143",
+            "name": "Kirti Dahiya"
+          }
+        ],
+        "abstract": "Agriculture is a critical source of income and employment in India. However, a common challenge faced by Indian farmers is the selection of suitable crops and fertilizers for their specific land conditions, which often results in significant yield losses. AgriTech, a modern farming approach, addresses this issue by leveraging research data on soil characteristics, types, and crop yield statistics to recommend the best crops and fertilizers based on location-specific conditions also considering the market trends. The application also allows disease detection based on image recognition. In this paper, we propose a recommendation system that leverages machine learning models to recommend suitable crops based on site-specific parameters with high accuracy and efficiency. The models used include Random Forest, Naive Bayes, Support Vector Machine (SVM), and Logistic Regression, with Random Forest serving as a key learner. The fertilizer recommendation system is developed using Python-based logic, where user-provided soil data is compared against optimal nutrient levels for crop growth. Based on discrepancies in nutrient levels (marked as HIGH or LOW), targeted fertilizer suggestions are provided to optimize crop yield along with optimum seed to be used for maximum yield."
+      },
+      {
+        "paperId": "0c21385635ee0c4bee0810e9be01c2506b98604e",
+        "externalIds": {
+          "DOI": "10.22214/ijraset.2025.75192",
+          "CorpusId": 288733194
+        },
+        "publicationVenue": {
+          "id": "100ffd12-b334-4f02-826b-8ac408e7df49",
+          "name": "International Journal for Research in Applied Science and Engineering Technology",
+          "type": "journal",
+          "alternate_names": [
+            "Int J Res Appl Sci Eng Technol"
+          ],
+          "issn": "2321-9653",
+          "url": "https://www.ijraset.com/"
+        },
+        "url": "https://www.semanticscholar.org/paper/0c21385635ee0c4bee0810e9be01c2506b98604e",
+        "title": "Artificial Intelligence-Based Crop Recommendation and Disease Detection System",
+        "venue": "International Journal for Research in Applied Science and Engineering Technology",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "https://doi.org/10.22214/ijraset.2025.75192",
+          "status": "GOLD",
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.22214/ijraset.2025.75192?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.22214/ijraset.2025.75192, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2093858734",
+            "name": "Prof. V. K. Barbudhe"
+          }
+        ],
+        "abstract": "Agriculture plays a huge role in India. It keeps a ton of people employed and pumps a lot into the economy. Still,\nfarmers run into all sorts of issues. They struggle with picking the right crops. Optimizing fertilizers is another headache. And\nspotting diseases early in crops. All that leads to lower yields and worn-out soil. This study brings in an AI setup that pulls\ntogether crop suggestions, better fertilizer use, and disease spotting all in one package. It looks at soil stuff like nitrogen levels,\nphosphorus, potassium, pH balance, and how moist the ground is. Then it factors in things like the weather, temperature,\nrainfall too. From there, it suggests the best crop and fertilizer mix. Machine learning handles the predictions for crops and\nfertilizers pretty accurately. For diseases, it uses deep learning with these CNN models to check leaf pictures and classify\nproblems. The whole thing is meant to help farmers, whether they are pros or just starting out. They can make smarter choices\nbased on data. That boosts yields, cuts down on wasted fertilizer, and keeps disease losses in check. Overall, this AI way of doing\nthings pushes agriculture toward being smarter, more sustainable, with tech right in the mix."
+      },
+      {
+        "paperId": "e427de03a77e2adf441df448638cc40167c61d5e",
+        "externalIds": {
+          "DOI": "10.1109/CICN67655.2025.11368007",
+          "CorpusId": 285290748
+        },
+        "publicationVenue": {
+          "id": "97a677bb-0fa7-4c1d-a54e-24db1fb98dd5",
+          "name": "International Conference on Computational Intelligence and Communication Networks",
+          "type": "conference",
+          "alternate_names": [
+            "CICN",
+            "Int Conf Comput Intell Commun Netw"
+          ]
+        },
+        "url": "https://www.semanticscholar.org/paper/e427de03a77e2adf441df448638cc40167c61d5e",
+        "title": "Predictive Analytics for Agriculture: Enhancing Crop and Fertilizer Decisions with ML and DL Models",
+        "venue": "International Conference on Computational Intelligence and Communication Networks",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/CICN67655.2025.11368007?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/CICN67655.2025.11368007, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2259704501",
+            "name": "M. Venkata"
+          },
+          {
+            "authorId": "2259864652",
+            "name": "Krishna Reddy"
+          },
+          {
+            "authorId": "2294256520",
+            "name": "K. Spandana"
+          },
+          {
+            "authorId": "2396393160",
+            "name": "S. Ramu"
+          }
+        ],
+        "abstract": "Most Indians live in rural areas where agriculture is their main source of income. This sector is vital to the economy and feeds the growing population. Agriculture's relevance in India's economic growth and food security is highlighted by the growing population's need for food. Indian crop outputs varied by area, crop type, weather, and farming practices. Recent Indian agricultural harvests have fluctuated. Farmers grow the same crops without expanding their crop variety. Without knowing nutrient deficits and quantities, they use fertilizers. Machine learning-based crop advice is crucial in modern agriculture. It revolutionizes farming by using data to select crops. Machine Learning optimizes crop selection using soil, climate, and historical data. Farmers can boost yield and reduce risk by cultivating recommended crops and using suggested fertilizers. The proposed approach, \u2018 Crop and Fertilizer Recommendation System (CFRS)\u2019, uses machine learning methods to predict crop suitability depending on soil conditions, rainfall, and pesticide use. Farmers can determine which crop is best for their land and environmental conditions. This article forecasts suitable crops to boost crop productivity and help agriculture. Increased productivity is another benefit. Accurate recommendations boost yields, enhancing farmers' income and food security."
+      },
+      {
+        "paperId": "799fb22428bb2b530223a6aa1389fa029cd9cb52",
+        "externalIds": {
+          "DOI": "10.1109/ASSIC64892.2025.11158543",
+          "CorpusId": 281335400
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/799fb22428bb2b530223a6aa1389fa029cd9cb52",
+        "title": "Agrohydrological Crop Yield Prediction",
+        "venue": "2025 International Conference on Advancements in Smart, Secure and Intelligent Computing (ASSIC)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/ASSIC64892.2025.11158543?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/ASSIC64892.2025.11158543, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2380739029",
+            "name": "B. Veda"
+          },
+          {
+            "authorId": "2283958170",
+            "name": "V. Geetha"
+          },
+          {
+            "authorId": "144652286",
+            "name": "Ajmeera Kiran"
+          },
+          {
+            "authorId": "2387067229",
+            "name": "Pratyush Kumar"
+          }
+        ],
+        "abstract": "Farming is one of the major sectors that influences a country's economic growth. The majority of people in a nation like India rely on agriculture for their livelihood. In order to make farming easier and to increase yield, many new technologies are being incorporated into the industry, including Machine Learning and Deep Learning. We present a website in this project that uses the following applications: Crop recommendation, Fertilizer recommendation and Plant disease prediction. This web platform empowers farmers with AI-driven insights, fostering sustainable practices and maximizing agricultural productivity. Agrohydrological crop yield prediction is a vital component of modern agriculture that leverages a combination of hydrological modeling, crop modeling, and data analytics to forecast crop yields. This predictive approach integrates various data sources, including historical weather patterns, soil characteristics, and crop-specific information, to provide accurate yield projections."
+      },
+      {
+        "paperId": "22fdace84bf450e9e39e1871b4830e7a2529b717",
+        "externalIds": {
+          "DOI": "10.1109/ICACRS67045.2025.11324028",
+          "CorpusId": 284723902
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/22fdace84bf450e9e39e1871b4830e7a2529b717",
+        "title": "AI-Driven Smart Farming: An Integrated Approach for Crop Advisory, Pest Detection, and Farmer Support Systems",
+        "venue": "2025 4th International Conference on Automation, Computing and Renewable Systems (ICACRS)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/ICACRS67045.2025.11324028?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/ICACRS67045.2025.11324028, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2262935530",
+            "name": "A. S"
+          },
+          {
+            "authorId": "2404527049",
+            "name": "R. Hemalatha"
+          }
+        ],
+        "abstract": "Agriculture in India faces persistent challenges including unpredictable climate, recurring pest infestations, volatile market prices, and limited access to timely advisory support. This paper presents an integrated AI-driven Smart Farming framework that unifies eight intelligent modules\u2014crop advisory, pest and disease detection, market price forecasting, agricultural chatbot, loan eligibility prediction, irrigation and fertilizer optimization, livestock health monitoring, and yield and insurance estimation\u2014into a single web-based ecosystem. Advanced machine learning models such as Random Forest, CNN, LSTM, and Gradient Boosting are employed, optimized via Grid Search and Cross-Validation. Experimental evaluation across datasets from Punjab, Maharashtra, and Tamil Nadu demonstrates enhanced performance with 94.6% accuracy in crop recommendation, 87.2% F1-score in pest detection, and a 12.3% reduction in yield prediction error compared to existing systems. These results validate the framework\u2019s effectiveness in supporting data-driven decision-making, improving resource management, and enhancing financial stability for farmers."
+      }
+    ],
+    "global": [
+      {
+        "paperId": "4aea4c5aec9ce30b3cd01043f2951978f3e05318",
+        "externalIds": {
+          "DOI": "10.1109/ICAIQSA67794.2025.11440655",
+          "CorpusId": 286778190
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/4aea4c5aec9ce30b3cd01043f2951978f3e05318",
+        "title": "A Novel Learning Technique Integrating Machine Learning and Deep Learning for Precision Fertilizer Recommendation in Vegetables",
+        "venue": "2025 International Conference on Artificial Intelligence and Quantum Computation-Based Sensor Application (ICAIQSA)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/ICAIQSA67794.2025.11440655?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/ICAIQSA67794.2025.11440655, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2213750937",
+            "name": "Sandip B. Chavan"
+          },
+          {
+            "authorId": "2347150284",
+            "name": "D. R. Ingle"
+          },
+          {
+            "authorId": "2425595795",
+            "name": "Dr. Atul Khumbar"
+          }
+        ],
+        "abstract": "the efficient application of fertilizers is the key to increasing crop yields and at the same time helping the nature through sustainable farming practices. Even though machine learning and precision agriculture are maturing, still a lot of fertilizer recommendation systems face difficulties like managing noisy input, outlier records, and being firmer in their abilities to customize to the specific conditions of the area. To solve these issues, the hybrid method combining deep learning and statistical analysis that is called robust has been developed in this paper. The system is based on agricultural datasets taken from trustworthy repositories and follows a structured three-stage pre-processing pipeline. First, Gaussian Mixture Models (GMM) are used to find hidden data clusters in the first stage and thus reveal important connections between soil characteristics and eco-factors. Next, the Interquartile Range (IQR) method is applied to find and take out outlying values in the second stage to hence upgrade the dataset reliability. Also in the third stage, ElasticNet regression is used for variable selection, so that only the most important parameters that affect fertilizer needs are kept. After that, in a multi-layer deep learning model, the current data set gets classified, providing precise multi-class fertilizer recommendations. Moreover, hybrid Independent Supervised Deep Belief Network (S\u2013DBN) is employed to attain higher precision, which delivers superior feature extraction and powerful classification performance. The method is developed for important vegetable crops like tomato, brinjal, chili, garlic, onion, potato etc. The findings from the experiments confirm that the new system has the ability to work with real-time smart farming applications due to its superior performance over the conventional recommender systems in terms of accuracy, adaptability to the changing field conditions, and the ability to generalization."
+      },
+      {
+        "paperId": "f3283098e5a50a28e9bfb813cd2fd08682445aa9",
+        "externalIds": {
+          "DOI": "10.1109/CSNT64827.2025.10968101",
+          "CorpusId": 278000329
+        },
+        "publicationVenue": {
+          "id": "8dff82c6-607a-4f61-9efa-a66d43226f8f",
+          "name": "International Conference on Communication Systems and Network Technologies",
+          "type": "conference",
+          "alternate_names": [
+            "CSNT",
+            "Int Conf Commun Syst Netw Technol"
+          ]
+        },
+        "url": "https://www.semanticscholar.org/paper/f3283098e5a50a28e9bfb813cd2fd08682445aa9",
+        "title": "Advanced IoT and Machine Learning System for Real-Time Crop and Fertilizer Recommendation",
+        "venue": "International Conference on Communication Systems and Network Technologies",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": "CLOSED",
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/CSNT64827.2025.10968101?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/CSNT64827.2025.10968101, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2344787860",
+            "name": "V. R. Khemnar"
+          },
+          {
+            "authorId": "72875362",
+            "name": "M. Bendre"
+          },
+          {
+            "authorId": "2146640194",
+            "name": "V. Kolekar"
+          }
+        ],
+        "abstract": "The integration of Internet of Things (IoT) and Machine Learning (ML) technology has the capacity to transform agriculture via the improvement of precision agricultural methods. The proposed research work explores integration of IoT and ML in field of crop and fertilizer recommendation. Proposed system's primary goal is to develop predictive models for determining the appropriate crop and fertilizer types based on various environmental and soil features. Using ML techniques, this research work aims to recommend the best crop and fertilizer combinations to optimize agricultural yield and sustainability. The collected data of IoT sensors give immediate soil health information, while ML algorithms analyze this data to recommends the most suitable crops and suggests the appropriate fertilizers. This integration promises to enhance agricultural productivity and sustainability through data-oriented decision taking and resource efficient utilization. The proposed system has used four ML models as Random Forest, Gradient Boosting, CatBoost, and XGBoost for predictions by using precision, recall, accuracy and F1 score. The obtained results shows that best accuracy value among the models for recommending crop is 0.9909 and for recommending fertilizer is 0.9886."
+      },
+      {
+        "paperId": "1c36fc59c33ab97e5f48d4281b56dad5cfc85678",
+        "externalIds": {
+          "DOI": "10.1109/IIPEM65914.2025.11548430",
+          "CorpusId": 289137561
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/1c36fc59c33ab97e5f48d4281b56dad5cfc85678",
+        "title": "Development of A Smart Crop and Fertilizer Recommendation System Using Machine Learning",
+        "venue": "2025 International Conference on Intelligent & Innovative Practices in Engineering & Management (IIPEM)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/IIPEM65914.2025.11548430?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/IIPEM65914.2025.11548430, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "70098109",
+            "name": "L. Dhamande"
+          },
+          {
+            "authorId": "96502742",
+            "name": "S. Jadhav"
+          },
+          {
+            "authorId": "2310758822",
+            "name": "P. M. Patare"
+          }
+        ],
+        "abstract": "The increasing need for food on a global scale, the scarcity of resources, and the degradation of the environment are all factors that are contributing to the rise of precision agriculture as an essential component of sustainable farming. Through the use of Machine Learning (ML) and Internet of Things (IoT) technologies, the primary objective of this project is to develop a Smart Crop and Fertilizer Recommendation System. The goal of this system is to provide suggestions for agricultural practices that are based on data and location-specific information. The system that has been proposed is capable of collecting data in real time on crop characteristics, environmental parameters (temperature, humidity, pH, rainfall), and soil nutrients (NPK) via the use of sensor networks and cloud databases. Various machine learning algorithms, including Random Forest, SVM, XGBoost, and a proprietary Neural Network, are trained in order to discover the optimal fertilizer dosages and classify the crops that are most suitable for certain growth conditions. Through examination using 10-fold cross-validation and performance metrics like as accuracy, precision, recall, and F1-score, the success of the system is shown and validated. With a score of 98.98% on the F1-test, the Neural Network performs better than the other models. Experimentation revealed that the amount of fertilizer that was wasted was cut by forty percent, and the accuracy of yield forecasts rose by as much as thirty percent. Through the use of technology to facilitate decision-making, this intelligent system has significant potential for developing precision agriculture, reducing the effect on the environment, and increasing the profitability of farming operations."
+      },
+      {
+        "paperId": "8d9ff098a5761488f60851a53c99e21398e73a90",
+        "externalIds": {
+          "DOI": "10.1109/ICRISET64803.2025.11252486",
+          "CorpusId": 283354781
+        },
+        "publicationVenue": {
+          "id": "301f0c53-3639-45c3-ae3b-f9b732aad4f8",
+          "name": "International Conference Emerging Trends Engineering, Science and Technology",
+          "type": "conference",
+          "alternate_names": [
+            "ICRISET",
+            "Int Conf Emerg Trends Eng Sci Technol"
+          ]
+        },
+        "url": "https://www.semanticscholar.org/paper/8d9ff098a5761488f60851a53c99e21398e73a90",
+        "title": "A Machine Learning-Based Agricultural Intelligence System for Crop and Fertilizer Recommendation with Price Trend Forecasting",
+        "venue": "International Conference Emerging Trends Engineering, Science and Technology",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/ICRISET64803.2025.11252486?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/ICRISET64803.2025.11252486, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2308680802",
+            "name": "T. Manju"
+          },
+          {
+            "authorId": "2394989729",
+            "name": "Shriman M S"
+          },
+          {
+            "authorId": "2394980912",
+            "name": "Sivanesh Kannan S"
+          }
+        ],
+        "abstract": "Achieving sustainability and productivity in precision agriculture is reliant on the right crop selection. The results promote the use of a machine learning approach that can assist farmers in selecting crops based on environmental factors and soil nutrients. This system takes into account real data sources such as temperature, humidity, soil pH, precipitation, and levels of phosphorus, potassium, nitrogen, etc.; The data was utilized to train a Random Forest Classifier that can accurately predict suitable crops. Also, some of the systems suggests fertilizers by analyzing NPK levels and suggesting the appropriate combination of nutrients with standard fertilizer. Its module also presents the expected sale prices of these crops to help farmers make their decisions financially. Agricultural professionals, who are not knowledgeable in economics or farming, can benefit from this system's helpful guidance. Based on tests, it has been shown that the model can provide farmers with clear and accessible information to make informed decisions. It shows machine learning can increase the profits, improve planning efficiency and enhance farming knowledge."
+      },
+      {
+        "paperId": "b2cb5525c9351cd142bcef8d9406b99b0dd99978",
+        "externalIds": {
+          "DOI": "10.1109/AIMLA63829.2025.11041392",
+          "CorpusId": 279610512
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/b2cb5525c9351cd142bcef8d9406b99b0dd99978",
+        "title": "Machine Learning-Based Soil Nutrient Analysis for Optimized Plant Cultivation and Precision Agriculture",
+        "venue": "2025 3rd International Conference on Artificial Intelligence and Machine Learning Applications Theme: Healthcare and Internet of Things (AIMLA)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: The following paper fields have been elided by the publisher: {'abstract'}. Paper or abstract available at https://api.unpaywall.org/v2/10.1109/AIMLA63829.2025.11041392?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/AIMLA63829.2025.11041392, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2368634221",
+            "name": "Maalini D"
+          },
+          {
+            "authorId": "2417233906",
+            "name": "V. G"
+          },
+          {
+            "authorId": "2368639204",
+            "name": "Ajai Kumar S R"
+          },
+          {
+            "authorId": "2367607899",
+            "name": "Baskar M"
+          },
+          {
+            "authorId": "2425537012",
+            "name": "G. G"
+          },
+          {
+            "authorId": "2415093116",
+            "name": "B. B"
+          }
+        ],
+        "abstract": null
+      },
+      {
+        "paperId": "45e2f94e30635ecabc14d75bdd7926883cea20a9",
+        "externalIds": {
+          "DOI": "10.69888/ftsess.2025.000370",
+          "CorpusId": 281347812
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/45e2f94e30635ecabc14d75bdd7926883cea20a9",
+        "title": "A Predictive Crop Management System for Precision Agriculture Leveraging Machine Learning",
+        "venue": "FMDB Transactions on Sustainable Environmental Sciences",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.69888/ftsess.2025.000370?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.69888/ftsess.2025.000370, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2380815902",
+            "name": "Ballela Avinash Reddy"
+          },
+          {
+            "authorId": "2337831129",
+            "name": "M. Praba"
+          },
+          {
+            "authorId": "2380815931",
+            "name": "Rachaputi Yeswanth Vardhan"
+          },
+          {
+            "authorId": "2380821862",
+            "name": "Charan Deepesh Kristam"
+          }
+        ],
+        "abstract": "A crop management system for precision agriculture utilizing machine learning aims to develop a farmer-friendly web application that incorporates ensemble learning algorithms. This web application features a crop recommendation system, a fertilizer recommendation system, a yield prediction system, and a crop possibility prediction system, all designed to assist farmers in making informed decisions based on reliable information. The crop and fertilizer recommendation system utilizes fundamental natural and soil properties of various minerals, as well as other factors, to recommend the most suitable crops for a particular region and the type of fertilizer required for that soil. The yield and crop possibility prediction system utilizes authentic data and current conditions, such as region, Season, crop type, and area, to help farmers maximize production and identify possible crops for that Season. The paper compares classification algorithms and chooses the best algorithm based on an analysis of the accuracy using ensemble learning. Based on the accuracy, the best algorithm is identified, and the model is trained accordingly. This improves efficiency, agricultural productivity, asset utilization, and food security. The crop management system serves as a fundamental asset for modern agriculture, enabling more effective strategies and driving economic progress."
+      },
+      {
+        "paperId": "87068b06159ec29fa06115b41d8f97bb190efd96",
+        "externalIds": {
+          "DOI": "10.63328/ijrdes-v7ri3p8",
+          "CorpusId": 282160797
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/87068b06159ec29fa06115b41d8f97bb190efd96",
+        "title": "Precision Agriculture: AI based Fertilizer Recommendations For Sustainable Crop Production",
+        "venue": "International Journal of Research and Development in Engineering Science",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "https://doi.org/10.63328/ijrdes-v7ri3p8",
+          "status": "HYBRID",
+          "license": "CCBY",
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.63328/ijrdes-v7ri3p8?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.63328/ijrdes-v7ri3p8, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2386243762",
+            "name": "Neeraja Peddinti"
+          },
+          {
+            "authorId": "2060113905",
+            "name": "Sandhya Ch."
+          }
+        ],
+        "abstract": "The use of precision farming has become a transformative approach to optimizing crop production while ensuring environmental sustainability. Fertilizer application, a critical factor in agricultural productivity, is often performed using conventional methods that lead to inefficient resource utilization, soil degradation, and environmental pollution. This paper presents an AI-based fertilizer recommendation system that leverages machine learning algorithms, remote sensing data, and soil health parameters to provide precise nutrient recommendations tailored to specific crops and field conditions. The proposed model integrates data from soil sensors, weather forecasts, and historical yield patterns to generate accurate fertilizer prescriptions, reducing excess usage and enhancing crop yields. By employing AI- driven predictive analytics, the system optimizes nutrient distribution, minimizes environmental impact, and supports sustainable farming practices. Experimental results demonstrate the effectiveness of the model in improving fertilizer, efficiency while maintaining soil health and maximizing agricultural productivity. This research highlights the potential of AI in precision agriculture and provides insights into how intelligent decision-making systems can contribute to sustainable food production will focus on expanding the datasets, refining predictive models, and integrating real-time monitoring for enhanced accuracy and adaptability."
+      },
+      {
+        "paperId": "176ab6478e3750d69b93d16d0a205416aaf4d24d",
+        "externalIds": {
+          "DOI": "10.1109/INCIP64058.2025.11020472",
+          "CorpusId": 279268988
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/176ab6478e3750d69b93d16d0a205416aaf4d24d",
+        "title": "Recommendation and Real-Time Monitoring System for Precision Agriculture",
+        "venue": "2025 International Conference on Next Generation Communication & Information Processing (INCIP)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/INCIP64058.2025.11020472?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/INCIP64058.2025.11020472, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2338466419",
+            "name": "Shreya A. Nalawade"
+          },
+          {
+            "authorId": "153603681",
+            "name": "A. Shelke"
+          },
+          {
+            "authorId": "2324973795",
+            "name": "S. Rajput"
+          },
+          {
+            "authorId": "2366233390",
+            "name": "Bhagyashree Tekade"
+          },
+          {
+            "authorId": "2350010889",
+            "name": "S. Wankhade"
+          }
+        ],
+        "abstract": "Agriculture is a highly income-generating segment for the world's economy, as it requires millions of people to carry out the business. The paper states a comprehensive Crop Recommendation and Fertilizer Suggestion System that would help farmers in deciding the appropriate crops and fertilizers to be planted at any point in time with live environmental and soil data. In this regard, the research uses IoT sensors to gather the following soil parameters of nitrogen (N), phosphorus (P), potassium (K), moisture, temperature, humidity, and rainfall. The system uses machine learning models to give the best recommendation on crops and fertilizers. A crop recommendation model is established using the XGBoost algorithm, and a fertilizer suggestion model utilizes Random Forest, thus giving data-driven insights to farmers for improving the efficiency and sustainability of farming. Besides, the portal has continuous monitoring, alerts soil deficiencies, and uses predictive analytics to aid the farmer. This goes to create informed decisions that would eventually boost crop productivity and profitability."
+      },
+      {
+        "paperId": "c36c60758bfe3b49a46ca765b7d49c6a3d9b159d",
+        "externalIds": {
+          "DOI": "10.1109/ICCIT68739.2025.11491780",
+          "CorpusId": 287986877
+        },
+        "publicationVenue": null,
+        "url": "https://www.semanticscholar.org/paper/c36c60758bfe3b49a46ca765b7d49c6a3d9b159d",
+        "title": "NextSeed: An IoT Based Precision Agriculture System for Soil Analysis and Crop Recommendation",
+        "venue": "2025 28th International Conference on Computer and Information Technology (ICCIT)",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/ICCIT68739.2025.11491780?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/ICCIT68739.2025.11491780, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2356446810",
+            "name": "M. Rakib"
+          },
+          {
+            "authorId": "2437833040",
+            "name": "Md Mohidul Alam"
+          },
+          {
+            "authorId": "2433207034",
+            "name": "Dabasis Das"
+          },
+          {
+            "authorId": "2341522898",
+            "name": "Golam Md. Muradul Bashir"
+          },
+          {
+            "authorId": "2292467621",
+            "name": "Md. Mahbubur Rahman"
+          }
+        ],
+        "abstract": "Agriculture is an important sector for the economy and food security of Bangladesh, which is facing several challenges due to climate change, lack of cultivable land and inadequate access to advanced farming technologies. To overcome the above challenges, this paper proposes NextSeed, which is an IoT based precision agriculture system that integrates realtime soils monitoring with machine learning for intelligent crop suggestion. The system uses a 7-in-1 soil sensor to measure NPK nutrients, pH, moisture, temperature and electrical conductivity, and some environmental sensors for rainfall, water level and atmospheric conditions. Data goes through anomaly detection before the cloud processing where a Naive Bayes classifier performs 99.77% accuracy in crop prediction. The system also offers fertilizer recommendations and allows automated irrigation control depending on soil conditions and water availability. NextSeed helps to cover significant gaps in solutions on the market by providing integrated automation that combines soil nutrition analysis with crops prediction and water management for agricultural decision support."
+      },
+      {
+        "paperId": "3b4c6fddb877bba891f2fe9d82e50be3a21f35bd",
+        "externalIds": {
+          "DOI": "10.1109/ICETM63734.2025.11051802",
+          "CorpusId": 279899315
+        },
+        "publicationVenue": {
+          "id": "28ce1090-5994-47b5-9e99-6ad8bd7b87d0",
+          "name": "International Conference on Education Technology Management",
+          "type": "conference",
+          "alternate_names": [
+            "ICETM",
+            "Int Conf Educ Technol Manag"
+          ]
+        },
+        "url": "https://www.semanticscholar.org/paper/3b4c6fddb877bba891f2fe9d82e50be3a21f35bd",
+        "title": "Krushimitra: Machine Learning-Based Smart Solutions for Crop Selection and Fertilizer Guidance",
+        "venue": "International Conference on Education Technology Management",
+        "year": 2025,
+        "openAccessPdf": {
+          "url": "",
+          "status": null,
+          "license": null,
+          "disclaimer": "Notice: Paper or abstract available at https://api.unpaywall.org/v2/10.1109/ICETM63734.2025.11051802?email=<INSERT_YOUR_EMAIL> or https://doi.org/10.1109/ICETM63734.2025.11051802, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use."
+        },
+        "authors": [
+          {
+            "authorId": "2290090104",
+            "name": "Gaurav Agrawal"
+          },
+          {
+            "authorId": "1394036360",
+            "name": "Ritesh Agwan"
+          },
+          {
+            "authorId": "2370136764",
+            "name": "Akshada Chavan"
+          },
+          {
+            "authorId": "2290096837",
+            "name": "Vaibhav Ghanghav"
+          },
+          {
+            "authorId": "32427654",
+            "name": "R. Nikam"
+          }
+        ],
+        "abstract": "This research introduces Krushimitra, a web-based application leveraging Machine Learning (ML) to optimize agricultural decision-making. The system consists of two primary modules: Crop Recommendation and Fertilizer Guidance. Krushimitra uses the Random Forest and Logistic Regression algorithms to forecast the best crops based on geographic location, soil composition, and current weather. It also offers customised fertiliser suggestions to improve soil fertility. The Random Forest model outperforms Logistic Regression with an accuracy of $85 \\%$. Krushimitra improves precision agriculture by combining region-specific datasets with real-time weather data, which raises sustainability and production."
+      }
+    ]
+  },
+  "2026": {
+    "india": [],
+    "global": []
+  }
+}
