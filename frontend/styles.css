@@ -80,7 +80,7 @@ body {
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    margin-top: 4rem; /* space for absolute logo */
+    margin-top: 4rem;
     padding: 1.5rem 0;
     position: relative;
     overflow: hidden;
@@ -127,7 +127,6 @@ body {
     border-top: 1px solid rgba(57, 255, 20, 0.1);
     position: relative;
 }
-/* Abstract field lines */
 .wireframe-lines {
     position: absolute; bottom: 0; width: 100%; height: 100%;
     background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 255, 170, 0.1) 10px, rgba(0, 255, 170, 0.1) 11px);
@@ -138,7 +137,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    margin-top: 4rem; /* match sidebar */
+    margin-top: 4rem;
 }
 
 /* Common Panel Styles */
@@ -175,7 +174,10 @@ body {
     font-weight: 600;
     font-size: 0.9rem;
     box-shadow: 0 0 10px rgba(57, 255, 20, 0.2), inset 0 0 5px rgba(57, 255, 20, 0.2);
+    cursor: pointer;
+    transition: 0.2s;
 }
+.pill-btn:hover { background: rgba(57, 255, 20, 0.1); }
 
 .metrics-row {
     display: flex;
@@ -206,22 +208,56 @@ body {
 /* Middle Row */
 .middle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 
-/* Sliders */
+/* Interactive Native HTML Sliders */
 .sliders-container { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
 .slider-labels { font-weight: 600; font-size: 1rem; margin-bottom: 0.4rem; color: var(--text-main); }
 .unit { color: var(--text-muted); font-size: 0.8rem; }
-.custom-slider-track {
-    width: 100%; height: 4px; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 4px, transparent 4px, transparent 8px);
-    position: relative; border-radius: 2px;
+
+/* Hide default appearance and track to build custom */
+input[type=range].styled-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+    position: relative;
+    outline: none;
+    --slider-fill: 50%; /* set by JS */
 }
-.custom-slider-fill {
-    position: absolute; top: 0; left: 0; height: 100%; background: var(--neon-cyan);
+
+/* Base Track */
+input[type=range].styled-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 4px, transparent 4px, transparent 8px);
+    border-radius: 2px;
+}
+
+/* Pseudo-element hack to create the dynamic glowing fill effect before the thumb in modern CSS without complex JS wrapping */
+input[type=range].styled-slider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    height: 4px;
+    width: var(--slider-fill);
+    background: var(--neon-cyan);
     box-shadow: 0 0 10px var(--neon-cyan);
+    pointer-events: none;
 }
-.custom-slider-thumb {
-    position: absolute; top: -4px; width: 12px; height: 12px; border-radius: 50%;
-    background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px var(--neon-cyan);
-    transform: translateX(-50%);
+
+/* Custom Thumb */
+input[type=range].styled-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 10px #fff, 0 0 20px var(--neon-cyan);
+    margin-top: -5px;
+    cursor: pointer;
+    position: relative;
+    z-index: 2; /* Needs to be above the ::before fill */
 }
 
 /* Bar Chart */
@@ -232,7 +268,7 @@ body {
 .bar-column { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative; z-index: 2; width: 40px;}
 .bar-value { color: var(--neon-green); font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; text-shadow: 0 0 5px rgba(57, 255, 20, 0.4); }
 .bar-track { width: 100%; height: 100%; display: flex; align-items: flex-end; border: 1px solid rgba(57, 255, 20, 0.2); border-bottom: none; border-radius: 4px 4px 0 0; background: rgba(0,0,0,0.3); }
-.bar-fill { width: 100%; background: linear-gradient(0deg, rgba(57, 255, 20, 0.2), var(--neon-green)); box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); border-radius: 2px 2px 0 0; }
+.bar-fill { width: 100%; background: linear-gradient(0deg, rgba(57, 255, 20, 0.2), var(--neon-green)); box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); border-radius: 2px 2px 0 0; transition: height 0.3s ease; }
 .bar-label { position: absolute; bottom: -1.5rem; color: var(--text-main); font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; }
 
 /* Bottom Row */
@@ -267,6 +303,10 @@ body {
 .action-text { display: flex; flex-direction: column; }
 .action-title { font-size: 1rem; font-weight: 600; color: var(--text-main); }
 .action-sub { font-size: 0.85rem; color: var(--text-muted); }
+
+/* Animation for Tabs */
+.fade-in { animation: fadeIn 0.4s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Responsive */
 @media (max-width: 1024px) {
