@@ -3,390 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriBrain - Digital Twin & Simulation Platform</title>
-    <meta name="description" content="AI-driven digital twin framework for sustainable agriculture and predictive soil analysis.">
+    <title>AGRIBRAIN Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="background-mesh">
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
-        <div class="glow-orb orb-3"></div>
-    </div>
-    
-    <header class="navbar">
-        <div class="logo">
-            <div class="logo-icon-wrapper">
-                <span class="logo-icon">🌿</span>
-            </div>
-            <h1>AgriBrain</h1>
+    <div class="app-container">
+        <!-- TOP HEADER LOGO (Absolute or part of sidebar) -->
+        <div class="global-logo">
+            <svg class="brain-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <!-- Abstract Brain/Leaf SVG -->
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--neon-green)"/>
+                <path d="M12 2C12 2 12 22 12 22M2 12C2 12 22 12 22 12" stroke="var(--neon-green)" stroke-dasharray="2 4"/>
+                <path d="M12 12C12 12 16 6 18 8C20 10 12 12 12 12Z" fill="var(--neon-green)" opacity="0.8"/>
+            </svg>
+            <h1>AGRIBRAIN</h1>
         </div>
-        <nav class="nav-links">
-            <a href="#" class="nav-item active" data-target="dashboard">Dashboard</a>
-            <a href="#" class="nav-item" data-target="simulations">Digital Twin Simulation</a>
-            <a href="#" class="nav-item" data-target="history">History</a>
-            <a href="#" class="nav-item" data-target="settings">Settings</a>
-        </nav>
-        <div class="header-actions">
-            <div class="sensor-status active">
-                <span class="pulse-dot"></span>
-                IoT Sensors Connected
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-icon-large">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--neon-cyan)"/>
+                    <path d="M12 12C12 12 16 6 18 8C20 10 12 12 12 12Z" stroke="var(--neon-green)" fill="rgba(0, 255, 136, 0.2)"/>
+                </svg>
             </div>
-            <img src="https://ui-avatars.com/api/?name=Farmer+User&background=0D8BFF&color=fff&rounded=true" alt="User Profile" class="avatar">
-        </div>
-    </header>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <span class="icon">⊞</span> Dashboard
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="icon">📈</span> Field Status
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="icon">🌱</span> Crops
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="icon">⚙️</span> AI Analytics
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="icon">🤖</span> Automation
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="icon">🔧</span> Settings
+                </a>
+            </nav>
+            <div class="sidebar-graphic">
+                <!-- Abstract farm wireframe graphic -->
+                <div class="wireframe-lines"></div>
+            </div>
+        </aside>
 
-    <main class="dashboard-container">
-
-        <!-- DASHBOARD TAB -->
-        <div id="dashboard" class="tab-content active-tab">
-            <div class="grid-layout">
-                <!-- Input Section -->
-                <section class="glass-panel input-section fade-in">
-                    <div class="section-header">
-                        <h2>Farm State Initialization</h2>
-                        <p>Real-time telemetry from NPK sensors and weather stations.</p>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- PANEL 1: LIVE FARM OVERVIEW -->
+            <section class="panel top-panel">
+                <div class="panel-header space-between">
+                    <div>
+                        <h2>LIVE FARM OVERVIEW</h2>
+                        <div class="sub-header">Field: <span class="highlight-green">North Sector</span> <span class="divider">|</span> Status: <span class="highlight-green">Optimal</span></div>
                     </div>
-                    
-                    <form class="soil-form" action="#" onsubmit="event.preventDefault();">
-                        <div class="input-grid">
-                            <div class="input-group">
-                                <label for="nitrogen">Nitrogen (N)</label>
-                                <div class="input-wrapper">
-                                    <input type="number" id="nitrogen" value="45" required>
-                                    <span class="unit">mg/kg</span>
-                                </div>
-                            </div>
-                            
-                            <div class="input-group">
-                                <label for="phosphorus">Phosphorus (P)</label>
-                                <div class="input-wrapper">
-                                    <input type="number" id="phosphorus" value="32" required>
-                                    <span class="unit">mg/kg</span>
-                                </div>
-                            </div>
-
-                            <div class="input-group">
-                                <label for="potassium">Potassium (K)</label>
-                                <div class="input-wrapper">
-                                    <input type="number" id="potassium" value="18" required>
-                                    <span class="unit">mg/kg</span>
-                                </div>
-                            </div>
-
-                            <div class="input-group">
-                                <label for="ph">Soil pH</label>
-                                <div class="input-wrapper">
-                                    <input type="number" step="0.1" id="ph" value="6.5" required>
-                                    <span class="unit">pH</span>
-                                </div>
-                            </div>
-
-                            <div class="input-group">
-                                <label for="rainfall">Projected Rainfall</label>
-                                <div class="input-wrapper">
-                                    <input type="number" id="rainfall" value="700" required>
-                                    <span class="unit">mm</span>
-                                </div>
-                            </div>
-
-                            <div class="input-group">
-                                <label for="temperature">Avg Temperature</label>
-                                <div class="input-wrapper">
-                                    <input type="number" step="0.1" id="temperature" value="28.5" required>
-                                    <span class="unit">°C</span>
+                    <button class="pill-btn">REAL-TIME | NK OPTIMAL</button>
+                </div>
+                
+                <div class="metrics-row">
+                    <div class="metric-item">
+                        <span class="metric-icon cyan">💧</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Soil Moisture</span>
+                            <span class="metric-value">68%</span>
+                        </div>
+                    </div>
+                    <div class="metric-divider"></div>
+                    <div class="metric-item">
+                        <span class="metric-icon green">🌡️</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Temp</span>
+                            <span class="metric-value">24°C</span>
+                        </div>
+                    </div>
+                    <div class="metric-divider"></div>
+                    <div class="metric-item">
+                        <span class="metric-icon green">🧬</span>
+                        <div class="metric-info">
+                            <span class="metric-label">NPK</span>
+                            <span class="metric-value">88</span>
+                        </div>
+                    </div>
+                    <div class="metric-divider"></div>
+                    <div class="metric-item">
+                        <span class="metric-icon yellow">🧪</span>
+                        <div class="metric-info">
+                            <span class="metric-label">pH</span>
+                            <span class="metric-value">6.4</span>
+                        </div>
+                    </div>
+                    <div class="metric-divider"></div>
+                    <div class="metric-item">
+                        <div class="metric-info">
+                            <span class="metric-label">AI Optimization:</span>
+                            <div class="ai-opt-row">
+                                <span class="metric-value green">94%</span>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" style="width: 94%;"></div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
 
-                        <div class="input-group full-width" style="margin-top: 1rem;">
-                            <label for="crop-type">Active Crop Type</label>
-                            <select id="crop-type" class="modern-select">
-                                <option value="rice" selected>Rice (Kharif)</option>
-                                <option value="wheat">Wheat (Rabi)</option>
-                                <option value="maize">Maize</option>
-                            </select>
-                        </div>
-
-                        <button type="button" class="btn-primary btn-glow" style="margin-top: 1.5rem; width: 100%;">
-                            <span class="btn-text">Execute AI Prediction</span>
-                            <span class="arrow">→</span>
-                        </button>
-                    </form>
-                </section>
-
-                <!-- Visualization & Results Section -->
-                <section class="results-section fade-in" style="animation-delay: 0.1s;">
-                    <div class="glass-panel chart-panel">
-                        <div class="section-header space-between">
-                            <div>
-                                <h2>Nutrient Delta Analysis</h2>
-                                <p>Current vs. Threshold Levels</p>
-                            </div>
-                            <span class="badge warning">Deficiency Detected</span>
-                        </div>
+            <div class="middle-row">
+                <!-- PANEL 2: SOIL COMPOSITION INPUTS -->
+                <section class="panel inputs-panel">
+                    <div class="panel-header">
+                        <h2>SOIL COMPOSITION INPUTS</h2>
+                    </div>
+                    <div class="sliders-container">
                         
-                        <!-- Premium CSS Chart -->
-                        <div class="css-chart-premium">
-                            <div class="chart-y-axis">
-                                <span>100%</span>
-                                <span>50%</span>
-                                <span>0%</span>
+                        <div class="slider-row">
+                            <div class="slider-labels space-between">
+                                <span>Nitrogen</span>
+                                <span class="highlight-green">N: 72 <span class="unit">mg/kg</span></span>
                             </div>
-                            <div class="chart-bars">
-                                <div class="bar-group">
-                                    <div class="bar-bg"></div>
-                                    <div class="bar-fill warning-fill" style="height: 45%;"></div>
-                                    <span class="label">N</span>
-                                </div>
-                                <div class="bar-group">
-                                    <div class="bar-bg"></div>
-                                    <div class="bar-fill optimal-fill" style="height: 85%;"></div>
-                                    <span class="label">P</span>
-                                </div>
-                                <div class="bar-group">
-                                    <div class="bar-bg"></div>
-                                    <div class="bar-fill danger-fill" style="height: 25%;"></div>
-                                    <span class="label">K</span>
-                                </div>
-                                <div class="bar-group">
-                                    <div class="bar-bg"></div>
-                                    <div class="bar-fill optimal-fill" style="height: 65%;"></div>
-                                    <span class="label">pH</span>
-                                </div>
+                            <div class="custom-slider-track">
+                                <div class="custom-slider-fill cyan-fill" style="width: 72%;"></div>
+                                <div class="custom-slider-thumb cyan-thumb" style="left: 72%;"></div>
                             </div>
                         </div>
+
+                        <div class="slider-row">
+                            <div class="slider-labels space-between">
+                                <span>Phosphorus</span>
+                                <span class="highlight-green">P: 65 <span class="unit">mg/kg</span></span>
+                            </div>
+                            <div class="custom-slider-track">
+                                <div class="custom-slider-fill cyan-fill" style="width: 65%;"></div>
+                                <div class="custom-slider-thumb cyan-thumb" style="left: 65%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="slider-row">
+                            <div class="slider-labels space-between">
+                                <span>Potassium</span>
+                                <span class="highlight-green">K: 81 <span class="unit">mg/kg</span></span>
+                            </div>
+                            <div class="custom-slider-track">
+                                <div class="custom-slider-fill cyan-fill" style="width: 81%;"></div>
+                                <div class="custom-slider-thumb cyan-thumb" style="left: 81%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="slider-row" style="margin-top: 1.5rem;">
+                            <div class="slider-labels space-between">
+                                <span>Moisture</span>
+                                <span class="highlight-green">68%</span>
+                            </div>
+                            <div class="custom-slider-track">
+                                <div class="custom-slider-fill cyan-fill" style="width: 68%;"></div>
+                                <div class="custom-slider-thumb cyan-thumb" style="left: 68%;"></div>
+                            </div>
+                        </div>
+
                     </div>
+                </section>
 
-                    <div class="glass-panel recommendation-panel premium-border">
-                        <div class="panel-blur-overlay"></div>
-                        <div class="panel-content">
-                            <div class="status-header">
-                                <div class="status-badge success-glow">
-                                    <span class="dot"></span> AI Analysis Complete
+                <!-- PANEL 3: YIELD FORECAST -->
+                <section class="panel yield-panel">
+                    <div class="panel-header">
+                        <h2>YIELD FORECAST (TONS/H)</h2>
+                    </div>
+                    <div class="bar-chart-container">
+                        <div class="y-axis">
+                            <span>20</span>
+                            <span>15</span>
+                            <span>10</span>
+                            <span>5</span>
+                            <span>0</span>
+                        </div>
+                        <div class="chart-bars">
+                            <div class="bar-column">
+                                <span class="bar-value">14.8</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill green-gradient" style="height: 74%;"></div>
                                 </div>
-                                <span class="confidence">Confidence: <strong>96.4%</strong></span>
+                                <span class="bar-label">CORN</span>
                             </div>
-                            <h2>Expected Yield: <span class="gradient-text">5.5 t/ha</span></h2>
-                            
-                            <div class="risk-meter">
-                                <div class="risk-label">Crop Failure Risk <span class="risk-value medium">Medium (34%)</span></div>
-                                <div class="progress-bar"><div class="progress-fill medium" style="width: 34%;"></div></div>
+                            <div class="bar-column">
+                                <span class="bar-value">9.2</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill green-gradient" style="height: 46%;"></div>
+                                </div>
+                                <span class="bar-label">SOY</span>
                             </div>
-
-                            <p class="description">
-                                <strong>SHAP Insight:</strong> Low rainfall projections and severe Potassium (K) deficiency are heavily impacting yield. 
-                                Immediate application of <strong>45kg Urea</strong> and <strong>20kg Potash</strong> is recommended.
-                            </p>
-                            <div class="action-buttons">
-                                <button class="btn-secondary" onclick="switchTab('simulations')">Open Simulation Engine</button>
+                            <div class="bar-column">
+                                <span class="bar-value">11.5</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill green-gradient" style="height: 57.5%;"></div>
+                                </div>
+                                <span class="bar-label">WHEAT</span>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
-        </div>
 
-        <!-- SIMULATIONS TAB -->
-        <div id="simulations" class="tab-content" style="display: none;">
-            <div class="sim-header fade-in">
-                <h2>Digital Twin Scenario Simulator</h2>
-                <p>Dynamically alter environmental variables to see projected AI outcomes instantly.</p>
+            <div class="bottom-row">
+                <!-- PANEL 4: DIGITAL TWIN SIMULATION -->
+                <section class="panel digital-twin-panel">
+                    <div class="panel-header">
+                        <h2>DIGITAL TWIN SIMULATION</h2>
+                    </div>
+                    <div class="twin-content">
+                        <div class="twin-left">
+                            <div class="twin-icons">
+                                <span class="circle-icon">☀️</span>
+                                <span class="circle-icon">🌾</span>
+                            </div>
+                            <div class="twin-timer">
+                                <span class="sub-text">Timer</span>
+                                <span class="green-text large">14:32</span>
+                            </div>
+                            <div class="twin-scenario mt-4">
+                                <span class="sub-text">Scenario:</span>
+                                <span class="green-text">Max Yield</span>
+                                <span class="sub-text">Water+Nutrients</span>
+                            </div>
+                        </div>
+
+                        <div class="twin-center">
+                            <div class="dial-container">
+                                <div class="dial-outer-ring"></div>
+                                <div class="dial-inner-ring">
+                                    <div class="dial-text">
+                                        <span class="sub-text">SIMULATION<br>STATUS</span>
+                                        <span class="active-text">ACTIVE</span>
+                                        <span class="percent-text">92%</span>
+                                    </div>
+                                </div>
+                                <div class="dial-progress"></div>
+                            </div>
+                        </div>
+
+                        <div class="twin-right">
+                            <div class="right-block">
+                                <span class="green-text">Agricultural<br>metrics</span>
+                                <span class="sub-text">Real-time farm<br>agricultural data</span>
+                            </div>
+                            <div class="right-block">
+                                <span class="sub-text">Scenario:</span>
+                                <span class="green-text">Max Yield</span>
+                                <span class="sub-text">Water+Nutrients</span>
+                            </div>
+                            <div class="right-block">
+                                <span class="sub-text">Variable:</span>
+                                <span class="green-text">Max Yield</span>
+                                <span class="sub-text">Water+Nutrients</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PANEL 5: AI INSIGHTS & ACTIONS -->
+                <section class="panel actions-panel">
+                    <div class="panel-header">
+                        <h2>AI INSIGHTS & ACTIONS</h2>
+                        <span class="sub-text block mt-1">Real-time recommendations</span>
+                    </div>
+                    <div class="action-list">
+                        <div class="action-item">
+                            <div class="action-icon circle-glow">💧</div>
+                            <div class="action-text">
+                                <span class="action-title">Irrigate N. Sector</span>
+                                <span class="action-sub">Irrigate recommendations</span>
+                            </div>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon circle-glow">🌿</div>
+                            <div class="action-text">
+                                <span class="action-title">Optimize NPK</span>
+                                <span class="action-sub">Geo are recommendation</span>
+                            </div>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon circle-glow">🐞</div>
+                            <div class="action-text">
+                                <span class="action-title">Monitor Pest Level</span>
+                                <span class="action-sub">Monitor recommendations</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-            <div class="grid-layout sim-layout fade-in" style="animation-delay: 0.1s;">
-                <div class="glass-panel">
-                    <h3>Environmental Sliders</h3>
-                    <div class="slider-group mt-4">
-                        <div class="slider-header">
-                            <span>Rainfall Variant</span>
-                            <span class="slider-value accent-cyan">560 mm (-20%)</span>
-                        </div>
-                        <input type="range" min="0" max="1000" value="560" class="modern-slider cyan">
-                    </div>
-                    <div class="slider-group mt-4">
-                        <div class="slider-header">
-                            <span>Nitrogen Application</span>
-                            <span class="slider-value accent-green">60 mg/kg (+15)</span>
-                        </div>
-                        <input type="range" min="0" max="150" value="60" class="modern-slider green">
-                    </div>
-                    <div class="slider-group mt-4">
-                        <div class="slider-header">
-                            <span>Temperature Shift</span>
-                            <span class="slider-value accent-orange">30.5 °C (+2.0)</span>
-                        </div>
-                        <input type="range" min="15" max="45" value="30.5" class="modern-slider orange">
-                    </div>
-                    
-                    <button class="btn-primary btn-glow mt-5 w-full">Run Simulation Matrix</button>
-                </div>
-                
-                <div class="glass-panel sim-results">
-                    <div class="status-badge warning-glow mb-4">
-                        <span class="dot"></span> Scenario C Output
-                    </div>
-                    <h3>Projected Impact</h3>
-                    
-                    <div class="metric-cards mt-4">
-                        <div class="metric-card">
-                            <span class="metric-title">Simulated Yield</span>
-                            <div class="metric-val danger-text">4.8 <span class="unit">t/ha</span> 📉</div>
-                        </div>
-                        <div class="metric-card">
-                            <span class="metric-title">Irrigation Demand</span>
-                            <div class="metric-val cyan-text">+120 <span class="unit">mm</span> 💧</div>
-                        </div>
-                    </div>
-                    
-                    <div class="risk-dial mt-5">
-                        <div class="dial-header">
-                            <span>Total Crop Risk</span>
-                            <span class="danger-text fw-bold">HIGH (78%)</span>
-                        </div>
-                        <div class="progress-bar thick"><div class="progress-fill danger-fill" style="width: 78%;"></div></div>
-                        <p class="mt-3 text-sm text-muted"><strong>Reasoning:</strong> Decreased rainfall paired with temperature increase exacerbates the existing potassium deficiency.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- HISTORY TAB -->
-        <div id="history" class="tab-content" style="display: none;">
-            <div class="glass-panel w-full fade-in">
-                <div class="section-header">
-                    <h2>Prediction History & Logs</h2>
-                    <p>Past telemetry logs and model outputs.</p>
-                </div>
-                <div class="table-container">
-                    <table class="modern-table">
-                        <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                <th>Crop</th>
-                                <th>NPK State</th>
-                                <th>Predicted Yield</th>
-                                <th>Risk Level</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>2026-06-25 14:30</td>
-                                <td>Rice</td>
-                                <td><span class="chip warning-chip">45/32/18</span></td>
-                                <td>5.5 t/ha</td>
-                                <td><span class="badge warning">Medium</span></td>
-                                <td><button class="btn-icon">View</button></td>
-                            </tr>
-                            <tr>
-                                <td>2026-05-10 09:15</td>
-                                <td>Wheat</td>
-                                <td><span class="chip success-chip">80/40/40</span></td>
-                                <td>4.2 t/ha</td>
-                                <td><span class="badge success">Low</span></td>
-                                <td><button class="btn-icon">View</button></td>
-                            </tr>
-                            <tr>
-                                <td>2026-04-01 11:20</td>
-                                <td>Cotton</td>
-                                <td><span class="chip danger-chip">20/15/10</span></td>
-                                <td>2.1 t/ha</td>
-                                <td><span class="badge danger">High</span></td>
-                                <td><button class="btn-icon">View</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- SETTINGS TAB -->
-        <div id="settings" class="tab-content" style="display: none;">
-            <div class="glass-panel w-half fade-in mx-auto">
-                <div class="section-header">
-                    <h2>System Configuration</h2>
-                    <p>IoT Hub and Model settings.</p>
-                </div>
-                
-                <div class="setting-group">
-                    <div class="setting-info">
-                        <h4>Enable Live Sensor Sync</h4>
-                        <p>Automatically fetch NPK readings from edge nodes.</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <hr class="glass-divider">
-                <div class="setting-group">
-                    <div class="setting-info">
-                        <h4>Auto-Execute Digital Twin</h4>
-                        <p>Run simulations in background for predictive alerts.</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <hr class="glass-divider">
-                <div class="setting-group">
-                    <div class="setting-info">
-                        <h4>Prediction Model</h4>
-                        <p>Select the backend ensemble model.</p>
-                    </div>
-                    <select class="modern-select small">
-                        <option>XGBoost (Recommended)</option>
-                        <option>Random Forest</option>
-                        <option>LightGBM</option>
-                    </select>
-                </div>
-                <button class="btn-secondary mt-5">Save Configuration</button>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- SPA Tab Logic -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const navItems = document.querySelectorAll('.nav-item');
-            const tabContents = document.querySelectorAll('.tab-content');
-
-            navItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    // Remove active class from all nav items
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    item.classList.add('active');
-
-                    // Hide all tab contents
-                    tabContents.forEach(tab => {
-                        tab.style.display = 'none';
-                        tab.classList.remove('active-tab');
-                    });
-
-                    // Show target tab
-                    const targetId = item.getAttribute('data-target');
-                    const targetTab = document.getElementById(targetId);
-                    targetTab.style.display = 'block';
-                    
-                    // Trigger reflow for animations
-                    void targetTab.offsetWidth;
-                    targetTab.classList.add('active-tab');
-                });
-            });
-        });
-        
-        // Expose switchTab globally for inline buttons
-        window.switchTab = function(tabId) {
-            const navLink = document.querySelector(`.nav-item[data-target="${tabId}"]`);
-            if(navLink) navLink.click();
-        }
-    </script>
+        </main>
+    </div>
 </body>
 </html>
