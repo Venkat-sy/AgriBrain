@@ -1,0 +1,162 @@
+{
+    "crop_recommendation": {
+        "input_features": [
+            "n",
+            "p",
+            "k",
+            "temperature",
+            "humidity",
+            "ph",
+            "rainfall"
+        ],
+        "target_column": "label_encoded",
+        "num_classes": 22,
+        "scaler_ref": "crop_scaler.pkl",
+        "types": {
+            "n": "float64",
+            "p": "float64",
+            "k": "float64",
+            "temperature": "float64",
+            "humidity": "float64",
+            "ph": "float64",
+            "rainfall": "float64"
+        }
+    },
+    "fertilizer_recommendation": {
+        "input_features": [
+            "Temperature",
+            "Humidity",
+            "Moisture",
+            "Nitrogen",
+            "Potassium",
+            "Phosphorous",
+            "Soil Type_Black",
+            "Soil Type_Clayey",
+            "Soil Type_Loamy",
+            "Soil Type_Red",
+            "Soil Type_Sandy",
+            "Soil Type_Unknown",
+            "Crop Type_Barley",
+            "Crop Type_Cotton",
+            "Crop Type_Ground Nuts",
+            "Crop Type_Maize",
+            "Crop Type_Millets",
+            "Crop Type_Oil seeds",
+            "Crop Type_Paddy",
+            "Crop Type_Pulses",
+            "Crop Type_Sugarcane",
+            "Crop Type_Tobacco",
+            "Crop Type_Unknown",
+            "Crop Type_Wheat"
+        ],
+        "target_column": "Fertilizer_Encoded",
+        "num_classes": 14,
+        "scaler_ref": "fertilizer_scaler.pkl",
+        "types": {
+            "Temperature": "float64",
+            "Humidity": "float64",
+            "Moisture": "float64",
+            "Nitrogen": "float64",
+            "Potassium": "float64",
+            "Phosphorous": "float64"
+        }
+    },
+    "yield_prediction": {
+        "input_features": [
+            "Area",
+            "Production",
+            "Annual_Rainfall",
+            "Fertilizer",
+            "Pesticide",
+            "Fertilizer_per_Area",
+            "Crop_Encoded",
+            "Season_Encoded",
+            "State_Encoded"
+        ],
+        "target_column": "Yield",
+        "scaler_ref": "yield_scaler.pkl",
+        "types": {
+            "Area": "float64",
+            "Production": "float64",
+            "Annual_Rainfall": "float64",
+            "Fertilizer": "float64",
+            "Pesticide": "float64",
+            "Fertilizer_per_Area": "float64"
+        }
+    },
+    "advanced_yield": {
+        "input_features": [
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
+            "pH",
+            "Rainfall_mm",
+            "Temperature_C",
+            "Humidity_pct",
+            "Soil_Moisture_pct",
+            "Crop_Type_Encoded"
+        ],
+        "target_columns": [
+            "Yield_tons_per_ha",
+            "Irrigation_Demand_mm",
+            "Crop_Failure_Risk"
+        ],
+        "types": {
+            "task": "multi_output_regression_and_classification"
+        }
+    },
+    "rainfall": {
+        "description": "Processed rainfall data with monsoon ratio and variability features",
+        "engineered_features": [
+            "Monsoon_Ratio",
+            "Rainfall_Variability"
+        ],
+        "types": {
+            "SUBDIVISION": "str",
+            "YEAR": "int64",
+            "JAN": "float64",
+            "FEB": "float64",
+            "MAR": "float64",
+            "APR": "float64",
+            "MAY": "float64",
+            "JUN": "float64",
+            "JUL": "float64",
+            "AUG": "float64",
+            "SEP": "float64",
+            "OCT": "float64",
+            "NOV": "float64",
+            "DEC": "float64",
+            "ANNUAL": "float64",
+            "Jan-Feb": "float64",
+            "Mar-May": "float64",
+            "Jun-Sep": "float64",
+            "Oct-Dec": "float64",
+            "Monsoon_Ratio": "float64",
+            "Rainfall_Variability": "float64"
+        }
+    },
+    "crop_production": {
+        "description": "District-level crop production data with yield per hectare",
+        "engineered_features": [
+            "Yield_per_ha"
+        ],
+        "encoded_columns": [
+            "State_Name_Encoded",
+            "Crop_Encoded",
+            "Season_Encoded"
+        ],
+        "types": {
+            "State_Name": "str",
+            "District_Name": "str",
+            "Crop_Year": "int64",
+            "Season": "str",
+            "Crop": "str",
+            "Area": "float64",
+            "Production": "float64",
+            "Yield_per_ha": "float64",
+            "State_Name_Encoded": "int64",
+            "Crop_Encoded": "int64",
+            "Season_Encoded": "int64"
+        }
+    }
+}
