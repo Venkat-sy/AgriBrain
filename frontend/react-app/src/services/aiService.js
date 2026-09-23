@@ -70,6 +70,7 @@ export function buildFarmContext({
 }
 
 export async function sendChatMessage({ messages, farmContext, userMessage }) {
+    // Send request to the backend (or Vercel serverless function) handling AI chat.
     const response = await fetch(CHAT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,6 +78,7 @@ export async function sendChatMessage({ messages, farmContext, userMessage }) {
     });
 
     const data = await response.json().catch(() => ({}));
+    // Preserve original error handling but adapt to the backend response shape.
     if (!response.ok) {
         const error = new Error(data.error || 'Failed to get a response from AgriBrain AI');
         error.code = data.code || 'REQUEST_FAILED';
@@ -84,11 +86,12 @@ export async function sendChatMessage({ messages, farmContext, userMessage }) {
         throw error;
     }
 
-    return {
-        content: data.message,
-        provider: data.provider,
-        model: data.model,
-    };
+    // The backend now returns { message, provider, model }. Fall back to older field names for compatibility.
+    const content = data.message ?? data.text ?? '';
+    const provider = data.provider ?? 'unknown';
+    const model = data.model ?? 'unknown';
+
+    return { content, provider, model };
 }
 
 export default {

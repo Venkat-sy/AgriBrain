@@ -427,10 +427,27 @@
     }
 
     .chat-row {
-        max-width: 95%;
-    }
+/* --------------------------------------------------------------- */
+/* Chat input area – sticky at bottom, larger, multi‑line support */
+/* --------------------------------------------------------------- */
+.chat-input-wrapper {
+    border-top: 1px solid var(--border-subtle);
+    padding: var(--space-3) var(--space-6);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    /* Ensure it stays at the bottom of the chat window */
+    flex-shrink: 0;
 }
 
+.chat-input-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+}
+
+.chat-input {
     flex: 1;
     background: transparent;
     border: none;
@@ -440,9 +457,32 @@
     color: var(--text-primary);
     resize: none;
     min-height: 40px;
-    max-height: 140px;
+    max-height: 200px; /* allow larger input */
     outline: none;
     line-height: var(--line-height-normal);
+}
+
+.chat-send-btn {
+    background: var(--forest-500);
+    border: none;
+    color: var(--text-inverse);
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.chat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+    background: var(--forest-600);
+}
 }
 
 }
