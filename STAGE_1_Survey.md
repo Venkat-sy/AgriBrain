@@ -57,7 +57,10 @@ A critical comparison of recent methodologies reveals a trade-off between predic
 
 ### 4. Research Gap
 Despite significant progress, a substantial research gap persists in the Indian context. **Current systems are strictly predictive and static.** They successfully recommend nutrients based on existing datasets but fail to provide interactive, forward-looking simulations adaptable to local climatic shocks. 
-The proposed solution must evolve from a **"Predict Only"** model to a **"Predict + Simulate Future Scenarios"** framework, synergizing Agentic AI with Explainable AI.
+
+**Critically, existing systems lack a unified geospatial decision-support pipeline.** They do not combine: (1) map-driven location selection, (2) localized historical rainfall analysis, (3) rainfall forecasting for the upcoming season, (4) spatial/regional soil identification, (5) ML-based crop recommendation using rainfall + soil + climate features, (6) financial planning with budget and land size, (7) yield and market value estimation, and (8) a practical farming activity roadmap — all in one workflow.
+
+The proposed solution must evolve from a **"Predict Only"** model to a **"Predict + Simulate + Plan"** framework, synergizing **Geospatial Intelligence**, **Time-Series Forecasting**, **Spatial Soil Data**, **Explainable AI**, and **Agricultural Simulation** into a single map-driven platform (AgriSim).
 
 ### 5. References
 1. *Interpretable deep learning models for independent fertilizer and crop recommendation.* Scientific Reports (Nature). DOI: 10.1038/s41598-025-26910-4

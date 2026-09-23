@@ -1,0 +1,32 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bangalore Urban",
+        "state": "Karnataka",
+        "state_code": "KA",
+        "district_code": "KA01"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[75.5,12.8],[75.6,12.8],[75.6,12.9],[75.5,12.9],[75.5,12.8]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mysore",
+        "state": "Karnataka",
+        "state_code": "KA",
+        "district_code": "KA02"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[76.5,12.2],[76.6,12.2],[76.6,12.3],[76.5,12.3],[76.5,12.2]]]
+      }
+    }
+    // Add further district features as needed
+  ]
+}

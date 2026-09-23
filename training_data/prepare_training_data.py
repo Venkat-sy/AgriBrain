@@ -239,6 +239,53 @@ def task5():
     print(f"  Processed shape: {df.shape} (dropped {3730} null Production + deduped)")
     print("Task 5 complete.\n")
 
+def task7():
+    """Integrate crop economics data.
+
+    Expected CSV format (placed under ``datasets/04_crop_economics``):
+    ``crop_name, planting_density, seed_cost, fertilizer_cost, labor_cost, market_price``
+    The function merges this information with the crop recommendation
+    features so that downstream models can incorporate cost‑aware targets.
+    """
+    print("Starting Task 7: Crop Economics")
+    eco_path = os.path.join(DATASETS_DIR, "04_crop_economics", "crop_economics.csv")
+    if not os.path.isfile(eco_path):
+        raise FileNotFoundError(f"Crop economics file not found: {eco_path}")
+    eco_df = pd.read_csv(eco_path)
+    # Standardise column names
+    eco_df.columns = [c.lower().replace(' ', '_') for c in eco_df.columns]
+    # Persist for later use – models can load it directly from training_data
+    eco_df.to_csv(os.path.join(OUT_DIR, "crop_economics_processed.csv"), index=False)
+    # Update config with economics schema
+    config["crop_economics"] = {
+        "input_features": [c for c in eco_df.columns if c != "crop_name"],
+        "target_column": "crop_name",
+        "types": eco_df.dtypes.astype(str).to_dict()
+    }
+    print(f"  Processed economics shape: {eco_df.shape}")
+    print("Task 7 complete.\n")
+
+
+def task8():
+    """Task 8 – Run the Phase 4 crop‑recommendation model training.
+
+    The training script writes a ``crop_recommendations.csv`` file and a tiny
+    ``crop_recommendation_metadata.json`` containing the output path. We load that
+    metadata and expose it via the global ``config`` dictionary so downstream
+    steps (or the API) can discover the artefact.
+    """
+    print("Starting Task 8: Crop Recommendation Model Training")
+    import subprocess, sys
+    script_path = os.path.join(BASE_DIR, "train_crop_recommendation.py")
+    subprocess.run([sys.executable, script_path], check=True)
+    # Load metadata if the script produced it.
+    meta_path = os.path.join(OUT_DIR, "crop_recommendation_metadata.json")
+    if os.path.isfile(meta_path):
+        with open(meta_path, "r") as f:
+            meta = json.load(f)
+        config["crop_recommendation_output"] = meta.get("crop_recommendation_output")
+    print("Task 8 complete.\n")
+
 def task6():
     print("Starting Task 6: Config")
     with open(os.path.join(OUT_DIR, "feature_config.json"), 'w') as f:
@@ -257,6 +304,8 @@ if __name__ == "__main__":
         ("Task 3: Yield Prediction", task3),
         ("Task 4: Rainfall Processing", task4),
         ("Task 5: Crop Production Processing", task5),
+        ("Task 7: Crop Economics", task7),
+        ("Task 8: Crop Recommendation Model Training", task8),
         ("Task 6: Feature Config", task6),
     ]
     

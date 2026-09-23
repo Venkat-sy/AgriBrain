@@ -1,2 +1,458 @@
-<background>
-Replace the Field Status tab content (lines 293-303) with an enhanced version featuring Google Maps integration, boundary drawing, and dashboard functionality.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGRIBRAIN Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- TOP HEADER LOGO -->
+        <div class="global-logo">
+            <svg class="brain-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--neon-green)"/>
+                <path d="M12 2C12 2 12 22 12 22M2 12C2 12 22 12 22 12" stroke="var(--neon-green)" stroke-dasharray="2 4"/>
+                <path d="M12 12C12 12 16 6 18 8C20 10 12 12 12 12Z" fill="var(--neon-green)" opacity="0.8"/>
+            </svg>
+            <h1>AGRIBRAIN</h1>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-icon-large">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--neon-cyan)"/>
+                    <path d="M12 12C12 12 16 6 18 8C20 10 12 12 12 12Z" stroke="var(--neon-green)" fill="rgba(0, 255, 136, 0.2)"/>
+                </svg>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <span class="icon">⊞</span> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-target="field-status">
+                    <span class="icon">📈</span> Field Status
+                </a>
+                <a href="#" class="nav-item" data-target="crops">
+                    <span class="icon">🌱</span> Crops
+                </a>
+                <a href="#" class="nav-item" data-target="ai-analytics">
+                    <span class="icon">⚙️</span> AI Analytics
+                </a>
+                <a href="#" class="nav-item" data-target="automation">
+                    <span class="icon">🤖</span> Automation
+                </a>
+                <a href="#" class="nav-item" data-target="settings">
+                    <span class="icon">🔧</span> Settings
+                </a>
+            </nav>
+            <div class="sidebar-graphic">
+                <div class="wireframe-lines"></div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="main-content">
+            
+            <!-- TAB: DASHBOARD -->
+            <div id="dashboard" class="tab-content active-tab fade-in">
+                <!-- PANEL 1: LIVE FARM OVERVIEW -->
+                <section class="panel top-panel">
+                    <div class="panel-header space-between">
+                        <div>
+                            <h2>LIVE FARM OVERVIEW</h2>
+                            <div class="sub-header">Field: <span class="highlight-green">North Sector</span> <span class="divider">|</span> Status: <span class="highlight-green">Optimal</span></div>
+                        </div>
+                        <button class="pill-btn">REAL-TIME | NK OPTIMAL</button>
+                    </div>
+                    
+                    <div class="metrics-row">
+                        <div class="metric-item">
+                            <span class="metric-icon cyan">💧</span>
+                            <div class="metric-info">
+                                <span class="metric-label">Soil Moisture</span>
+                                <span class="metric-value">68%</span>
+                            </div>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="metric-item">
+                            <span class="metric-icon green">🌡️</span>
+                            <div class="metric-info">
+                                <span class="metric-label">Temp</span>
+                                <span class="metric-value">24°C</span>
+                            </div>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="metric-item">
+                            <span class="metric-icon green">🧬</span>
+                            <div class="metric-info">
+                                <span class="metric-label">NPK</span>
+                                <span class="metric-value">88</span>
+                            </div>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="metric-item">
+                            <span class="metric-icon yellow">🧪</span>
+                            <div class="metric-info">
+                                <span class="metric-label">pH</span>
+                                <span class="metric-value">6.4</span>
+                            </div>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="metric-item">
+                            <div class="metric-info">
+                                <span class="metric-label">AI Optimization:</span>
+                                <div class="ai-opt-row">
+                                    <span class="metric-value green">94%</span>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-fill" style="width: 94%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="middle-row mt-4">
+                    <!-- PANEL 2: SOIL COMPOSITION INPUTS -->
+                    <section class="panel inputs-panel">
+                        <div class="panel-header">
+                            <h2>SOIL COMPOSITION INPUTS</h2>
+                        </div>
+                        <div class="sliders-container">
+                            
+                            <div class="slider-row">
+                                <div class="slider-labels space-between">
+                                    <span>Nitrogen</span>
+                                    <span class="highlight-green">N: <span id="n-val">72</span> <span class="unit">mg/kg</span></span>
+                                </div>
+                                <input type="range" id="nitrogen-slider" class="styled-slider cyan-slider" min="0" max="150" value="72">
+                            </div>
+
+                            <div class="slider-row">
+                                <div class="slider-labels space-between">
+                                    <span>Phosphorus</span>
+                                    <span class="highlight-green">P: <span id="p-val">65</span> <span class="unit">mg/kg</span></span>
+                                </div>
+                                <input type="range" id="phosphorus-slider" class="styled-slider cyan-slider" min="0" max="150" value="65">
+                            </div>
+
+                            <div class="slider-row">
+                                <div class="slider-labels space-between">
+                                    <span>Potassium</span>
+                                    <span class="highlight-green">K: <span id="k-val">81</span> <span class="unit">mg/kg</span></span>
+                                </div>
+                                <input type="range" id="potassium-slider" class="styled-slider cyan-slider" min="0" max="150" value="81">
+                            </div>
+
+                            <div class="slider-row" style="margin-top: 1.5rem;">
+                                <div class="slider-labels space-between">
+                                    <span>Moisture</span>
+                                    <span class="highlight-green"><span id="m-val">68</span>%</span>
+                                </div>
+                                <input type="range" id="moisture-slider" class="styled-slider cyan-slider" min="0" max="100" value="68">
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- PANEL 3: YIELD FORECAST -->
+                    <section class="panel yield-panel">
+                        <div class="panel-header">
+                            <h2>YIELD FORECAST (TONS/H)</h2>
+                        </div>
+                        <div class="bar-chart-container">
+                            <div class="y-axis">
+                                <span>20</span>
+                                <span>15</span>
+                                <span>10</span>
+                                <span>5</span>
+                                <span>0</span>
+                            </div>
+                            <div class="chart-bars">
+                                <div class="bar-column">
+                                    <span class="bar-value" id="corn-yield">14.8</span>
+                                    <div class="bar-track">
+                                        <div class="bar-fill green-gradient" id="corn-bar" style="height: 74%;"></div>
+                                    </div>
+                                    <span class="bar-label">CORN</span>
+                                </div>
+                                <div class="bar-column">
+                                    <span class="bar-value" id="soy-yield">9.2</span>
+                                    <div class="bar-track">
+                                        <div class="bar-fill green-gradient" id="soy-bar" style="height: 46%;"></div>
+                                    </div>
+                                    <span class="bar-label">SOY</span>
+                                </div>
+                                <div class="bar-column">
+                                    <span class="bar-value" id="wheat-yield">11.5</span>
+                                    <div class="bar-track">
+                                        <div class="bar-fill green-gradient" id="wheat-bar" style="height: 57.5%;"></div>
+                                    </div>
+                                    <span class="bar-label">WHEAT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="bottom-row mt-4">
+                    <!-- PANEL 4: DIGITAL TWIN SIMULATION -->
+                    <section class="panel digital-twin-panel">
+                        <div class="panel-header">
+                            <h2>DIGITAL TWIN SIMULATION</h2>
+                        </div>
+                        <div class="twin-content">
+                            <div class="twin-left">
+                                <div class="twin-icons">
+                                    <span class="circle-icon">☀️</span>
+                                    <span class="circle-icon">🌾</span>
+                                </div>
+                                <div class="twin-timer">
+                                    <span class="sub-text">Timer</span>
+                                    <span class="green-text large">14:32</span>
+                                </div>
+                                <div class="twin-scenario mt-4">
+                                    <span class="sub-text">Scenario:</span>
+                                    <span class="green-text">Max Yield</span>
+                                    <span class="sub-text">Water+Nutrients</span>
+                                </div>
+                            </div>
+
+                            <div class="twin-center">
+                                <div class="dial-container">
+                                    <div class="dial-outer-ring"></div>
+                                    <div class="dial-inner-ring">
+                                        <div class="dial-text">
+                                            <span class="sub-text">SIMULATION<br>STATUS</span>
+                                            <span class="active-text">ACTIVE</span>
+                                            <span class="percent-text">92%</span>
+                                        </div>
+                                    </div>
+                                    <div class="dial-progress"></div>
+                                </div>
+                            </div>
+
+                            <div class="twin-right">
+                                <div class="right-block">
+                                    <span class="green-text">Agricultural<br>metrics</span>
+                                    <span class="sub-text">Real-time farm<br>agricultural data</span>
+                                </div>
+                                <div class="right-block">
+                                    <span class="sub-text">Scenario:</span>
+                                    <span class="green-text">Max Yield</span>
+                                    <span class="sub-text">Water+Nutrients</span>
+                                </div>
+                                <div class="right-block">
+                                    <span class="sub-text">Variable:</span>
+                                    <span class="green-text">Max Yield</span>
+                                    <span class="sub-text">Water+Nutrients</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- PANEL 5: AI INSIGHTS & ACTIONS -->
+                    <section class="panel actions-panel">
+                        <div class="panel-header">
+                            <h2>AI INSIGHTS & ACTIONS</h2>
+                            <span class="sub-text block mt-1">Real-time recommendations</span>
+                        </div>
+                        <div class="action-list">
+                            <div class="action-item">
+                                <div class="action-icon circle-glow">💧</div>
+                                <div class="action-text">
+                                    <span class="action-title">Irrigate N. Sector</span>
+                                    <span class="action-sub">Irrigate recommendations</span>
+                                </div>
+                            </div>
+                            <div class="action-item">
+                                <div class="action-icon circle-glow">🌿</div>
+                                <div class="action-text">
+                                    <span class="action-title">Optimize NPK</span>
+                                    <span class="action-sub">Geo are recommendation</span>
+                                </div>
+                            </div>
+                            <div class="action-item">
+                                <div class="action-icon circle-glow">🐞</div>
+                                <div class="action-text">
+                                    <span class="action-title">Monitor Pest Level</span>
+                                    <span class="action-sub">Monitor recommendations</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- TAB: FIELD STATUS (DUMMY) -->
+            <div id="field-status" class="tab-content fade-in" style="display: none;">
+                <section class="panel top-panel" style="height: 100%;">
+                    <div class="panel-header">
+                        <h2>FIELD STATUS MODULE</h2>
+                        <div class="sub-header">Live telemetry and drone surveillance feeds.</div>
+                    </div>
+                    <div style="height: 500px; display: flex; justify-content: center; align-items: center; border: 1px dashed var(--neon-cyan); margin-top: 2rem; border-radius: 12px; background: rgba(0,255,255,0.02);">
+                        <h3 class="highlight-green">DRONE CAMERA FEED: STANDBY</h3>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB: CROPS (DUMMY) -->
+            <div id="crops" class="tab-content fade-in" style="display: none;">
+                <section class="panel top-panel" style="height: 100%;">
+                    <div class="panel-header">
+                        <h2>CROP MANAGEMENT</h2>
+                        <div class="sub-header">Inventory and growth stage tracking.</div>
+                    </div>
+                    <table style="width: 100%; margin-top: 2rem; border-collapse: collapse; text-align: left;">
+                        <tr style="border-bottom: 1px solid var(--neon-green); color: var(--neon-green);">
+                            <th style="padding: 1rem;">Crop</th><th style="padding: 1rem;">Sector</th><th style="padding: 1rem;">Stage</th><th style="padding: 1rem;">Health</th>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <td style="padding: 1rem;">Corn</td><td style="padding: 1rem;">North</td><td style="padding: 1rem;">Vegetative</td><td style="padding: 1rem;" class="highlight-green">94%</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <td style="padding: 1rem;">Soy</td><td style="padding: 1rem;">East</td><td style="padding: 1rem;">Flowering</td><td style="padding: 1rem;" class="highlight-green">88%</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem;">Wheat</td><td style="padding: 1rem;">South</td><td style="padding: 1rem;">Harvest</td><td style="padding: 1rem; color: #ffff00;">72%</td>
+                        </tr>
+                    </table>
+                </section>
+            </div>
+
+            <!-- TAB: AI ANALYTICS (DUMMY) -->
+            <div id="ai-analytics" class="tab-content fade-in" style="display: none;">
+                <section class="panel top-panel" style="height: 100%;">
+                    <div class="panel-header">
+                        <h2>AI ANALYTICS ENGINE</h2>
+                        <div class="sub-header">XGBoost Model predictions and SHAP explanations.</div>
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <p class="sub-text">Model Status: <span class="highlight-green">ONLINE</span></p>
+                        <p class="sub-text mt-4">Last Training Accuracy: <span class="highlight-green">97.4%</span></p>
+                        <p class="sub-text mt-4">Data points processed: <span class="highlight-green">14,203</span></p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB: AUTOMATION (DUMMY) -->
+            <div id="automation" class="tab-content fade-in" style="display: none;">
+                <section class="panel top-panel" style="height: 100%;">
+                    <div class="panel-header">
+                        <h2>IoT AUTOMATION HUB</h2>
+                        <div class="sub-header">Control smart irrigation and nutrient dispensing systems.</div>
+                    </div>
+                    <div style="display: flex; gap: 2rem; margin-top: 2rem;">
+                        <button class="pill-btn">TRIGGER N. SECTOR IRRIGATION</button>
+                        <button class="pill-btn" style="border-color: var(--neon-cyan); color: var(--neon-cyan);">DISPENSE UREA (5kg)</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB: SETTINGS (DUMMY) -->
+            <div id="settings" class="tab-content fade-in" style="display: none;">
+                <section class="panel top-panel" style="height: 100%;">
+                    <div class="panel-header">
+                        <h2>SYSTEM SETTINGS</h2>
+                        <div class="sub-header">Global configuration for AgriBrain.</div>
+                    </div>
+                    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="checkbox" checked> Enable Auto-Irrigation
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="checkbox" checked> Sync live weather API
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- SPA Tab Navigation Logic ---
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Update active nav styling
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+
+                    // Hide all tabs
+                    tabContents.forEach(tab => {
+                        tab.style.display = 'none';
+                        tab.classList.remove('active-tab');
+                    });
+
+                    // Show selected tab
+                    const targetId = item.getAttribute('data-target');
+                    const targetTab = document.getElementById(targetId);
+                    if(targetTab) {
+                        targetTab.style.display = 'block';
+                        void targetTab.offsetWidth; // trigger reflow for fade-in animation
+                        targetTab.classList.add('active-tab');
+                    }
+                });
+            });
+
+            // --- Interactive Sliders Logic ---
+            const sliders = [
+                { id: 'nitrogen-slider', valId: 'n-val' },
+                { id: 'phosphorus-slider', valId: 'p-val' },
+                { id: 'potassium-slider', valId: 'k-val' },
+                { id: 'moisture-slider', valId: 'm-val' }
+            ];
+
+            sliders.forEach(sliderConfig => {
+                const slider = document.getElementById(sliderConfig.id);
+                const valDisplay = document.getElementById(sliderConfig.valId);
+                
+                if(slider && valDisplay) {
+                    // Initialize the background gradient based on default value
+                    updateSliderBackground(slider);
+
+                    slider.addEventListener('input', (e) => {
+                        valDisplay.textContent = e.target.value;
+                        updateSliderBackground(e.target);
+                        
+                        // Optional: Randomly tweak yield forecast values when sliders move to simulate "Digital Twin" reaction
+                        simulateYieldChange();
+                    });
+                }
+            });
+
+            function updateSliderBackground(slider) {
+                const min = slider.min || 0;
+                const max = slider.max || 100;
+                const val = slider.value;
+                const percentage = ((val - min) / (max - min)) * 100;
+                
+                // We use CSS custom properties to update the styling of the pseudo-elements in styles.css
+                slider.style.setProperty('--slider-fill', `${percentage}%`);
+            }
+
+            function simulateYieldChange() {
+                // Just a visual dummy effect to make the UI feel responsive to input
+                const corn = document.getElementById('corn-yield');
+                const cornBar = document.getElementById('corn-bar');
+                if(corn && Math.random() > 0.5) {
+                    const newVal = (12 + Math.random() * 5).toFixed(1);
+                    corn.textContent = newVal;
+                    cornBar.style.height = `${(newVal/20)*100}%`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -19,6 +19,22 @@ This document is a curated collection of highly accessible articles and direct v
 *   **Article:** [IBM's Guide to Digital Twins](https://www.ibm.com/topics/what-is-a-digital-twin)
 *   **Summary Verdict (TL;DR):** A Digital Twin is a software replica of a physical farm. By feeding real-world soil data and weather forecasts into this software replica, you can fast-forward time to see what will happen to the crops without risking a real-world harvest. It's the ultimate "What-If" engine.
 
+### Time-Series Forecasting (Rainfall Prediction)
+*   **Video:** [Prophet Time Series Forecasting Tutorial](https://www.youtube.com/watch?v=BfZaizlQ8sY)
+*   **Article:** [Facebook Prophet Documentation](https://facebook.github.io/prophet/docs/quick_start.html)
+*   **Summary Verdict (TL;DR):** Prophet is designed for business time series with strong seasonal patterns (like monsoons). It handles missing data, outliers, and holiday effects automatically — ideal for Indian rainfall data.
+
+### Geospatial Data & PostGIS (Your Map Foundation)
+*   **Video:** [PostGIS Tutorial](https://www.youtube.com/watch?v=L7tQh5QxV8Q)
+*   **Article:** [PostGIS Workshop](https://postgis.net/workshops/postgis-intro/)
+*   **Article:** [GeoPandas Documentation](https://geopandas.org/en/stable/docs/user_guide.html)
+*   **Summary Verdict (TL;DR):** PostGIS extends PostgreSQL with spatial functions. You can store district boundaries as geometries, find which district a lat/long falls in, and query soil types by region — all in SQL.
+
+### Interactive Maps with Leaflet.js (Your Frontend Map)
+*   **Video:** [Leaflet.js Interactive Maps Tutorial](https://www.youtube.com/watch?v=ZB1Rl51Y7uQ)
+*   **Article:** [Leaflet.js Official Tutorials](https://leafletjs.com/examples.html)
+*   **Summary Verdict (TL;DR):** Leaflet is the lightweight, mobile-friendly standard for interactive web maps. Combined with React, it powers the map-driven location selection in AgriSim.
+
 ## 2. The Indian Agriculture Context (News & Reports)
 *   **Search Google for:** "How AI is Transforming Indian Agriculture"
     *   **Summary Verdict (TL;DR):** The biggest hurdles in Indian farming are data localization (massive micro-climate variations) and delivering AI insights to farmers via simple interfaces rather than complex dashboards.
@@ -44,5 +60,7 @@ This document is a curated collection of highly accessible articles and direct v
     *   *Limit:* They are static. They look at current soil health and give a generic number. They cannot simulate what happens if a farmer uses less water or experiences a heatwave.
 *   **Solution 2: Generic Weather Forecasting Apps**
     *   *Limit:* They tell the farmer it will rain, but they do not mathematically link the rain forecast to the *nutrient runoff* that will occur in the soil.
-*   **Solution 3: Your Proposed System (Predict + Simulate + Explain)**
-    *   *How it overcomes limits:* By using Digital Twin concepts, your system will link the soil data with the weather forecast, run a simulation, and use XAI to tell the farmer: *"Because heavy rain is expected next week, wait before applying Nitrogen, otherwise 30% of it will wash away into the river."*
+*   **Solution 3: Generic Crop Recommendation Apps**
+    *   *Limit:* They use only NPK/pH, ignoring rainfall forecast, regional soil type, land size, budget, and farming calendar.
+*   **Solution 4: AgriSim (Predict + Forecast + Simulate + Plan + Explain)**
+    *   *How it overcomes limits:* By using a **map-driven geospatial pipeline**, AgriSim connects: location → historical rainfall → rainfall forecast → regional soil → crop recommendation (with SHAP reasoning) → budget/land input → simulation (costs, yield, value, risk) → farming roadmap. XAI explains every recommendation. The farmer sees the full picture before deciding.

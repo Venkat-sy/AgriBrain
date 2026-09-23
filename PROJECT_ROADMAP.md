@@ -1,93 +1,159 @@
 # Final Year Project: Complete Roadmap & Learning Guide
 
-**Project Title:** AI-Driven Nutrient Recommendation System with Digital Twin & XAI Capabilities  
-**Domain:** Precision Agriculture / Artificial Intelligence  
-**Target Context:** Indian Agriculture (Smallholder Farms, Monsoonal Climate)
+**Project Title:** AgriSim: Geospatial Farming Simulator & Predictive AI Guide  
+**Domain:** Precision Agriculture / Artificial Intelligence / Geospatial Decision Support  
+**Target Context:** Indian Agriculture (Smallholder Farms, Monsoonal Climate, District-Level Planning)
 
 As your guide, I have structured this roadmap to take you from the theoretical research phase all the way to a fully deployed software application. Since this project is a massive learning opportunity, every stage includes **Learning Resources** tailored to be fully accessible from India, using direct links to popular, free Indian tech educators.
 
+The project follows the **AgriSim Pipeline**:
+**MAP → RAINFALL → RAINFALL FORECAST → REGIONAL SOIL → CROP RECOMMENDATION → LAND/BUDGET → SIMULATION → YIELD/COST → FARMING ROADMAP**
+
 ---
 
-## Stage 1: Literature Survey & Problem Definition (Weeks 1–4) ✅ *COMPLETED*
-*   **Tasks:** Study existing systems, identify the research gap (Predict Only vs. Predict + Simulate).
-*   **Deliverables:** Literature Table, Research Gap Identification, Survey Paper Draft.
+## Phase 1: Literature Survey & Problem Definition (Weeks 1–4) ✅ *COMPLETED*
+*   **Tasks:** Study existing systems, identify the research gap (Predict Only → Predict + Simulate + Geospatial). Align problem statement with AgriSim's map-driven workflow.
+*   **Deliverables:** Literature Table, Research Gap Identification, Survey Paper Draft, Updated Synopsis (AgriSim-aligned).
 *   **Learning Resources:** 
     *   *You have already completed this! Refer to your `STAGE_1_Resource_Vault.md` and `STAGE_1_CheatSheet.md` for a recap of the theories.*
 
 ---
 
-## Stage 2: System Architecture & Requirements (Weeks 5–8)
-Before writing any code, you must define the "blueprint" of your project.
+## Phase 2: System Architecture & Requirements (Weeks 5–8) 🔴 *NEEDS REWORK*
+Before writing any code, you must define the "blueprint" of your project aligned with AgriSim pipeline.
 
 *   **Software Requirements Stack:**
-    *   **Machine Learning:** Python, Scikit-Learn, XGBoost, SHAP.
-    *   **Backend / API:** FastAPI or Flask (Python).
-    *   **Frontend (User Interface):** HTML/CSS/JavaScript or React.
-*   **Deliverable:** A System Architecture Diagram.
+    *   **Machine Learning:** Python, Scikit-Learn, XGBoost, LightGBM, Prophet, SHAP, (optional: PyTorch/TensorFlow for CNN).
+    *   **Backend / API:** FastAPI (async) with SQLAlchemy + PostGIS.
+    *   **Database:** PostgreSQL + PostGIS (spatial queries), Redis (caching).
+    *   **Frontend (User Interface):** React + Leaflet.js (interactive maps), Recharts/Chart.js (visualizations).
+    *   **Geospatial:** GeoPandas, Shapely, district boundary GeoJSON.
+*   **Deliverable:** 
+    *   System Architecture Diagram matching AgriSim pipeline
+    *   PostgreSQL + PostGIS database schema
+    *   OpenAPI/Swagger specification for all endpoints
+    *   FastAPI project skeleton with router structure
 *   **Learning Resources:**
     *   **[Video]** [CampusX System Architecture for Machine Learning Projects](https://www.youtube.com/watch?v=bHK1fE_BUms)
-    *   **[Search Google]** "Software Architecture Diagrams Best Practices" (Search this to see visual examples of how APIs connect to databases).
+    *   **[Video]** [FastAPI Official Tutorial](https://fastapi.tiangolo.com/tutorial/)
+    *   **[Video]** [Leaflet.js Interactive Maps Tutorial](https://www.youtube.com/watch?v=ZB1Rl51Y7uQ)
+    *   **[Article]** [PostGIS Tutorial](https://postgis.net/workshops/postgis-intro/)
 
 ---
 
-## Stage 3: Data Preprocessing & EDA (Weeks 9–11)
-AI is only as good as the data you feed it. You must learn how to clean data and draw graphs.
+## Phase 3: Data Collection, Preprocessing & EDA (Weeks 9–12) 🟡 *PARTIALLY COMPLETED - NEEDS REALIGNMENT*
+Redirect existing datasets to AgriSim objectives.
 
 *   **Tasks:**
-    *   Load your dataset into Python using Pandas.
-    *   **Clean the Data:** Handle missing values, remove duplicates.
-    *   **Exploratory Data Analysis (EDA):** Create graphs to see how Nitrogen levels correlate with crop yield.
-*   **Deliverable:** A Jupyter Notebook (`.ipynb`) containing all your data cleaning steps.
+    *   **Rainfall Data:** Process district-level monthly time-series (1901-2015) for forecasting — focus on Prophet/XGBoost-ready format.
+    *   **Soil Data:** Acquire/create region→soil type mapping (ICAR/NBSSLUP publications, Soil Health Card aggregates) — build spatial table with geometry.
+    *   **Crop Recommendation Data:** Enhance existing datasets with soil type + region as features.
+    *   **Crop Economics Data:** **NEW** — Build crop economics dataset (spacing, input costs per hectare, market prices, growth stages).
+    *   **Crop Production Data:** Use district-level historical production for yield baseline assumptions.
+    *   **Geospatial Data:** Download district boundaries GeoJSON (DataMeet/geojson-india).
+*   **Deliverable:** 
+    *   District-monthly rainfall time-series ready for forecasting
+    *   Soil spatial table (PostGIS) populated with region→soil mappings
+    *   Crop economics table built
+    *   Comprehensive EDA notebook per AgriSim data category
 *   **Learning Resources:**
     *   **[Video]** [CodeWithHarry Pandas Tutorial in Hindi](https://www.youtube.com/watch?v=RhEjmHeDNoA) 
     *   **[Video]** [Krish Naik Exploratory Data Analysis (EDA)](https://www.youtube.com/watch?v=ioN1jcWxbv8)
+    *   **[Video]** [Prophet Time Series Forecasting Tutorial](https://www.youtube.com/watch?v=BfZaizlQ8sY)
+    *   **[Article]** [GeoPandas Documentation](https://geopandas.org/en/stable/docs/user_guide.html)
 
 ---
 
-## Stage 4: Core Machine Learning Development (Weeks 12–16)
-This is where you build the "Brain" of your project.
+## Phase 4: Modern ML / AI & XAI (Weeks 13–17) 🟡 *PARTIALLY COMPLETED - NEEDS MODERNIZATION*
+Train four model types with modern candidates; SHAP explainability for all.
 
 *   **Tasks:**
-    *   **Baseline Model:** Train Random Forest and XGBoost models.
-    *   **The XAI Integration:** Write the Python code using the `shap` library to generate visual explanations.
-*   **Deliverable:** A trained `.pkl` (pickle) model file.
+    *   **Model 1 — Rainfall Forecasting (Time-Series Regression):** Prophet (baseline) vs XGBoost-Lag vs LightGBM-Lag vs LSTM. Metrics: MAE, RMSE, MAPE. District-level monthly prediction.
+    *   **Model 2 — Crop Recommendation (Multi-class Classification):** XGBoost vs LightGBM vs HistGradientBoosting vs TabNet. Features: rainfall forecast, soil type, climate, region. Metrics: F1-macro, Top-3 Accuracy.
+    *   **Model 3 — Yield Prediction (Regression):** XGBoost vs LightGBM vs Random Forest vs HistGradientBoosting. Features: crop, soil, rainfall, land size, management. Metrics: R², MAE, RMSE.
+    *   **Model 4 — Crop Economics / Cost Estimation (Regression):** LightGBM for cost per hectare by crop/region.
+    *   **XAI Layer:** SHAP (TreeExplainer) for all models — beeswarm, dependence, waterfall plots. Save explainers for API serving.
+*   **Deliverable:** 
+    *   4 trained model artifacts (.pkl/.joblib) with comparison reports
+    *   SHAP explainers saved for production
+    *   Model cards documenting features, metrics, limitations
 *   **Learning Resources:**
     *   **[Video]** [Krish Naik Random Forest Algorithm Explained](https://www.youtube.com/watch?v=nxFG5xdpDto)
     *   **[Video]** [Krish Naik XGBoost Algorithm Intuition](https://www.youtube.com/watch?v=gPciUPwWJQQ) 
     *   **[Video]** [CampusX Explainable AI SHAP Tutorial](https://www.youtube.com/watch?v=8EQwpmK49sk)
+    *   **[Video]** [Prophet Time Series Forecasting](https://www.youtube.com/watch?v=BfZaizlQ8sY)
+    *   **[Article]** [LightGBM Documentation](https://lightgbm.readthedocs.io/en/latest/)
 
 ---
 
-## Stage 5: The "Digital Twin" Simulation Module (Weeks 17–20)
-This is your unique selling point (USP).
+## Phase 5: Agricultural Simulation Engine (Weeks 18–21) 🔴 *NOT STARTED*
+Core simulation logic: budget → costs → yield → value → roadmap.
 
 *   **Tasks:**
-    *   Build a Python logic module that modifies predictions based on hypothetical "what-if" scenarios.
-*   **Deliverable:** The Simulation logic integrated into your main backend.
+    *   **Plant Capacity Calculator:** Crop-specific spacing × land area → plant count.
+    *   **Cost Engine:** Seeds/seedlings + fertilizer + irrigation + labor + land prep + plant protection + misc. Regional cost assumptions table.
+    *   **Yield Engine:** Base yield × area × adjustment factors (rainfall adequacy, soil suitability, management level).
+    *   **Market Value Engine:** Yield × price assumption (with source/date metadata).
+    *   **Risk Engine:** Rainfall deficit probability, price volatility, pest/disease pressure indicators.
+    *   **Roadmap Generator:** Crop growth stages → calendar timeline (land prep → sowing → irrigation → fertilization → harvesting). User-adjustable start date.
+    *   **User Override:** Allow modification of rainfall assumptions, cost assumptions, yield assumptions before finalizing.
+*   **Deliverable:** 
+    *   Simulation Python module (pure functions, testable)
+    *   Integrated into FastAPI as `/simulate` endpoint
+    *   Unit tests for each calculation
 *   **Learning Resources:**
-    *   **[API Doc]** [Python Requests Library Documentation](https://requests.readthedocs.io/en/latest/) (The official, guaranteed-to-work documentation for pulling live web data in Python).
+    *   **[Article]** [Crop Growth Stages Reference](https://www.icar.org.in/)
+    *   **[Video]** [Software Design Patterns for Business Logic](https://www.youtube.com/watch?v=NuHxG2VcQ4A)
 
 ---
 
-## Stage 6: Full-Stack Web Application Integration (Weeks 21–24)
-Making your AI usable for a farmer or end-user.
+## Phase 6: Full-Stack Application Integration (Weeks 22–26) 🔴 *NOT STARTED*
+End-to-end user journey: Map → Rainfall → Soil → Crop → Sim → Roadmap.
 
 *   **Tasks:**
-    *   **Backend:** Wrap your Python ML code in API endpoints using FastAPI or Flask.
-    *   **Frontend:** Build a web interface.
-*   **Deliverable:** A fully functioning local web application.
+    *   **Backend (FastAPI):** 
+        *   Router structure: `/map`, `/rainfall`, `/soil`, `/crop`, `/simulate`, `/roadmap`, `/chat` (optional)
+        *   PostGIS spatial queries for district lookup & soil filtering
+        *   Async model inference with cached SHAP explainers
+        *   OpenAPI docs auto-generated
+    *   **Frontend (React + Leaflet):**
+        *   MapView: Interactive India map, pin drop, district highlight
+        *   RainfallDashboard: Historical charts + 12-month forecast with confidence intervals
+        *   SoilSelector: Region-filtered dropdown + manual override + optional image upload
+        *   CropRecPanel: Ranked recommendations with SHAP reasoning
+        *   SimulationForm: Crop, land size, budget, adjustable assumptions
+        *   FinancialDashboard: Cost breakdown, yield, market value, risk indicators
+        *   RoadmapTimeline: Interactive calendar with activity cards
+        *   Optional: SoilImage, Disease, Chat modules
+    *   **State Management:** React Query for server state, local state for form wizard.
+*   **Deliverable:** 
+    *   Working full-stack application (local)
+    *   Complete user journey functional without mock data
 *   **Learning Resources:**
-    *   **[Video]** [CodeWithHarry Flask Tutorial](https://www.youtube.com/watch?v=DD3ou9sa3Z8)
-    *   **[Tutorial]** [FastAPI Official Documentation](https://fastapi.tiangolo.com/tutorial/) 
+    *   **[Video]** [FastAPI Official Tutorial](https://fastapi.tiangolo.com/tutorial/)
+    *   **[Video]** [React + Leaflet Tutorial](https://www.youtube.com/watch?v=ZB1Rl51Y7uQ)
+    *   **[Video]** [React Query (TanStack Query) Tutorial](https://www.youtube.com/watch?v=seU46c6of5A)
 
 ---
 
-## Stage 7: Testing, Validation & Final Thesis (Weeks 25–28)
+## Phase 7: Testing, Validation & Final Documentation (Weeks 27–29) 🔴 *NOT STARTED*
 Polishing the diamond before final submission.
 
 *   **Tasks:**
-    *   Test the web app with extreme "edge case" inputs.
-    *   Write the Final Project Report / Thesis.
-*   **Deliverable:** Final Thesis Document and a deployed app on the internet.
+    *   Unit tests for each service (backend + simulation engine)
+    *   Integration tests for API endpoints
+    *   E2E tests for user journey (Playwright/Cypress)
+    *   Geospatial validation (district lookup accuracy)
+    *   ML model validation reports (drift, fairness, robustness)
+    *   Simulation scenario testing (different budgets, land sizes, rainfall scenarios, soil types, crops)
+    *   Final thesis/documentation
+    *   Deployment preparation (Docker, cloud deployment)
+*   **Deliverable:** 
+    *   All test suites passing
+    *   Model validation documented
+    *   Final thesis complete
+    *   Deployed application (cloud)
 *   **Learning Resources:**
     *   **[Video]** [Krish Naik End to End Machine Learning Deployment](https://www.youtube.com/watch?v=S_F_c9e2bz4)
+    *   **[Video]** [Docker for ML Applications](https://www.youtube.com/watch?v=gAkwW2tuIqE)
+    *   **[Video]** [Playwright E2E Testing](https://www.youtube.com/watch?v=Y7yCr4GcJyU)

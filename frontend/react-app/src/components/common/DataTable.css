@@ -1,0 +1,76 @@
+/* ═══════════════════════════════════════════════════════════
+   DATA TABLE - Professional Table Component
+   ═══════════════════════════════════════════════════════════ */
+
+.data-table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+}
+
+/* Header */
+.data-table thead {
+    background: var(--neutral-50);
+    border-bottom: 1px solid var(--border-medium);
+}
+
+.data-table thead th {
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+/* Body */
+.data-table tbody tr {
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background-color var(--transition-fast);
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tbody td {
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    line-height: var(--line-height-normal);
+}
+
+/* Hoverable rows */
+.data-table-hoverable tbody tr:hover {
+    background: var(--neutral-50);
+}
+
+.data-table-hoverable tbody tr[style*="cursor: pointer"]:hover {
+    background: var(--neutral-100);
+}
+
+/* Compact variant */
+.data-table-compact thead th {
+    padding: var(--space-3) var(--space-4);
+}
+
+.data-table-compact tbody td {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-xs);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .data-table thead th,
+    .data-table tbody td {
+        padding: var(--space-3);
+        font-size: var(--font-size-xs);
+    }
+}

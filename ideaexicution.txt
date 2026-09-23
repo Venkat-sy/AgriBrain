@@ -1,0 +1,792 @@
+I have attached the **AgriSim Project Plan / Blueprint PDF**. Treat that PDF as the **authoritative target specification** for what my final-year project should become.
+
+I also have an existing project repository called `FinalYearProject`.
+
+The existing project already follows a **7-stage/phase academic structure**, and some stages have already been completed or partially implemented.
+
+## IMPORTANT
+
+Do NOT throw away the existing project.
+
+Do NOT start a completely new project.
+
+Instead:
+
+**Existing Project → Audit → Preserve Completed Work → Correct Direction → Upgrade → Implement Missing Features → Final AgriSim**
+
+The project must continue to be organized into the same **7 main phases/stages**, because these phases are already being used for my academic project tracking and reviews.
+
+---
+
+# PRIMARY REFERENCE
+
+Use the attached **AgriSim PDF** as the target specification.
+
+The PDF describes the intended system involving:
+
+* Geospatial map-based location selection
+* Historical rainfall analysis
+* Rainfall forecasting
+* Spatial/regional soil identification
+* Crop recommendation
+* Farm simulation
+* Budget estimation
+* Yield prediction
+* Farming roadmap/scheduling
+* Optional soil image classification
+* Optional plant disease detection
+* AI/chatbot capabilities
+
+The final system should ultimately follow:
+
+**MAP → RAINFALL → RAINFALL FORECAST → REGIONAL SOIL → CROP RECOMMENDATION → LAND/BUDGET → SIMULATION → YIELD/COST → FARMING ROADMAP**
+
+---
+
+# VERY IMPORTANT: EXISTING WORK
+
+Some phases of my current project have already been worked on.
+
+Before changing anything:
+
+1. Inspect the entire repository.
+2. Read the existing:
+
+   * `PROJECT_ROADMAP.md`
+   * `synopsis.md`
+   * `progress.md`
+   * `CLAUDE.md`
+   * Stage documentation
+   * Source code
+   * Datasets
+   * ML training scripts
+   * Models
+   * Frontend
+   * Backend
+   * Database
+   * Notebooks
+3. Determine exactly what has already been completed.
+4. Do NOT redo completed work unnecessarily.
+5. Reuse useful existing datasets, code, models, documentation, and architecture wherever possible.
+6. Modify only what needs to change to align the project with the AgriSim PDF.
+
+---
+
+# MAINTAIN THE 7-PHASE STRUCTURE
+
+The project must remain organized into these seven major stages:
+
+## PHASE 1 — Literature Survey & Problem Definition
+
+### Current situation
+
+This phase is already substantially completed.
+
+The existing project contains literature-survey material, research-gap analysis, problem definition, synopsis, and review material.
+
+### New goal
+
+Do NOT unnecessarily redo the literature survey.
+
+Instead, audit the existing material against the AgriSim direction.
+
+The research/problem definition should ultimately support:
+
+* Geospatial agricultural decision support
+* Localized rainfall analysis
+* Rainfall forecasting
+* Soil-aware crop recommendation
+* Agricultural simulation
+* Farm planning
+* AI/ML-based decision support
+
+Preserve useful academic work already completed.
+
+Only modify the problem statement, objectives, research gap, or scope where necessary to align with the AgriSim PDF.
+
+### Status
+
+**Already worked on / mostly completed**
+
+---
+
+# PHASE 2 — System Architecture & Requirements
+
+This phase needs to be **realigned rather than recreated**.
+
+The architecture should evolve toward:
+
+```text
+Interactive Map
+      ↓
+Latitude / Longitude
+      ↓
+Geospatial Data
+      ↓
+Historical Rainfall
+      ↓
+Rainfall Forecasting
+      ↓
+Regional Soil Database
+      ↓
+Crop Recommendation
+      ↓
+Simulation Engine
+      ↓
+Budget + Yield + Market Value
+      ↓
+Farming Roadmap
+```
+
+Technology should be selected based on the existing project where practical.
+
+Preferred architecture:
+
+### Frontend
+
+React.js
+
+Leaflet.js for maps.
+
+### Backend
+
+Python + FastAPI.
+
+### Database
+
+PostgreSQL, preferably with PostGIS if spatial queries are required.
+
+### ML
+
+Use modern, appropriate ML approaches rather than automatically retaining outdated algorithms.
+
+### Phase 2 deliverables
+
+* Updated system architecture
+* Updated component diagram
+* Updated data flow
+* Updated database architecture
+* API architecture
+* ML architecture
+* Functional requirements
+* Non-functional requirements
+* Updated project roadmap
+
+---
+
+# PHASE 3 — Data Collection, Preprocessing & EDA
+
+This phase should preserve useful preprocessing/EDA work from the existing project but redirect the datasets toward the AgriSim objectives.
+
+Organize the data into major categories:
+
+### 1. Rainfall / Weather Data
+
+Historical rainfall data suitable for time-series forecasting.
+
+Prefer:
+
+* Monthly rainfall
+* District/region information
+* Multi-year historical records
+* Temperature where available
+* Humidity where available
+* Other useful climate variables
+
+### 2. Soil Data
+
+Data that allows geographical regions to be associated with soil types.
+
+Potential structure:
+
+```text
+Region
+District
+State
+Geometry
+Soil Type
+Predominant Soil
+```
+
+### 3. Crop Recommendation Data
+
+Features may include:
+
+```text
+N
+P
+K
+pH
+Rainfall
+Temperature
+Humidity
+Soil Type
+Region
+Climate Variables
+```
+
+Use only features that are actually supported by the dataset.
+
+### 4. Crop Economics
+
+Where reliable data exists:
+
+```text
+Crop
+Land Area
+Spacing
+Input Costs
+Labour Cost
+Expected Yield
+Market Price
+```
+
+### 5. Optional Computer Vision Data
+
+For soil image classification:
+
+* Soil image dataset
+
+For plant disease detection:
+
+* PlantVillage or another appropriate public dataset
+
+### EDA
+
+Perform:
+
+* Missing-value analysis
+* Outlier analysis
+* Distribution analysis
+* Correlation analysis
+* Feature relationships
+* Class balance
+* Temporal rainfall patterns
+* Regional differences
+
+Preserve existing EDA work if it remains useful.
+
+---
+
+# PHASE 4 — Modern ML / AI Models
+
+This phase should be significantly upgraded from the old project architecture.
+
+## IMPORTANT ML INSTRUCTION
+
+Do NOT simply continue using Random Forest/XGBoost because they were originally selected.
+
+Evaluate **modern ML models that are appropriate for each task**.
+
+Model choice must be based on:
+
+* Dataset size
+* Feature types
+* Computational requirements
+* Interpretability
+* Expected performance
+* Final-year project feasibility
+* Availability of local training resources
+
+Do not use an unnecessarily complicated model merely to make the project sound advanced.
+
+---
+
+## 4.1 Rainfall Forecasting
+
+Evaluate appropriate modern time-series models.
+
+Possible candidates include:
+
+* LSTM
+* GRU
+* Temporal Fusion Transformer
+* XGBoost/LightGBM with engineered temporal features
+* Prophet as a baseline
+* ARIMA/SARIMA as a baseline
+
+For a final-year project, use a sensible comparison such as:
+
+**Baseline → Modern Model → Evaluation → Select the most suitable model**
+
+For example:
+
+```text
+SARIMA/Prophet
+       ↓
+LSTM/GRU
+       ↓
+Compare
+       ↓
+Select appropriate model
+```
+
+If a transformer-based model is justified by the dataset size and resources, evaluate it, but do not force it into the system.
+
+---
+
+## 4.2 Crop Recommendation
+
+Evaluate modern tabular ML approaches such as:
+
+* XGBoost
+* LightGBM
+* CatBoost
+* Random Forest as baseline
+* HistGradientBoosting
+* Other appropriate modern tabular models
+
+The final model should use validated agricultural features.
+
+Do not automatically use Random Forest just because the old project used it.
+
+Compare models and select based on evaluation.
+
+---
+
+## 4.3 Yield Prediction
+
+Use suitable regression models.
+
+Potential candidates:
+
+* XGBoost Regressor
+* LightGBM Regressor
+* CatBoost Regressor
+* Random Forest Regressor
+* Neural-network regression where justified
+
+Evaluate:
+
+```text
+MAE
+RMSE
+R²
+```
+
+---
+
+## 4.4 Irrigation / Water Demand
+
+If sufficient data exists, develop an appropriate prediction model for:
+
+```text
+Irrigation Demand
+```
+
+Potential approaches:
+
+* Gradient boosting
+* Regression models
+* Time-series models
+* Neural networks
+
+Do not create a fake model if sufficient training data does not exist.
+
+---
+
+## 4.5 Crop Failure Risk
+
+If the dataset supports it, implement:
+
+```text
+Crop Failure Risk
+```
+
+using suitable classification methods.
+
+Output should be something understandable such as:
+
+```text
+Low
+Medium
+High
+```
+
+with probability/confidence where justified.
+
+---
+
+# 5. EXPLAINABLE AI
+
+The old project contains SHAP/XAI work.
+
+Do not automatically remove it.
+
+Instead, integrate explainability into the **new ML architecture**.
+
+For the selected models, determine the most appropriate explainability method.
+
+Possible tools:
+
+* SHAP
+* LIME
+* Feature importance
+* Partial dependence
+* Permutation importance
+
+The system should explain why a crop was recommended.
+
+For example:
+
+```text
+Crop Recommendation
+
+Recommended Crop: Rice
+
+Important Factors:
+Rainfall      █████████
+Soil Type     ████████
+Temperature   ██████
+pH            █████
+```
+
+The exact visualization should be based on actual model outputs.
+
+Do NOT fabricate explanations.
+
+---
+
+# PHASE 5 — Digital Twin / Agricultural Simulation
+
+Preserve the existing project's **Digital Twin / What-If simulation concept**, because this can remain an important part of the final project.
+
+However, adapt it to the AgriSim workflow.
+
+The simulation should start after:
+
+```text
+Location
++
+Rainfall
++
+Predicted Rainfall
++
+Soil
++
+Crop
++
+Land Area
++
+Budget
+```
+
+The user should be able to modify relevant parameters and observe changes.
+
+Example:
+
+```text
+Scenario A
+Rainfall: Normal
+Soil: Red
+Budget: ₹5L
+       ↓
+Yield: X
+Risk: Y
+```
+
+Then:
+
+```text
+Scenario B
+Rainfall: Lower
+Soil: Red
+Budget: ₹5L
+       ↓
+Yield: X
+Risk: Y
+```
+
+The Digital Twin should answer:
+
+> "What happens if I change this farming condition?"
+
+Possible variables:
+
+* Rainfall
+* Temperature
+* Soil nutrients
+* Soil type
+* Moisture
+* Irrigation
+* Budget
+* Land area
+
+Do not simulate variables for which the underlying ML/data pipeline has no meaningful relationship.
+
+---
+
+# PHASE 6 — Full-Stack Application Integration
+
+This phase should convert all the work into one coherent application.
+
+The primary user journey must be:
+
+```text
+MAP
+ ↓
+LOCATION
+ ↓
+HISTORICAL RAINFALL
+ ↓
+RAIN FORECAST
+ ↓
+REGIONAL SOIL OPTIONS
+ ↓
+CONFIRM SOIL
+ ↓
+CROP RECOMMENDATION
+ ↓
+SELECT CROP
+ ↓
+LAND + BUDGET
+ ↓
+SIMULATION
+ ↓
+COST + YIELD + MARKET VALUE
+ ↓
+FARMING ROADMAP
+```
+
+### Frontend
+
+Use the existing frontend where practical.
+
+Improve it toward:
+
+* Map-first interface
+* Rainfall charts
+* Forecast visualization
+* Soil selection
+* Crop recommendations
+* Simulation controls
+* Budget dashboard
+* Yield dashboard
+* Farming timeline
+* XAI visualizations
+
+---
+
+# PHASE 6 OPTIONAL MODULES
+
+Only after the core application is stable:
+
+## Soil Image Analyzer
+
+Use transfer learning with an appropriate lightweight vision model such as:
+
+* MobileNetV3
+* EfficientNet
+* MobileNetV2
+
+Do not force a CNN if the dataset is insufficient.
+
+Workflow:
+
+```text
+Upload Soil Image
+        ↓
+AI Prediction
+        ↓
+Confidence
+        ↓
+User Confirmation
+        ↓
+Crop Recommendation
+```
+
+The user must always be able to override the prediction.
+
+---
+
+# PLANT DISEASE DETECTION
+
+Treat plant disease detection as an **optional extension**, not the core system.
+
+Potential approach:
+
+```text
+Leaf Image
+    ↓
+Vision Model
+    ↓
+Disease Classification
+    ↓
+Confidence
+    ↓
+Treatment Information
+```
+
+Possible modern lightweight models:
+
+* MobileNetV3
+* EfficientNet
+* ConvNeXt-Tiny
+* MobileNetV2
+
+Choose based on dataset size and computational resources.
+
+If confidence is low, return:
+
+```text
+Inconclusive — please upload a clearer image.
+```
+
+Do not present the result as a guaranteed medical/agricultural diagnosis.
+
+---
+
+# PHASE 7 — TESTING, VALIDATION & FINAL DOCUMENTATION
+
+The final phase should validate the entire system.
+
+## Test:
+
+### Geospatial
+
+* Valid coordinates
+* Invalid coordinates
+* Different regions
+* Soil filtering
+
+### Rainfall
+
+* Historical data retrieval
+* Forecast generation
+* Missing data
+* Forecast accuracy
+
+### ML
+
+* Classification metrics
+* Regression metrics
+* Time-series metrics
+* Confusion matrices where appropriate
+* Model comparison
+
+### Simulation
+
+* Different budgets
+* Different land sizes
+* Different rainfall scenarios
+* Different soil types
+* Different crops
+
+### Frontend
+
+* API failures
+* Loading states
+* Empty states
+* Invalid inputs
+* Mobile/responsive behavior
+
+---
+
+# ACADEMIC PHASE TRACKING
+
+Maintain the following structure in the project documentation:
+
+```text
+PHASE 1
+Literature Survey & Problem Definition
+
+PHASE 2
+System Architecture & Requirements
+
+PHASE 3
+Data Collection, Preprocessing & EDA
+
+PHASE 4
+Modern ML / AI & XAI
+
+PHASE 5
+Digital Twin / Agricultural Simulation
+
+PHASE 6
+Full-Stack Application Integration
+
+PHASE 7
+Testing, Validation & Final Documentation
+```
+
+For each phase maintain:
+
+```text
+Objectives
+Current Status
+Completed Work
+Remaining Work
+Deliverables
+Files/Modules
+Testing
+Next Steps
+```
+
+---
+
+# CURRENT STATUS MUST BE PRESERVED
+
+Before implementation, determine which phases are:
+
+🟢 COMPLETED
+🟡 PARTIALLY COMPLETED
+🔴 NOT STARTED
+🔵 NEEDS REWORK
+
+Do NOT mark something completed simply because a file exists.
+
+Verify that it actually works.
+
+---
+
+# FIRST TASK
+
+Do NOT immediately start rewriting the project.
+
+First inspect the entire repository and the attached AgriSim PDF.
+
+Then produce a **phase-wise migration plan** in this exact format:
+
+| Phase   | Existing Status | What Can Be Reused | What Needs Modification | What Must Be Added | Priority |
+| ------- | --------------- | ------------------ | ----------------------- | ------------------ | -------- |
+| Phase 1 |                 |                    |                         |                    |          |
+| Phase 2 |                 |                    |                         |                    |          |
+| Phase 3 |                 |                    |                         |                    |          |
+| Phase 4 |                 |                    |                         |                    |          |
+| Phase 5 |                 |                    |                         |                    |          |
+| Phase 6 |                 |                    |                         |                    |          |
+| Phase 7 |                 |                    |                         |                    |          |
+
+Then provide:
+
+### 1. Current Project Architecture
+
+### 2. AgriSim Target Architecture
+
+### 3. Major Differences
+
+### 4. Phase-by-Phase Migration Plan
+
+### 5. Modern ML Model Candidates
+
+### 6. Features That Should Be Preserved
+
+### 7. Features That Should Be Reworked
+
+### 8. Features That Should Become Optional
+
+### 9. Features That Are Missing
+
+### 10. Recommended Development Order
+
+---
+
+## FINAL RULE
+
+The existing project is **not a failed project that needs to be discarded**.
+
+It is a partially completed foundation that needs to be redirected.
+
+Preserve valuable work, correct the architecture, modernize the ML components, and gradually transform it into the AgriSim system described in the attached PDF.
+
+Do not make major changes until the phase-wise audit and migration plan are complete.

@@ -115,6 +115,265 @@ def evaluate_regression(model, X, y, label=""):
         print(f"    {label}: RMSE={rmse:.4f}, MAE={mae:.4f}, R²={r2:.4f}")
     return metrics
 
+# ---------------------------------------------------------------------------
+# Updated training utilities – modernized implementations
+# ---------------------------------------------------------------------------
+from sklearn.model_selection import train_test_split, StratifiedKFold
+from datetime import datetime
+
+def _load_data(task_name: str):
+    """Load the appropriate CSV for a given task.
+
+    Returns
+    -------
+    X : pandas.DataFrame
+        Feature matrix.
+    y : pandas.Series
+        Target vector.
+    """
+    mapping = {
+        "crop_recommendation": "crop_recommendation_train.csv",
+        "fertilizer_recommendation": "fertilizer_recommendation_train.csv",
+        "yield_prediction": "yield_prediction_train.csv",
+        "advanced_yield": "advanced_yield_train.csv",
+    }
+    file_name = mapping.get(task_name)
+    if not file_name:
+        raise ValueError(f"Unsupported task {task_name}")
+    df = pd.read_csv(os.path.join(TRAIN_DIR, file_name))
+    # Determine target column based on task
+    if task_name == "crop_recommendation":
+        target_col = "label_encoded"
+    elif task_name == "fertilizer_recommendation":
+        target_col = "Fertilizer_Encoded"
+    elif task_name == "yield_prediction":
+        target_col = "Yield_per_Area"
+    else:  # advanced_yield – caller will slice columns
+        target_col = None
+    if target_col:
+        X = df.drop(columns=[target_col])
+        y = df[target_col]
+        return X, y
+    return df, None
+
+def _fit_model(model, X_train, y_train, X_val, y_val, is_classifier: bool):
+    """Fit a model with optional early stopping for XGBoost.
+
+    Parameters
+    ----------
+    model : estimator
+        sklearn or xgboost estimator instance.
+    X_train, y_train, X_val, y_val : arrays
+        Training and validation splits.
+    is_classifier : bool
+        Determines early‑stopping handling.
+    """
+    if isinstance(model, (XGBClassifier, XGBRegressor)) and HAS_XGB:
+        # XGBoost supports early stopping via eval_set
+        eval_metric = "logloss" if is_classifier else "rmse"
+        model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_val, y_val)],
+            eval_metric=eval_metric,
+            early_stopping_rounds=10,
+            verbose=False,
+        )
+    else:
+        model.fit(X_train, y_train)
+    return model
+
+def train_classification_task(task_name: str):
+    """Train classification models for the specified task.
+
+    The function loads data, performs a stratified split, runs a grid search
+    for RandomForest and (optionally) XGBoost, evaluates on a held‑out test set
+    and saves the best model.
+    """
+    print(f"\n--- Training classification task: {task_name} ---")
+    X, y = _load_data(task_name)
+    # Stratified split to preserve class distribution
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    # Further split training set for validation during hyper‑parameter search
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
+    )
+
+    # --- Random Forest ---
+    rf = RandomForestClassifier(random_state=42)
+    rf_grid = GridSearchCV(rf, RF_CLF_PARAMS, cv=3, n_jobs=-1, scoring="accuracy")
+    rf_grid.fit(X_train, y_train)
+    best_rf = rf_grid.best_estimator_
+    best_rf = _fit_model(best_rf, X_train, y_train, X_val, y_val, is_classifier=True)
+    rf_metrics = evaluate_classification(best_rf, X_test, y_test, label="RF")
+
+    # --- XGBoost (optional) ---
+    if HAS_XGB:
+        xgb = XGBClassifier(
+            use_label_encoder=False,
+            eval_metric="logloss",
+            random_state=42,
+        )
+        xgb_grid = GridSearchCV(xgb, XGB_CLF_PARAMS, cv=3, n_jobs=-1, scoring="accuracy")
+        xgb_grid.fit(X_train, y_train)
+        best_xgb = xgb_grid.best_estimator_
+        best_xgb = _fit_model(best_xgb, X_train, y_train, X_val, y_val, is_classifier=True)
+        xgb_metrics = evaluate_classification(best_xgb, X_test, y_test, label="XGB")
+    else:
+        best_xgb = None
+        xgb_metrics = {}
+
+    # Choose best model based on validation accuracy (using stored cv results)
+    rf_val_score = rf_grid.best_score_
+    xgb_val_score = xgb_grid.best_score_ if HAS_XGB else -1
+    if xgb_val_score > rf_val_score:
+        best_model = best_xgb
+        best_name = "xgboost"
+        best_metrics = xgb_metrics
+    else:
+        best_model = best_rf
+        best_name = "rf"
+        best_metrics = rf_metrics
+
+    # Save models with timestamp versioning
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    model_path = os.path.join(MODELS_DIR, f"{best_name}_{task_name}_model_{timestamp}.pkl")
+    joblib.dump(best_model, model_path)
+    print(f"    ✅ Saved best {best_name} model for {task_name} to {model_path}")
+
+    # Record results
+    task_results = {
+        "problem_type": "classification",
+        "models": {
+            "rf": {"model_path": model_path if best_name == "rf" else None, "test_metrics": rf_metrics},
+            "xgboost": {"model_path": model_path if best_name == "xgboost" else None, "test_metrics": xgb_metrics},
+        },
+        "selected_best": best_name,
+    }
+    all_results[task_name] = task_results
+
+def train_regression_task(task_name: str):
+    """Train regression models for the specified task.
+
+    Supports RandomForestRegressor and optional XGBoostRegressor.
+    """
+    print(f"\n--- Training regression task: {task_name} ---")
+    X, y = _load_data(task_name)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.2, random_state=42
+    )
+
+    # Random Forest
+    rf = RandomForestRegressor(random_state=42)
+    rf_grid = GridSearchCV(rf, RF_REG_PARAMS, cv=3, n_jobs=-1, scoring="neg_mean_squared_error")
+    rf_grid.fit(X_train, y_train)
+    best_rf = rf_grid.best_estimator_
+    best_rf = _fit_model(best_rf, X_train, y_train, X_val, y_val, is_classifier=False)
+    rf_metrics = evaluate_regression(best_rf, X_test, y_test, label="RF")
+
+    # XGBoost (optional)
+    if HAS_XGB:
+        xgb = XGBRegressor(random_state=42)
+        xgb_grid = GridSearchCV(xgb, XGB_REG_PARAMS, cv=3, n_jobs=-1, scoring="neg_mean_squared_error")
+        xgb_grid.fit(X_train, y_train)
+        best_xgb = xgb_grid.best_estimator_
+        best_xgb = _fit_model(best_xgb, X_train, y_train, X_val, y_val, is_classifier=False)
+        xgb_metrics = evaluate_regression(best_xgb, X_test, y_test, label="XGB")
+    else:
+        best_xgb = None
+        xgb_metrics = {}
+
+    rf_val = rf_grid.best_score_
+    xgb_val = xgb_grid.best_score_ if HAS_XGB else -np.inf
+    if xgb_val > rf_val:
+        best_model = best_xgb
+        best_name = "xgboost"
+        best_metrics = xgb_metrics
+    else:
+        best_model = best_rf
+        best_name = "rf"
+        best_metrics = rf_metrics
+
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    model_path = os.path.join(MODELS_DIR, f"{best_name}_{task_name}_model_{timestamp}.pkl")
+    joblib.dump(best_model, model_path)
+    print(f"    ✅ Saved best {best_name} regression model for {task_name} to {model_path}")
+
+    task_results = {
+        "problem_type": "regression",
+        "models": {
+            "rf": {"model_path": model_path if best_name == "rf" else None, "test_metrics": rf_metrics},
+            "xgboost": {"model_path": model_path if best_name == "xgboost" else None, "test_metrics": xgb_metrics},
+        },
+        "selected_best": best_name,
+    }
+    all_results[task_name] = task_results
+
+def train_advanced_yield():
+    """Train models for the advanced yield multi‑output task.
+
+    This function loads the advanced yield dataset and trains three separate
+    models: regression for ``Yield_tons_per_ha`` and ``Irrigation_Demand_mm``,
+    and classification for ``Crop_Failure_Risk``.
+    """
+    print("\n--- Training advanced yield multi‑output task ---")
+    df = pd.read_csv(os.path.join(TRAIN_DIR, "advanced_yield_train.csv"))
+    # Features are all columns except the three targets and the encoded crop type
+    target_cols = {
+        "yield": "Yield_tons_per_ha",
+        "irrigation": "Irrigation_Demand_mm",
+        "risk": "Crop_Failure_Risk",
+    }
+    feature_cols = [c for c in df.columns if c not in list(target_cols.values()) + ["Crop_Type_Encoded"]]
+    X = df[feature_cols]
+
+    sub_results = {}
+    for sub_name, target in target_cols.items():
+        y = df[target]
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y if sub_name == "risk" else None
+        )
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_train, y_train, test_size=0.2, random_state=42, stratify=y_train if sub_name == "risk" else None
+        )
+        if sub_name == "risk":
+            # Classification
+            model = RandomForestClassifier(random_state=42)
+            grid = GridSearchCV(model, RF_CLF_PARAMS, cv=3, n_jobs=-1, scoring="accuracy")
+            grid.fit(X_train, y_train)
+            best = grid.best_estimator_
+            best = _fit_model(best, X_train, y_train, X_val, y_val, is_classifier=True)
+            metrics = evaluate_classification(best, X_test, y_test, label=sub_name)
+            problem = "classification"
+        else:
+            # Regression
+            model = RandomForestRegressor(random_state=42)
+            grid = GridSearchCV(model, RF_REG_PARAMS, cv=3, n_jobs=-1, scoring="neg_mean_squared_error")
+            grid.fit(X_train, y_train)
+            best = grid.best_estimator_
+            best = _fit_model(best, X_train, y_train, X_val, y_val, is_classifier=False)
+            metrics = evaluate_regression(best, X_test, y_test, label=sub_name)
+            problem = "regression"
+        # Save model
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        model_path = os.path.join(MODELS_DIR, f"best_adv_{sub_name}_{timestamp}.pkl")
+        joblib.dump(best, model_path)
+        sub_results[sub_name] = {
+            "problem_type": problem,
+            "models": {
+                "rf": {"model_path": model_path, "test_metrics": metrics}
+            },
+            "selected_best": "rf",
+        }
+        print(f"    ✅ Trained {problem} model for {sub_name} – saved to {model_path}")
+
+    all_results["advanced_yield"] = {"sub_tasks": sub_results}
+
 
 # ─── Training Functions ─────────────────────────────────────────────────────
 

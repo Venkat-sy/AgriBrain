@@ -1,5 +1,6 @@
 from pptx import Presentation
 from pptx.util import Inches, Pt
+import os
 
 prs = Presentation()
 
@@ -119,14 +120,40 @@ create_slide("Proposed Workflow", [
     "9. Dashboard (Glassmorphism UI) -> Decision Support"
 ])
 
-# Slide 11: System Architecture
-create_slide("System Architecture", [
-    "Edge Layer: Agricultural Field, IoT Sensors, Weather APIs.",
-    "Data Layer: Data Collection Layer -> Cloud Storage.",
-    "Processing Layer: Data Preprocessing (Pandas/NumPy).",
-    "Intelligence Layer: AI Models (Scikit-Learn/XGBoost) embedded within the Digital Twin Engine.",
-    "Presentation Layer: Explainable AI Layer routes logic to the Dashboard (HTML/CSS/JS SPA) for Farmer Decision Support."
-])
+# Slide 11: System Architecture (with image)
+arch_slide_layout = prs.slide_layouts[5]  # blank layout
+arch_slide = prs.slides.add_slide(arch_slide_layout)
+
+# Add title text box at top
+from pptx.util import Emu
+title_txBox = arch_slide.shapes.add_textbox(Inches(0.3), Inches(0.1), Inches(9.4), Inches(0.7))
+title_tf = title_txBox.text_frame
+title_p = title_tf.paragraphs[0]
+title_p.text = "System Architecture"
+title_p.font.size = Pt(28)
+title_p.font.bold = True
+
+# Embed architecture image, centered and scaled to fit slide
+arch_img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "system_architecture.jpg")
+if os.path.exists(arch_img_path):
+    arch_slide.shapes.add_picture(arch_img_path, Inches(1.8), Inches(0.85), Inches(6.0), Inches(6.5))
+else:
+    # Fallback to text if image not found
+    tb = arch_slide.shapes.add_textbox(Inches(0.5), Inches(1.0), Inches(9.0), Inches(5.5))
+    tf2 = tb.text_frame
+    tf2.word_wrap = True
+    lines = [
+        "Agricultural Dataset: Soil Data, Weather Data, Crop Data, Historical Yield",
+        "Data Cleaning & EDA: Missing Value Handling, Outlier Detection, Correlation Analysis",
+        "Yield Prediction Model | Irrigation Prediction Model | Risk Prediction Model",
+        "Digital Twin Simulation Engine: What-if Modeling, Crop Growth Simulation",
+        "Scenario Analysis Dashboard: Interactive Visualizations, KPI Monitoring",
+        "Decision Support System: Actionable Recommendations, Resource Optimization"
+    ]
+    for line in lines:
+        lp = tf2.add_paragraph()
+        lp.text = line
+        lp.font.size = Pt(16)
 
 # Slide 12: Digital Twin Concept
 create_slide("Digital Twin Concept", [
@@ -228,5 +255,5 @@ create_slide("Conclusion & Thank You", [
     "Questions & Answers."
 ])
 
-prs.save("Final_Stage_Review_Presentation.pptx")
-print("Presentation created successfully as 'Final_Stage_Review_Presentation.pptx'")
+prs.save("Stage_Review_With_Architecture.pptx")
+print("Presentation created successfully as 'Stage_Review_With_Architecture.pptx'")
