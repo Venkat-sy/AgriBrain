@@ -15,17 +15,17 @@ pytestmark = pytest.mark.skip(reason="Skip due to model redefinition conflict in
 import importlib, sys
 
 # Ensure a fresh import of the data_import module to avoid duplicate model registration
-for mod in ["agrisim_backend.models", "agrisim_backend.data_import.soil_spatial_import"]:
+for mod in ["backend.models", "backend.data_import.soil_spatial_import"]:
     if mod in sys.modules:
         del sys.modules[mod]
 
-from agrisim_backend.data_import import soil_spatial_import
+from backend.data_import import soil_spatial_import
 # Import the models fresh after ensuring previous imports are cleared
 # Import Base lazily; the import may fail if the ORM metadata has already been
 # populated by another test. We catch the ImportError/Exception to allow the
 # module to load (the test is skipped anyway).
 try:
-    from agrisim_backend.models import Base
+    from backend.models import Base
 except Exception:  # pragma: no cover
     Base = None
 
@@ -67,3 +67,4 @@ def test_load_districts_and_soil_mapping(tmp_path):
         totals[district_id] += perc
     for total in totals.values():
         assert abs(total - 100.0) < 1e-3
+

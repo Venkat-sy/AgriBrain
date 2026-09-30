@@ -27,10 +27,16 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       
+      - name: Install Node.js dependencies and build frontend
+        run: |
+          cd frontend/react-app
+          npm ci
+          npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './frontend'
+          # The Vite build output directory
+          path: './frontend/react-app/dist'
           
       - name: Deploy to GitHub Pages
         id: deployment

@@ -42,7 +42,8 @@ async function runMyModel({ userMessage, farmContext }) {
         };
 
         try {
-            const res = await fetch('http://localhost:8000/api/v1/crop/recommend', {
+            const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+            const res = await fetch(`${backendUrl}/api/v1/crop/recommend`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),

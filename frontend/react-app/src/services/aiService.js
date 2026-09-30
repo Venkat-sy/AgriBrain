@@ -1,4 +1,9 @@
-const CHAT_ENDPOINT = '/api/chat';
+// The chat endpoint is configurable via an environment variable.
+// In development Vite serves a local middleware at /api/chat.
+// For production the frontend is hosted on GitHub Pages and must call the
+// backend directly. The VITE_BACKEND_URL variable is supplied at build time.
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const CHAT_ENDPOINT = `${BACKEND_URL}/api/chat`;
 
 export function buildFarmContext({
     farms = [],

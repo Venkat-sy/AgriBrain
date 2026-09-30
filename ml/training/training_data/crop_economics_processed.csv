@@ -1,0 +1,6 @@
+crop_name,planting_density,seed_cost,fertilizer_cost,labor_cost,market_price
+rice,150,20,15,30,150
+wheat,200,18,12,28,120
+cotton,250,22,18,35,200
+groundnut,180,19,14,25,130
+ragi,160,15,10,22,110

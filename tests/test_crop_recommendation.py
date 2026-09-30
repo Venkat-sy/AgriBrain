@@ -6,7 +6,7 @@ import numpy as np
 from pathlib import Path
 
 # Import the module under test
-from agrisim_backend.ml.crop_recommendation import merge_data, train_model, recommend
+from backend.ml.crop_recommendation import merge_data, train_model, recommend
 
 
 def _create_dummy_training_csv(path: Path) -> None:
@@ -75,3 +75,4 @@ def test_recommend_returns_top_k(tmp_path: Path):
         assert "crop_name" in r and "confidence" in r
         # Confidence should be a float between 0 and 1.
         assert 0.0 <= r["confidence"] <= 1.0
+
