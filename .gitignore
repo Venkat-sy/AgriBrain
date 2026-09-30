@@ -68,3 +68,7 @@ data/*.csv
 ~$*.docx
 ~$*.pptx
 ~$*.xlsx
+.vercel
+.env*
+.vercel_python_packages/
+*.zip
