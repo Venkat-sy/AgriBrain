@@ -7,3 +7,7 @@ xgboost
 shap
 joblib
 jupyterlab
+fastapi
+uvicorn[standard]
+mangum
+prophet
