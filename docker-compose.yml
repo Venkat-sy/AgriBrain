@@ -1,0 +1,63 @@
+ version: '3.8'
+
+ services:
+   # Backend API
+   backend:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+     ports:
+       - "8000:8000"
+     environment:
+       - DATABASE_URL=sqlite:///./agrisim_dev.db
+       - DATAGOV_API_KEY=${DATAGOV_API_KEY}
+       - GEMINI_API_KEY=${GEMINI_API_KEY}
+       - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+     volumes:
+       - ./backend:/app
+       - ./models:/app/models
+       - ./ml:/app/ml
+     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+     healthcheck:
+       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+       interval: 30s
+       timeout: 10s
+       retries: 3
+
+   # Frontend Web App
+   frontend:
+     build:
+       context: ./frontend_web
+       dockerfile: Dockerfile
+     ports:
+       - "3000:3000"
+     environment:
+       - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
+     volumes:
+       - ./frontend_web:/app
+       - /app/node_modules
+       - /app/.next
+     command: npm run dev
+     depends_on:
+       - backend
+     healthcheck:
+       test: ["CMD", "curl", "-f", "http://localhost:3000"]
+       interval: 30s
+       timeout: 10s
+       retries: 3
+
+   # Database (PostgreSQL for production, SQLite for dev)
+   # Uncomment for PostgreSQL:
+   # db:
+   #   image: postgres:15-alpine
+   #   environment:
+   #     - POSTGRES_DB=agribrain
+   #     - POSTGRES_USER=agribrain_user
+   #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+   #   ports:
+   #     - "5432:5432"
+   #   volumes:
+   #     - postgres_data:/var/lib/postgresql/data
+
+ # volumes:
+ #   postgres_data:

@@ -1,0 +1,98 @@
+"use client";
+
+import { useState, useMemo } from "react";
+
+interface InputPanelProps {
+  onSubmit: (formData: {
+    district_id: number;
+    soil_type: string;
+    rainfall_mm: number;
+    temperature_c?: number;
+    humidity_percent?: number;
+    ph?: number;
+    n?: number;
+    p?: number;
+    k?: number;
+  }) => void;
+  isLoading: boolean;
+  hasRecommendations: boolean;
+}
+
+const DISTRICTS = [
+  { id: 1, name: "Erode, Tamil Nadu", rainfall_mm: 750 },
+  { id: 2, name: "Coimbatore, Tamil Nadu", rainfall_mm: 650 },
+  { id: 3, name: "Salem, Tamil Nadu", rainfall_mm: 700 },
+  { id: 4, name: "Madurai, Tamil Nadu", rainfall_mm: 850 },
+  { id: 5, name: "Tiruchirappalli, Tamil Nadu", rainfall_mm: 800 },
+  { id: 6, name: "Karnal, Haryana", rainfall_mm: 650 },
+  { id: 7, name: "Ludhiana, Punjab", rainfall_mm: 600 },
+  { id: 8, name: "Amritsar, Punjab", rainfall_mm: 550 },
+  { id: 9, name: "Nashik, Maharashtra", rainfall_mm: 900 },
+  { id: 10, name: "Ahmednagar, Maharashtra", rainfall_mm: 750 },
+];
+
+const SOIL_TYPES = [
+  "Alluvial Soil",
+  "Black Soil (Regur)",
+  "Red Soil",
+  "Laterite Soil",
+  "Desert Soil",
+  "Mountain Soil",
+  "Peaty & Marshy Soil",
+];
+
+const PLANTING_SEASONS = ["Kharif", "Rabi", "Zaid", "Annual"];
+
+export function InputPanel({ onSubmit, isLoading, hasRecommendations }: InputPanelProps) {
+  const [formData, setFormData] = useState({
+    district_id: 1,
+    soil_type: "Alluvial Soil",
+    land_area_ha: 2.0,
+    budget_inr: 100000,
+    rainfall_mm: 750,
+    temperature_c: 28,
+    humidity_percent: 65,
+    ph: 6.5,
+    n: 120,
+    p: 40,
+    k: 150,
+    planting_season: "Kharif",
+    planned_start_date: "",
+  });
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const handleDistrictChange = (districtId: number) => {
+    const district = DISTRICTS.find(d => d.id === districtId);
+    if (district) {
+      setFormData(prev => ({ ...prev, district_id: districtId, rainfall_mm: district.rainfall_mm }));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      district_id: formData.district_id,
+      soil_type: formData.soil_type,
+      rainfall_mm: formData.rainfall_mm,
+      temperature_c: formData.temperature_c,
+      humidity_percent: formData.humidity_percent,
+      ph: formData.ph,
+      n: formData.n,
+      p: formData.p,
+      k: formData.k,
+    });
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const parsedValue = type === "number" ? parseFloat(value) : value;
+    setFormData(prev => ({ ...prev, [name]: parsedValue }));
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, planned_start_date: e.target.value }));
+  };
+
+  const content = useMemo(() => (
+    <form onSubmit={handleSubmit} className="space-y-5">
