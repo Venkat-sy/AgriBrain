@@ -1,0 +1,19 @@
+import pandas as pd
+df = pd.read_csv('master_agri_dataset_v2.csv')
+print(f'Master shape: {df.shape}')
+print(f'Years: {sorted(df["year"].unique())}')
+print(f'Districts: {df["district_name"].nunique()}')
+print(f'Crops: {df["crop"].nunique()}')
+print(f'Genuine crop: {df["area_ha"].notna().sum()}')
+print(f'Genuine rainfall: {df["annual_rainfall_mm"].notna().sum()}')
+print(f'Genuine soil: {df["soil_ph"].notna().sum()}')
+print(f'Crop data source: {df["crop_data_source"].value_counts().to_dict()}')
+print(f'Rainfall data source: {df["rainfall_data_source"].value_counts().to_dict()}')
+print(f'Soil data source: {df["soil_data_source"].value_counts().to_dict()}')
+
+# Check overlap
+crop_years = set(df[df['area_ha'].notna()]['year'].unique())
+rain_years = set(df[df['annual_rainfall_mm'].notna()]['year'].unique())
+print(f'\nCrop years: {sorted(crop_years)}')
+print(f'Rainfall years: {sorted(rain_years)}')
+print(f'Overlap: {crop_years & rain_years}')

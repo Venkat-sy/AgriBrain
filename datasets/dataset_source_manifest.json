@@ -1,0 +1,127 @@
+{
+  "rainfall": {
+    "genuine": {
+      "2021-2025": {
+        "source": "IMD NetCDF Grid (RF25_indYYYY_rfp25.nc)",
+        "provenance": "netcdf_grid_derived",
+        "files": [
+          "raw/RF25_ind2021_rfp25.nc",
+          "raw/RF25_ind2022_rfp25.nc",
+          "raw/RF25_ind2023_rfp25.nc",
+          "raw/RF25_ind2024_rfp25.nc",
+          "raw/RF25_ind2025_rfp25.nc"
+        ],
+        "processed_file": "temp_annual.pkl",
+        "districts": 631,
+        "records_per_year": "~631",
+        "total_records": "3155",
+        "status": "INTEGRATED"
+      },
+      "2026": {
+        "source": "IMD District-wise Daily Observations",
+        "provenance": "imd_district_observation",
+        "files": [
+          "rainfall_districtwise_daily_imd.csv"
+        ],
+        "processed_file": "temp_annual.pkl",
+        "districts": 437,
+        "records": 437,
+        "status": "INTEGRATED"
+      }
+    },
+    "synthetic_removed": {
+      "source": "rainfall_district_annual.csv (10 districts)",
+      "provenance": "synthetic_placeholder",
+      "status": "REMOVED - replaced by genuine IMD data"
+    },
+    "output_files": [
+      "temp_annual.pkl",
+      "district_rainfall_history.csv",
+      "district_rainfall_summary.json",
+      "rainfall_data_coverage.csv"
+    ]
+  },
+  "crop_production": {
+    "genuine": {
+      "source": "ICRISAT District Level Database",
+      "provenance": "icrisat_district_database",
+      "api_credentials": "configured in acquire_crop_data.py",
+      "raw_files": "raw/icrisat_*.csv (preserved)",
+      "processed_files": [
+        "processed/crop_production_district_icrisat.csv",
+        "processed/crop_yield_district_icrisat.csv"
+      ],
+      "years": "1978-2017",
+      "districts": 309,
+      "crops": 23,
+      "records": 179283,
+      "crops_list": [
+        "Rice",
+        "Wheat",
+        "Maize",
+        "Cotton",
+        "Soybean",
+        "Groundnut",
+        "Sugarcane",
+        "Chickpea",
+        "Sorghum",
+        "Pearl Millet",
+        "Finger Millet",
+        "Barley",
+        "Sunflower",
+        "Sesame",
+        "Castor",
+        "Linseed",
+        "Mustard",
+        "Pigeon Pea",
+        "Green Gram",
+        "Black Gram",
+        "Jute",
+        "Safflower",
+        "Minor Pulses"
+      ],
+      "status": "INTEGRATED - HISTORICAL ONLY"
+    },
+    "gaps": {
+      "2018-2025": "NO DATA - not fabricated",
+      "district_mapping": "ICRISAT names matched to 309 of 641 canonical",
+      "missing_crops": "Horticulture, minor pulses, oilseeds"
+    }
+  },
+  "soil": {
+    "current": {
+      "file": "soil_characteristics.csv",
+      "status": "SYNTHETIC PLACEHOLDER (per-state uniform values)",
+      "provenance": "state_level_synthetic"
+    },
+    "genuine_raw": {
+      "soil_ph": "raw/soil_ph.csv (SoilGrids download)",
+      "soil_organic_carbon": "raw/soil_organic_carbon.csv (SoilGrids download)"
+    },
+    "genuine_sources_identified": [
+      "SoilGrids 250m global rasters (ISRIC)",
+      "NBSS&LUP District Soil Profiles (ICAR)",
+      "ICAR-IISS Soil Health Cards"
+    ],
+    "action_required": "Process raw downloads to 641 canonical districts"
+  },
+  "master_dataset": {
+    "file": "master_agri_dataset.csv",
+    "records": 179283,
+    "years": "1978-2017",
+    "districts": 309,
+    "crops": 23,
+    "rainfall_coverage": "0 (NaN) - NO YEAR OVERLAP",
+    "yield_coverage": "179283 (100%)",
+    "production_coverage": "179283 (100%)",
+    "soil_ph_coverage": "179283 (100% - synthetic)",
+    "soil_oc_coverage": "179283 (100% - synthetic)",
+    "rainfall_data_available_separately": [
+      "temp_annual.pkl (2021-2026, 631 districts)",
+      "district_rainfall_history.csv",
+      "district_rainfall_summary.json"
+    ]
+  },
+  "validation_timestamp": "2026-11-07",
+  "validation_status": "PASSED - Genuine IMD rainfall restored, synthetic removed, crop data verified, soil gaps documented"
+}

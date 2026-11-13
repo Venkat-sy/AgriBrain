@@ -1,0 +1,113 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+pytestdebug.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Models and ML artifacts (large files)
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.bin
+ml/*.pkl
+ml/*.joblib
+ml/*.h5
+ml/*.pt
+ml/*.bin
+
+# Training data
+training_data/*.csv
+training_data/*.parquet
+training_data/*.json
+
+# Frontend
+frontend_web/node_modules/
+frontend_web/.next/
+frontend_web/out/
+frontend_web/build/
+frontend_web/*.log
+frontend_web/.turbo/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE/Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.iml
+
+# Test
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.hypothesis/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Misc
+*.bak
+*.backup
+*.tmp
+*.temp
+*.orig
+*.swp
+
+# Firebase credentials (sensitive)
+*.json

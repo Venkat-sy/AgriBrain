@@ -242,15 +242,20 @@ def task5():
 def task7():
     """Integrate crop economics data.
 
-    Expected CSV format (placed under ``datasets/04_crop_economics``):
+    Expected CSV format (placed under ``datasets/economics``):
     ``crop_name, planting_density, seed_cost, fertilizer_cost, labor_cost, market_price``
     The function merges this information with the crop recommendation
     features so that downstream models can incorporate cost‑aware targets.
     """
     print("Starting Task 7: Crop Economics")
-    eco_path = os.path.join(DATASETS_DIR, "04_crop_economics", "crop_economics.csv")
+    eco_path = os.path.join(DATASETS_DIR, "economics", "crop_economics.csv")
     if not os.path.isfile(eco_path):
-        raise FileNotFoundError(f"Crop economics file not found: {eco_path}")
+        # Try alternative path
+        eco_path_alt = os.path.join(DATASETS_DIR, "04_crop_economics", "crop_economics.csv")
+        if os.path.isfile(eco_path_alt):
+            eco_path = eco_path_alt
+        else:
+            raise FileNotFoundError(f"Crop economics file not found: {eco_path} or {eco_path_alt}")
     eco_df = pd.read_csv(eco_path)
     # Standardise column names
     eco_df.columns = [c.lower().replace(' ', '_') for c in eco_df.columns]

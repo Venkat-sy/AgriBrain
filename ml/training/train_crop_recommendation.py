@@ -25,7 +25,7 @@ import joblib
 import pandas as pd
 
 from backend.core.config import get_settings
-from backend.ml.crop_recommendation import merge_data, train_model, recommend
+from ml.inference.crop_recommendation import merge_data, train_model, recommend
 
 # ---------------------------------------------------------------------------
 # Resolve directories
@@ -59,8 +59,8 @@ def main() -> None:
         for _, row in test_df.iterrows():
             # Drop the target column if it exists – the model expects only the
             # feature set.
-            row_features = row.drop(labels=["label_encoded"], errors="ignore").to_dict()
-            recs = recommend(model, row_features, top_k=5)
+            row_features = row.drop(labels=["label_encoded", "label"], errors="ignore").to_dict()
+            recs = recommend(row_features, top_k=5)
             for r in recs:
                 records.append(
                     {

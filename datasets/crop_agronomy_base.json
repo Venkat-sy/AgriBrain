@@ -1,0 +1,527 @@
+{
+  "Rice": {
+    "season": "Kharif",
+    "duration_days": 120,
+    "n_kg_per_ha": 120,
+    "p_kg_per_ha": 60,
+    "k_kg_per_ha": 60,
+    "water_requirement_mm": 1200,
+    "optimal_temp_c": 25,
+    "soil_ph_range": [
+      5.5,
+      7.0
+    ],
+    "cultivation_cost_inr_per_ha": 45000,
+    "market_price_inr_per_ton": 22000,
+    "yield_range_tons_per_ha": [
+      3.0,
+      6.5
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Clay Loam",
+      "Silty Clay"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Wheat": {
+    "season": "Rabi",
+    "duration_days": 110,
+    "n_kg_per_ha": 100,
+    "p_kg_per_ha": 50,
+    "k_kg_per_ha": 50,
+    "water_requirement_mm": 450,
+    "optimal_temp_c": 20,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 35000,
+    "market_price_inr_per_ton": 24000,
+    "yield_range_tons_per_ha": [
+      3.5,
+      5.5
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Clay Loam",
+      "Black"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Maize": {
+    "season": "Kharif",
+    "duration_days": 95,
+    "n_kg_per_ha": 120,
+    "p_kg_per_ha": 60,
+    "k_kg_per_ha": 60,
+    "water_requirement_mm": 600,
+    "optimal_temp_c": 27,
+    "soil_ph_range": [
+      5.8,
+      7.0
+    ],
+    "cultivation_cost_inr_per_ha": 30000,
+    "market_price_inr_per_ton": 20000,
+    "yield_range_tons_per_ha": [
+      4.0,
+      7.0
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Red",
+      "Black",
+      "Loam"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Cotton": {
+    "season": "Kharif",
+    "duration_days": 180,
+    "n_kg_per_ha": 100,
+    "p_kg_per_ha": 50,
+    "k_kg_per_ha": 50,
+    "water_requirement_mm": 700,
+    "optimal_temp_c": 28,
+    "soil_ph_range": [
+      6.0,
+      8.0
+    ],
+    "cultivation_cost_inr_per_ha": 55000,
+    "market_price_inr_per_ton": 58000,
+    "yield_range_tons_per_ha": [
+      0.4,
+      1.2
+    ],
+    "suitable_soils": [
+      "Black",
+      "Alluvial",
+      "Red"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Soybean": {
+    "season": "Kharif",
+    "duration_days": 100,
+    "n_kg_per_ha": 30,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 40,
+    "water_requirement_mm": 500,
+    "optimal_temp_c": 26,
+    "soil_ph_range": [
+      6.0,
+      7.0
+    ],
+    "cultivation_cost_inr_per_ha": 28000,
+    "market_price_inr_per_ton": 48000,
+    "yield_range_tons_per_ha": [
+      1.0,
+      2.5
+    ],
+    "suitable_soils": [
+      "Black",
+      "Alluvial",
+      "Red"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Groundnut": {
+    "season": "Kharif",
+    "duration_days": 110,
+    "n_kg_per_ha": 20,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 40,
+    "water_requirement_mm": 450,
+    "optimal_temp_c": 28,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 35000,
+    "market_price_inr_per_ton": 58000,
+    "yield_range_tons_per_ha": [
+      1.2,
+      2.5
+    ],
+    "suitable_soils": [
+      "Red",
+      "Sandy Loam",
+      "Alluvial"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Sugarcane": {
+    "season": "Annual",
+    "duration_days": 300,
+    "n_kg_per_ha": 250,
+    "p_kg_per_ha": 100,
+    "k_kg_per_ha": 200,
+    "water_requirement_mm": 2000,
+    "optimal_temp_c": 30,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 120000,
+    "market_price_inr_per_ton": 3200,
+    "yield_range_tons_per_ha": [
+      60,
+      100
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Black",
+      "Clay Loam"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Chickpea": {
+    "season": "Rabi",
+    "duration_days": 110,
+    "n_kg_per_ha": 20,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 20,
+    "water_requirement_mm": 300,
+    "optimal_temp_c": 22,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 25000,
+    "market_price_inr_per_ton": 52000,
+    "yield_range_tons_per_ha": [
+      0.8,
+      1.8
+    ],
+    "suitable_soils": [
+      "Black",
+      "Alluvial",
+      "Red"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Sorghum": {
+    "season": "Kharif",
+    "duration_days": 100,
+    "n_kg_per_ha": 80,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 40,
+    "water_requirement_mm": 400,
+    "optimal_temp_c": 28,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 22000,
+    "market_price_inr_per_ton": 18000,
+    "yield_range_tons_per_ha": [
+      2.0,
+      4.0
+    ],
+    "suitable_soils": [
+      "Red",
+      "Black",
+      "Alluvial"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Pearl Millet": {
+    "season": "Kharif",
+    "duration_days": 85,
+    "n_kg_per_ha": 60,
+    "p_kg_per_ha": 30,
+    "k_kg_per_ha": 30,
+    "water_requirement_mm": 350,
+    "optimal_temp_c": 30,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 18000,
+    "market_price_inr_per_ton": 20000,
+    "yield_range_tons_per_ha": [
+      1.5,
+      3.0
+    ],
+    "suitable_soils": [
+      "Sandy",
+      "Desert",
+      "Red"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Finger Millet": {
+    "season": "Kharif",
+    "duration_days": 110,
+    "n_kg_per_ha": 50,
+    "p_kg_per_ha": 25,
+    "k_kg_per_ha": 25,
+    "water_requirement_mm": 500,
+    "optimal_temp_c": 25,
+    "soil_ph_range": [
+      5.5,
+      7.0
+    ],
+    "cultivation_cost_inr_per_ha": 20000,
+    "market_price_inr_per_ton": 25000,
+    "yield_range_tons_per_ha": [
+      1.5,
+      3.0
+    ],
+    "suitable_soils": [
+      "Red",
+      "Laterite",
+      "Alluvial"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Barley": {
+    "season": "Rabi",
+    "duration_days": 100,
+    "n_kg_per_ha": 60,
+    "p_kg_per_ha": 30,
+    "k_kg_per_ha": 30,
+    "water_requirement_mm": 300,
+    "optimal_temp_c": 18,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 22000,
+    "market_price_inr_per_ton": 18000,
+    "yield_range_tons_per_ha": [
+      2.5,
+      4.0
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Sandy Loam"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Sunflower": {
+    "season": "Rabi",
+    "duration_days": 95,
+    "n_kg_per_ha": 80,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 40,
+    "water_requirement_mm": 450,
+    "optimal_temp_c": 24,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 25000,
+    "market_price_inr_per_ton": 42000,
+    "yield_range_tons_per_ha": [
+      1.2,
+      2.2
+    ],
+    "suitable_soils": [
+      "Black",
+      "Alluvial",
+      "Red"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Sesame": {
+    "season": "Kharif",
+    "duration_days": 90,
+    "n_kg_per_ha": 40,
+    "p_kg_per_ha": 20,
+    "k_kg_per_ha": 20,
+    "water_requirement_mm": 350,
+    "optimal_temp_c": 28,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 20000,
+    "market_price_inr_per_ton": 70000,
+    "yield_range_tons_per_ha": [
+      0.5,
+      1.0
+    ],
+    "suitable_soils": [
+      "Red",
+      "Sandy Loam",
+      "Alluvial"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Castor": {
+    "season": "Kharif",
+    "duration_days": 150,
+    "n_kg_per_ha": 60,
+    "p_kg_per_ha": 30,
+    "k_kg_per_ha": 30,
+    "water_requirement_mm": 500,
+    "optimal_temp_c": 27,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 28000,
+    "market_price_inr_per_ton": 45000,
+    "yield_range_tons_per_ha": [
+      1.0,
+      2.0
+    ],
+    "suitable_soils": [
+      "Red",
+      "Sandy",
+      "Black"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Linseed": {
+    "season": "Rabi",
+    "duration_days": 110,
+    "n_kg_per_ha": 40,
+    "p_kg_per_ha": 20,
+    "k_kg_per_ha": 20,
+    "water_requirement_mm": 300,
+    "optimal_temp_c": 20,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 18000,
+    "market_price_inr_per_ton": 50000,
+    "yield_range_tons_per_ha": [
+      0.8,
+      1.5
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Black",
+      "Red"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Mustard": {
+    "season": "Rabi",
+    "duration_days": 110,
+    "n_kg_per_ha": 80,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 40,
+    "water_requirement_mm": 350,
+    "optimal_temp_c": 20,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 22000,
+    "market_price_inr_per_ton": 48000,
+    "yield_range_tons_per_ha": [
+      1.2,
+      2.0
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Sandy Loam",
+      "Black"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Pigeon Pea": {
+    "season": "Kharif",
+    "duration_days": 180,
+    "n_kg_per_ha": 20,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 20,
+    "water_requirement_mm": 600,
+    "optimal_temp_c": 28,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 25000,
+    "market_price_inr_per_ton": 60000,
+    "yield_range_tons_per_ha": [
+      0.8,
+      1.5
+    ],
+    "suitable_soils": [
+      "Red",
+      "Black",
+      "Alluvial"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Green Gram": {
+    "season": "Kharif",
+    "duration_days": 70,
+    "n_kg_per_ha": 20,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 20,
+    "water_requirement_mm": 300,
+    "optimal_temp_c": 30,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 18000,
+    "market_price_inr_per_ton": 65000,
+    "yield_range_tons_per_ha": [
+      0.6,
+      1.2
+    ],
+    "suitable_soils": [
+      "Red",
+      "Sandy Loam",
+      "Alluvial"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Black Gram": {
+    "season": "Kharif",
+    "duration_days": 75,
+    "n_kg_per_ha": 20,
+    "p_kg_per_ha": 40,
+    "k_kg_per_ha": 20,
+    "water_requirement_mm": 350,
+    "optimal_temp_c": 30,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 18000,
+    "market_price_inr_per_ton": 65000,
+    "yield_range_tons_per_ha": [
+      0.6,
+      1.2
+    ],
+    "suitable_soils": [
+      "Red",
+      "Black",
+      "Alluvial"
+    ],
+    "data_source": "ICAR Package of Practices"
+  },
+  "Jute": {
+    "season": "Kharif",
+    "duration_days": 120,
+    "n_kg_per_ha": 60,
+    "p_kg_per_ha": 30,
+    "k_kg_per_ha": 30,
+    "water_requirement_mm": 1000,
+    "optimal_temp_c": 28,
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "cultivation_cost_inr_per_ha": 35000,
+    "market_price_inr_per_ton": 40000,
+    "yield_range_tons_per_ha": [
+      2.0,
+      3.5
+    ],
+    "suitable_soils": [
+      "Alluvial",
+      "Clay Loam",
+      "Silty"
+    ],
+    "data_source": "ICAR Package of Practices"
+  }
+}

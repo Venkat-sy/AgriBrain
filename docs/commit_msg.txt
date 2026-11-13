@@ -1,0 +1,21 @@
+﻿feat: Complete AgriBrain platform integration with 4-page routing, ML pipeline, and deployment configs
+
+- Added 4-page Next.js 14 App Router flow: Welcome (/), Simulate (/simulate), Calendar (/calendar), Expert Chat (/expert-chat)
+- Integrated FarmContext for state persistence across page transitions
+- Added WeatherWidget, AlertsWidget, DigitalTwinWidget components
+- Wired frontend API routes to FastAPI backend with proper proxying
+- ML pipeline: crop recommendation model + scaler loading, feature normalization, inference
+- Mandi pricing: DataGov API integration with x10 conversion + 70+ crop fallback prices
+- Simulation engine: yield, revenue, cost, ROI, risk assessment
+- Database: SQLAlchemy models with SQLite dev DB (10 districts, 8 crops)
+- Firebase config: service account + RTDB URL ready for session binding
+
+Deployment preparation:
+- backend/render.yaml: Render.com deployment config (backend + frontend + PostgreSQL)
+- docker-compose.yml: Local containerized dev environment
+- backend/Dockerfile: Multi-stage production build with model artifacts
+- frontend_web/Dockerfile: Next.js standalone output
+- next.config.ts: Added output: standalone
+- DEPLOYMENT_READINESS_REPORT.md: Comprehensive deployment guide
+
+All tests passing: zero TS errors, ML inference working, simulation pipeline functional, builds successful

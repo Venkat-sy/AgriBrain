@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 class DistrictBase(BaseModel):
     name: str = Field(..., max_length=100)
     state: str = Field(..., max_length=100)
-    state_code: str = Field(..., max_length=10)
-    district_code: str = Field(..., max_length=20)
+    state_code: Optional[str] = Field(None, max_length=10)
+    district_code: Optional[str] = Field(None, max_length=20)
 
 
 class DistrictCreate(DistrictBase):

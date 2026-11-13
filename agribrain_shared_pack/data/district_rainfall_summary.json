@@ -1,0 +1,2801 @@
+{
+  "Adilabad|Andhra Pradesh": {
+    "district_name": "Adilabad",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Agra|Uttar Pradesh": {
+    "district_name": "Agra",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ahmadabad|Gujarat": {
+    "district_name": "Ahmadabad",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ahmadnagar|Maharashtra": {
+    "district_name": "Ahmadnagar",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ajmer|Rajasthan": {
+    "district_name": "Ajmer",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Akola|Maharashtra": {
+    "district_name": "Akola",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Alappuzha|Kerala": {
+    "district_name": "Alappuzha",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Aligarh|Uttar Pradesh": {
+    "district_name": "Aligarh",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Allahabad|Uttar Pradesh": {
+    "district_name": "Allahabad",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Almora|Uttarakhand": {
+    "district_name": "Almora",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Alwar|Rajasthan": {
+    "district_name": "Alwar",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ambala|Haryana": {
+    "district_name": "Ambala",
+    "state_name": "Haryana",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Amravati|Maharashtra": {
+    "district_name": "Amravati",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Amreli|Gujarat": {
+    "district_name": "Amreli",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Amritsar|Punjab": {
+    "district_name": "Amritsar",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Anantapur|Andhra Pradesh": {
+    "district_name": "Anantapur",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Aurangabad|Maharashtra": {
+    "district_name": "Aurangabad",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Azamgarh|Uttar Pradesh": {
+    "district_name": "Azamgarh",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bahraich|Uttar Pradesh": {
+    "district_name": "Bahraich",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Balaghat|Madhya Pradesh": {
+    "district_name": "Balaghat",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Balangir|Odisha": {
+    "district_name": "Balangir",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Baleshwar|Odisha": {
+    "district_name": "Baleshwar",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ballia|Uttar Pradesh": {
+    "district_name": "Ballia",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Banas Kantha|Gujarat": {
+    "district_name": "Banas Kantha",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Banda|Uttar Pradesh": {
+    "district_name": "Banda",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bangalore|Karnataka": {
+    "district_name": "Bangalore",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bankura|West Bengal": {
+    "district_name": "Bankura",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Banswara|Rajasthan": {
+    "district_name": "Banswara",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bara Banki|Uttar Pradesh": {
+    "district_name": "Bara Banki",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Barddhaman|West Bengal": {
+    "district_name": "Barddhaman",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bareilly|Uttar Pradesh": {
+    "district_name": "Bareilly",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Barmer|Rajasthan": {
+    "district_name": "Barmer",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bastar|Chhattisgarh": {
+    "district_name": "Bastar",
+    "state_name": "Chhattisgarh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Basti|Uttar Pradesh": {
+    "district_name": "Basti",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bathinda|Punjab": {
+    "district_name": "Bathinda",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Belgaum|Karnataka": {
+    "district_name": "Belgaum",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bellary|Karnataka": {
+    "district_name": "Bellary",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Betul|Madhya Pradesh": {
+    "district_name": "Betul",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bhagalpur|Bihar": {
+    "district_name": "Bhagalpur",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bhandara|Maharashtra": {
+    "district_name": "Bhandara",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bharatpur|Rajasthan": {
+    "district_name": "Bharatpur",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bharuch|Gujarat": {
+    "district_name": "Bharuch",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bhavnagar|Gujarat": {
+    "district_name": "Bhavnagar",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bhilwara|Rajasthan": {
+    "district_name": "Bhilwara",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bhind|Madhya Pradesh": {
+    "district_name": "Bhind",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bhojpur|Bihar": {
+    "district_name": "Bhojpur",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bid|Maharashtra": {
+    "district_name": "Bid",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bidar|Karnataka": {
+    "district_name": "Bidar",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bijapur|Karnataka": {
+    "district_name": "Bijapur",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bijnor|Uttar Pradesh": {
+    "district_name": "Bijnor",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bikaner|Rajasthan": {
+    "district_name": "Bikaner",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bilaspur|Chhattisgarh": {
+    "district_name": "Bilaspur",
+    "state_name": "Chhattisgarh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bilaspur|Himachal Pradesh": {
+    "district_name": "Bilaspur",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Birbhum|West Bengal": {
+    "district_name": "Birbhum",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Budaun|Uttar Pradesh": {
+    "district_name": "Budaun",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bulandshahr|Uttar Pradesh": {
+    "district_name": "Bulandshahr",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Buldana|Maharashtra": {
+    "district_name": "Buldana",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Bundi|Rajasthan": {
+    "district_name": "Bundi",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Cachar|Assam": {
+    "district_name": "Cachar",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chamba|Himachal Pradesh": {
+    "district_name": "Chamba",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chamoli|Uttarakhand": {
+    "district_name": "Chamoli",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chandrapur|Maharashtra": {
+    "district_name": "Chandrapur",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chhatarpur|Madhya Pradesh": {
+    "district_name": "Chhatarpur",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chhindwara|Madhya Pradesh": {
+    "district_name": "Chhindwara",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chikmagalur|Karnataka": {
+    "district_name": "Chikmagalur",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chitradurga|Karnataka": {
+    "district_name": "Chitradurga",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chittaurgarh|Rajasthan": {
+    "district_name": "Chittaurgarh",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Chittoor|Andhra Pradesh": {
+    "district_name": "Chittoor",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Churu|Rajasthan": {
+    "district_name": "Churu",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Coimbatore|Tamil Nadu": {
+    "district_name": "Coimbatore",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Cuddalore|Tamil Nadu": {
+    "district_name": "Cuddalore",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Cuttack|Odisha": {
+    "district_name": "Cuttack",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dakshina Kannada|Karnataka": {
+    "district_name": "Dakshina Kannada",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Damoh|Madhya Pradesh": {
+    "district_name": "Damoh",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Darbhanga|Bihar": {
+    "district_name": "Darbhanga",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Darjiling|West Bengal": {
+    "district_name": "Darjiling",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Darrang|Assam": {
+    "district_name": "Darrang",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Datia|Madhya Pradesh": {
+    "district_name": "Datia",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dehradun|Uttarakhand": {
+    "district_name": "Dehradun",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Deoria|Uttar Pradesh": {
+    "district_name": "Deoria",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dewas|Madhya Pradesh": {
+    "district_name": "Dewas",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dhanbad|Jharkhand": {
+    "district_name": "Dhanbad",
+    "state_name": "Jharkhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dhar|Madhya Pradesh": {
+    "district_name": "Dhar",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dharwad|Karnataka": {
+    "district_name": "Dharwad",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dhenkanal|Odisha": {
+    "district_name": "Dhenkanal",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dhule|Maharashtra": {
+    "district_name": "Dhule",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dibrugarh|Assam": {
+    "district_name": "Dibrugarh",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dima Hasao|Assam": {
+    "district_name": "Dima Hasao",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dumka|Jharkhand": {
+    "district_name": "Dumka",
+    "state_name": "Jharkhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Dungarpur|Rajasthan": {
+    "district_name": "Dungarpur",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Durg|Chhattisgarh": {
+    "district_name": "Durg",
+    "state_name": "Chhattisgarh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "East Godavari|Andhra Pradesh": {
+    "district_name": "East Godavari",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "East Nimar|Madhya Pradesh": {
+    "district_name": "East Nimar",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ernakulam|Kerala": {
+    "district_name": "Ernakulam",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Etah|Uttar Pradesh": {
+    "district_name": "Etah",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Etawah|Uttar Pradesh": {
+    "district_name": "Etawah",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Faizabad|Uttar Pradesh": {
+    "district_name": "Faizabad",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Farrukhabad|Uttar Pradesh": {
+    "district_name": "Farrukhabad",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Fatehpur|Uttar Pradesh": {
+    "district_name": "Fatehpur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Firozpur|Punjab": {
+    "district_name": "Firozpur",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ganganagar|Rajasthan": {
+    "district_name": "Ganganagar",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ganjam|Odisha": {
+    "district_name": "Ganjam",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Garhwal|Uttarakhand": {
+    "district_name": "Garhwal",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Gaya|Bihar": {
+    "district_name": "Gaya",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ghazipur|Uttar Pradesh": {
+    "district_name": "Ghazipur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Goalpara|Assam": {
+    "district_name": "Goalpara",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Gonda|Uttar Pradesh": {
+    "district_name": "Gonda",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Gorakhpur|Uttar Pradesh": {
+    "district_name": "Gorakhpur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Gulbarga|Karnataka": {
+    "district_name": "Gulbarga",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Guna|Madhya Pradesh": {
+    "district_name": "Guna",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Guntur|Andhra Pradesh": {
+    "district_name": "Guntur",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Gurdaspur|Punjab": {
+    "district_name": "Gurdaspur",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Gurgaon|Haryana": {
+    "district_name": "Gurgaon",
+    "state_name": "Haryana",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Gwalior|Madhya Pradesh": {
+    "district_name": "Gwalior",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hamirpur|Uttar Pradesh": {
+    "district_name": "Hamirpur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Haora|West Bengal": {
+    "district_name": "Haora",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hardoi|Uttar Pradesh": {
+    "district_name": "Hardoi",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hassan|Karnataka": {
+    "district_name": "Hassan",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hazaribagh|Jharkhand": {
+    "district_name": "Hazaribagh",
+    "state_name": "Jharkhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hisar|Haryana": {
+    "district_name": "Hisar",
+    "state_name": "Haryana",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hoshangabad|Madhya Pradesh": {
+    "district_name": "Hoshangabad",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hoshiarpur|Punjab": {
+    "district_name": "Hoshiarpur",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hugli|West Bengal": {
+    "district_name": "Hugli",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Hyderabad|Andhra Pradesh": {
+    "district_name": "Hyderabad",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Indore|Madhya Pradesh": {
+    "district_name": "Indore",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jabalpur|Madhya Pradesh": {
+    "district_name": "Jabalpur",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jaipur|Rajasthan": {
+    "district_name": "Jaipur",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jaisalmer|Rajasthan": {
+    "district_name": "Jaisalmer",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jalandhar|Punjab": {
+    "district_name": "Jalandhar",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jalaun|Uttar Pradesh": {
+    "district_name": "Jalaun",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jalgaon|Maharashtra": {
+    "district_name": "Jalgaon",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jalor|Rajasthan": {
+    "district_name": "Jalor",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jalpaiguri|West Bengal": {
+    "district_name": "Jalpaiguri",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jamnagar|Gujarat": {
+    "district_name": "Jamnagar",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jaunpur|Uttar Pradesh": {
+    "district_name": "Jaunpur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jhabua|Madhya Pradesh": {
+    "district_name": "Jhabua",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jhalawar|Rajasthan": {
+    "district_name": "Jhalawar",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jhansi|Uttar Pradesh": {
+    "district_name": "Jhansi",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jhunjhunun|Rajasthan": {
+    "district_name": "Jhunjhunun",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jind|Haryana": {
+    "district_name": "Jind",
+    "state_name": "Haryana",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Jodhpur|Rajasthan": {
+    "district_name": "Jodhpur",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Junagadh|Gujarat": {
+    "district_name": "Junagadh",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kachchh|Gujarat": {
+    "district_name": "Kachchh",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kalahandi|Odisha": {
+    "district_name": "Kalahandi",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kamrup|Assam": {
+    "district_name": "Kamrup",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kancheepuram|Tamil Nadu": {
+    "district_name": "Kancheepuram",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kandhamal|Odisha": {
+    "district_name": "Kandhamal",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kangra|Himachal Pradesh": {
+    "district_name": "Kangra",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kanniyakumari|Tamil Nadu": {
+    "district_name": "Kanniyakumari",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kannur|Kerala": {
+    "district_name": "Kannur",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kanpur Nagar|Uttar Pradesh": {
+    "district_name": "Kanpur Nagar",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kapurthala|Punjab": {
+    "district_name": "Kapurthala",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Karbi Anglong|Assam": {
+    "district_name": "Karbi Anglong",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Karimnagar|Andhra Pradesh": {
+    "district_name": "Karimnagar",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Karnal|Haryana": {
+    "district_name": "Karnal",
+    "state_name": "Haryana",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kendujhar|Odisha": {
+    "district_name": "Kendujhar",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Khammam|Andhra Pradesh": {
+    "district_name": "Khammam",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kheda|Gujarat": {
+    "district_name": "Kheda",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kheri|Uttar Pradesh": {
+    "district_name": "Kheri",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kinnaur|Himachal Pradesh": {
+    "district_name": "Kinnaur",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Koch Bihar|West Bengal": {
+    "district_name": "Koch Bihar",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kodagu|Karnataka": {
+    "district_name": "Kodagu",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kolar|Karnataka": {
+    "district_name": "Kolar",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kolhapur|Maharashtra": {
+    "district_name": "Kolhapur",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kollam|Kerala": {
+    "district_name": "Kollam",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Koraput|Odisha": {
+    "district_name": "Koraput",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kota|Rajasthan": {
+    "district_name": "Kota",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kottayam|Kerala": {
+    "district_name": "Kottayam",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kozhikode|Kerala": {
+    "district_name": "Kozhikode",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Krishna|Andhra Pradesh": {
+    "district_name": "Krishna",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kullu|Himachal Pradesh": {
+    "district_name": "Kullu",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Kurnool|Andhra Pradesh": {
+    "district_name": "Kurnool",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Lahul & Spiti|Himachal Pradesh": {
+    "district_name": "Lahul & Spiti",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Lakhimpur|Assam": {
+    "district_name": "Lakhimpur",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Lucknow|Uttar Pradesh": {
+    "district_name": "Lucknow",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ludhiana|Punjab": {
+    "district_name": "Ludhiana",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Madurai|Tamil Nadu": {
+    "district_name": "Madurai",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mahbubnagar|Andhra Pradesh": {
+    "district_name": "Mahbubnagar",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mahendragarh|Haryana": {
+    "district_name": "Mahendragarh",
+    "state_name": "Haryana",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mahesana|Gujarat": {
+    "district_name": "Mahesana",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mainpuri|Uttar Pradesh": {
+    "district_name": "Mainpuri",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Malappuram|Kerala": {
+    "district_name": "Malappuram",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Maldah|West Bengal": {
+    "district_name": "Maldah",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mandi|Himachal Pradesh": {
+    "district_name": "Mandi",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mandla|Madhya Pradesh": {
+    "district_name": "Mandla",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mandsaur|Madhya Pradesh": {
+    "district_name": "Mandsaur",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mandya|Karnataka": {
+    "district_name": "Mandya",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mathura|Uttar Pradesh": {
+    "district_name": "Mathura",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mayurbhanj|Odisha": {
+    "district_name": "Mayurbhanj",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Medak|Andhra Pradesh": {
+    "district_name": "Medak",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Meerut|Uttar Pradesh": {
+    "district_name": "Meerut",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mirzapur|Uttar Pradesh": {
+    "district_name": "Mirzapur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Moradabad|Uttar Pradesh": {
+    "district_name": "Moradabad",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Morena|Madhya Pradesh": {
+    "district_name": "Morena",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mumbai|Maharashtra": {
+    "district_name": "Mumbai",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Munger|Bihar": {
+    "district_name": "Munger",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Murshidabad|West Bengal": {
+    "district_name": "Murshidabad",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Muzaffarnagar|Uttar Pradesh": {
+    "district_name": "Muzaffarnagar",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Muzaffarpur|Bihar": {
+    "district_name": "Muzaffarpur",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Mysore|Karnataka": {
+    "district_name": "Mysore",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nadia|West Bengal": {
+    "district_name": "Nadia",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nagaon|Assam": {
+    "district_name": "Nagaon",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nagaur|Rajasthan": {
+    "district_name": "Nagaur",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nagpur|Maharashtra": {
+    "district_name": "Nagpur",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nainital|Uttarakhand": {
+    "district_name": "Nainital",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nalgonda|Andhra Pradesh": {
+    "district_name": "Nalgonda",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nanded|Maharashtra": {
+    "district_name": "Nanded",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Narsimhapur|Madhya Pradesh": {
+    "district_name": "Narsimhapur",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nashik|Maharashtra": {
+    "district_name": "Nashik",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Nizamabad|Andhra Pradesh": {
+    "district_name": "Nizamabad",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "North 24 Parganas|West Bengal": {
+    "district_name": "North 24 Parganas",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Osmanabad|Maharashtra": {
+    "district_name": "Osmanabad",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Palakkad|Kerala": {
+    "district_name": "Palakkad",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Palamu|Jharkhand": {
+    "district_name": "Palamu",
+    "state_name": "Jharkhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Pali|Rajasthan": {
+    "district_name": "Pali",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Panch Mahals|Gujarat": {
+    "district_name": "Panch Mahals",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Panna|Madhya Pradesh": {
+    "district_name": "Panna",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Parbhani|Maharashtra": {
+    "district_name": "Parbhani",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Pashchim Champaran|Bihar": {
+    "district_name": "Pashchim Champaran",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Pashchim Medinipur|West Bengal": {
+    "district_name": "Pashchim Medinipur",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Patiala|Punjab": {
+    "district_name": "Patiala",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Patna|Bihar": {
+    "district_name": "Patna",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Pilibhit|Uttar Pradesh": {
+    "district_name": "Pilibhit",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Pithoragarh|Uttarakhand": {
+    "district_name": "Pithoragarh",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Pratapgarh|Uttar Pradesh": {
+    "district_name": "Pratapgarh",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Pune|Maharashtra": {
+    "district_name": "Pune",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Purbi Singhbhum|Jharkhand": {
+    "district_name": "Purbi Singhbhum",
+    "state_name": "Jharkhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Puri|Odisha": {
+    "district_name": "Puri",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Purnia|Bihar": {
+    "district_name": "Purnia",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Puruliya|West Bengal": {
+    "district_name": "Puruliya",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Rae Bareli|Uttar Pradesh": {
+    "district_name": "Rae Bareli",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Raichur|Karnataka": {
+    "district_name": "Raichur",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Raigarh|Chhattisgarh": {
+    "district_name": "Raigarh",
+    "state_name": "Chhattisgarh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Raigarh|Maharashtra": {
+    "district_name": "Raigarh",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Raipur|Chhattisgarh": {
+    "district_name": "Raipur",
+    "state_name": "Chhattisgarh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Raisen|Madhya Pradesh": {
+    "district_name": "Raisen",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Rajgarh|Madhya Pradesh": {
+    "district_name": "Rajgarh",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Rajkot|Gujarat": {
+    "district_name": "Rajkot",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ramanathapuram|Tamil Nadu": {
+    "district_name": "Ramanathapuram",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Rampur|Uttar Pradesh": {
+    "district_name": "Rampur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ranchi|Jharkhand": {
+    "district_name": "Ranchi",
+    "state_name": "Jharkhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ratlam|Madhya Pradesh": {
+    "district_name": "Ratlam",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ratnagiri|Maharashtra": {
+    "district_name": "Ratnagiri",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Rewa|Madhya Pradesh": {
+    "district_name": "Rewa",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Rohtak|Haryana": {
+    "district_name": "Rohtak",
+    "state_name": "Haryana",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Rupnagar|Punjab": {
+    "district_name": "Rupnagar",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sabar Kantha|Gujarat": {
+    "district_name": "Sabar Kantha",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sagar|Madhya Pradesh": {
+    "district_name": "Sagar",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Saharanpur|Uttar Pradesh": {
+    "district_name": "Saharanpur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Saharsa|Bihar": {
+    "district_name": "Saharsa",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Salem|Tamil Nadu": {
+    "district_name": "Salem",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sambalpur|Odisha": {
+    "district_name": "Sambalpur",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sangli|Maharashtra": {
+    "district_name": "Sangli",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sangrur|Punjab": {
+    "district_name": "Sangrur",
+    "state_name": "Punjab",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Saran (chhapra)|Bihar": {
+    "district_name": "Saran (chhapra)",
+    "state_name": "Bihar",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Satara|Maharashtra": {
+    "district_name": "Satara",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Satna|Madhya Pradesh": {
+    "district_name": "Satna",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sawai Madhopur|Rajasthan": {
+    "district_name": "Sawai Madhopur",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sehore|Madhya Pradesh": {
+    "district_name": "Sehore",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Seoni|Madhya Pradesh": {
+    "district_name": "Seoni",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Shahdol|Madhya Pradesh": {
+    "district_name": "Shahdol",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Shahjahanpur|Uttar Pradesh": {
+    "district_name": "Shahjahanpur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Shajapur|Madhya Pradesh": {
+    "district_name": "Shajapur",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Shimla|Himachal Pradesh": {
+    "district_name": "Shimla",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Shimoga|Karnataka": {
+    "district_name": "Shimoga",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Shivpuri|Madhya Pradesh": {
+    "district_name": "Shivpuri",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sidhi|Madhya Pradesh": {
+    "district_name": "Sidhi",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sikar|Rajasthan": {
+    "district_name": "Sikar",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sirmaur|Himachal Pradesh": {
+    "district_name": "Sirmaur",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sirohi|Rajasthan": {
+    "district_name": "Sirohi",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sitapur|Uttar Pradesh": {
+    "district_name": "Sitapur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sivasagar|Assam": {
+    "district_name": "Sivasagar",
+    "state_name": "Assam",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Solan|Himachal Pradesh": {
+    "district_name": "Solan",
+    "state_name": "Himachal Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Solapur|Maharashtra": {
+    "district_name": "Solapur",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sri Potti Sriramulu Nellore|Andhra Pradesh": {
+    "district_name": "Sri Potti Sriramulu Nellore",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Srikakulam|Andhra Pradesh": {
+    "district_name": "Srikakulam",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sultanpur|Uttar Pradesh": {
+    "district_name": "Sultanpur",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Sundargarh|Odisha": {
+    "district_name": "Sundargarh",
+    "state_name": "Odisha",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Surat|Gujarat": {
+    "district_name": "Surat",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Surendranagar|Gujarat": {
+    "district_name": "Surendranagar",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Surguja|Chhattisgarh": {
+    "district_name": "Surguja",
+    "state_name": "Chhattisgarh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Tehri Garhwal|Uttarakhand": {
+    "district_name": "Tehri Garhwal",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Thane|Maharashtra": {
+    "district_name": "Thane",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Thanjavur|Tamil Nadu": {
+    "district_name": "Thanjavur",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "The Dangs|Gujarat": {
+    "district_name": "The Dangs",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "The Nilgiris|Tamil Nadu": {
+    "district_name": "The Nilgiris",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Thiruvananthapuram|Kerala": {
+    "district_name": "Thiruvananthapuram",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Thrissur|Kerala": {
+    "district_name": "Thrissur",
+    "state_name": "Kerala",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Tikamgarh|Madhya Pradesh": {
+    "district_name": "Tikamgarh",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Tiruchirappalli|Tamil Nadu": {
+    "district_name": "Tiruchirappalli",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Tirunelveli|Tamil Nadu": {
+    "district_name": "Tirunelveli",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Tonk|Rajasthan": {
+    "district_name": "Tonk",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Tumkur|Karnataka": {
+    "district_name": "Tumkur",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Udaipur|Rajasthan": {
+    "district_name": "Udaipur",
+    "state_name": "Rajasthan",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Ujjain|Madhya Pradesh": {
+    "district_name": "Ujjain",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Unnao|Uttar Pradesh": {
+    "district_name": "Unnao",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Uttar Dinajpur|West Bengal": {
+    "district_name": "Uttar Dinajpur",
+    "state_name": "West Bengal",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Uttara Kannada|Karnataka": {
+    "district_name": "Uttara Kannada",
+    "state_name": "Karnataka",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Uttarkashi|Uttarakhand": {
+    "district_name": "Uttarkashi",
+    "state_name": "Uttarakhand",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Vadodara|Gujarat": {
+    "district_name": "Vadodara",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Valsad|Gujarat": {
+    "district_name": "Valsad",
+    "state_name": "Gujarat",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Varanasi|Uttar Pradesh": {
+    "district_name": "Varanasi",
+    "state_name": "Uttar Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Vellore|Tamil Nadu": {
+    "district_name": "Vellore",
+    "state_name": "Tamil Nadu",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Vidisha|Madhya Pradesh": {
+    "district_name": "Vidisha",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Visakhapatnam|Andhra Pradesh": {
+    "district_name": "Visakhapatnam",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Warangal|Andhra Pradesh": {
+    "district_name": "Warangal",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Wardha|Maharashtra": {
+    "district_name": "Wardha",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "West Godavari|Andhra Pradesh": {
+    "district_name": "West Godavari",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "West Nimar|Madhya Pradesh": {
+    "district_name": "West Nimar",
+    "state_name": "Madhya Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Y.s.r.|Andhra Pradesh": {
+    "district_name": "Y.s.r.",
+    "state_name": "Andhra Pradesh",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  },
+  "Yavatmal|Maharashtra": {
+    "district_name": "Yavatmal",
+    "state_name": "Maharashtra",
+    "mean_annual_rainfall_mm": NaN,
+    "std_annual_rainfall_mm": 0,
+    "min_annual_rainfall_mm": NaN,
+    "max_annual_rainfall_mm": NaN,
+    "years_with_data": 0
+  }
+}

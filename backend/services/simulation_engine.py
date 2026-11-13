@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, date, timedelta
 from dataclasses import dataclass
+import logging
 
 from backend.models import (
     CropProfile, CropCost, CropPrice, District, RainfallMonthly
@@ -14,6 +15,16 @@ from backend.schemas import (
     RoadmapActivity,
     ActivityType
 )
+from backend.services.market_pricing import get_market_price_with_fallback
+
+# Import ML inference module
+import sys
+import os
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, project_root)
+from backend.ml.inference.crop_recommendation import recommend, predict_yield
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,32 +50,70 @@ class SimulationEngine:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_rainfall_for_district(self, district_id: int, month: Optional[int] = None) -> float:
-        """Get average monthly rainfall for a district, optionally for a specific month."""
+    def get_rainfall_for_district(self, district_id: int, month: Optional[int] = None, crop_duration_days: int = 120) -> float:
+        """Get average rainfall for a district.
+        
+        If month is provided, returns single month average.
+        If month is None or crop_duration_days > 30, returns seasonal total 
+        (sum of months covering the crop duration starting from planting month).
+        """
         query = self.db.query(RainfallMonthly).filter(
             RainfallMonthly.district_id == district_id
         )
         
-        if month:
+        if month and crop_duration_days <= 30:
+            # Single month query for short-duration crops
             query = query.filter(RainfallMonthly.month == month)
-        
-        records = query.all()
-        if not records:
-            return 100.0  # Default fallback
-        
-        return sum(r.rainfall_mm for r in records) / len(records)
+            records = query.all()
+            if not records:
+                return 100.0
+            return sum(r.rainfall_mm for r in records) / len(records)
+        else:
+            # Seasonal rainfall - sum over crop duration months
+            if not month:
+                month = 6  # Default to June
+            
+            num_months = max(1, (crop_duration_days + 15) // 30)  # Round up
+            months = [(month + i - 1) % 12 + 1 for i in range(num_months)]
+            
+            total_rainfall = 0.0
+            for m in months:
+                records = self.db.query(RainfallMonthly).filter(
+                    RainfallMonthly.district_id == district_id,
+                    RainfallMonthly.month == m
+                ).all()
+                if records:
+                    total_rainfall += sum(r.rainfall_mm for r in records) / len(records)
+            
+            return total_rainfall if total_rainfall > 0 else 100.0
     
-    def get_latest_market_price(self, crop_id: int) -> float:
-        """Get the latest market price for a crop."""
+    def get_latest_market_price(self, crop_id: int, state_name: str = None) -> float:
+        """Get the latest market price for a crop using live API with fallback.
+        
+        Returns price in INR per TON (not per quintal).
+        Live Mandi prices from API are in ₹/Quintal, so we multiply by 10 to get ₹/Ton.
+        Database prices are already stored as ₹/Ton.
+        """
+        # Try to get from database first (historical data) - already stored as ₹/Ton
         latest_price = self.db.query(CropPrice).filter(
             CropPrice.crop_id == crop_id
         ).order_by(CropPrice.price_date.desc()).first()
         
         if latest_price:
-            return latest_price.price_per_ton
+            price_per_ton = latest_price.price_per_ton
+            logger.info(f"Using DB price for crop_id {crop_id}: ₹{price_per_ton:,.0f}/ton")
+            return price_per_ton
         
-        # Fallback prices (INR per ton) - approximate market rates
-        fallback_prices = {
+        # If no historical data, use live market API with fallback
+        # get_market_price_with_fallback handles quintal-to-ton conversion internally
+        crop = self.db.query(CropProfile).filter(CropProfile.id == crop_id).first()
+        if crop and state_name:
+            price_per_ton = get_market_price_with_fallback(crop.name, state_name)
+            logger.info(f"Using live API/fallback price for {crop.name}: ₹{price_per_ton:,.0f}/ton")
+            return price_per_ton
+        
+        # Final fallback to hardcoded prices (already in ₹/Ton)
+        fallback_prices_per_ton = {
             "Rice": 20000,
             "Wheat": 22000,
             "Maize": 18000,
@@ -79,8 +128,10 @@ class SimulationEngine:
             "Urad": 65000,
         }
         
-        crop = self.db.query(CropProfile).filter(CropProfile.id == crop_id).first()
-        return fallback_prices.get(crop.name if crop else "Rice", 20000)
+        crop_name = crop.name if crop else "Rice"
+        price_per_ton = fallback_prices_per_ton.get(crop_name, 20000)
+        logger.warning(f"Using hardcoded fallback price for {crop_name}: ₹{price_per_ton:,.0f}/ton")
+        return price_per_ton
     
     def get_crop_costs(self, crop_id: int, region: str = "national") -> List[CropCost]:
         """Get input costs for a crop."""
@@ -139,6 +190,7 @@ class SimulationEngine:
                 ("Irrigation", "ha", 3000, 8),
                 ("Harvesting", "ha", 4000, 1),
                 ("Threshing & Winnowing", "ha", 2500, 1),
+                ("Labor", "day", 400, 50),
             ]
 
         # Create CropCost objects (not saved to DB, just for calculation)
@@ -274,31 +326,74 @@ class SimulationEngine:
     def run_simulation(
         self,
         request: SimulationRequest,
-        district: District,
+        district: Optional[District],
         crop: CropProfile
     ) -> SimulationResponse:
         """Run complete simulation and return results."""
         
         # Get rainfall
         rainfall_mm = request.rainfall_override_mm or self.get_rainfall_for_district(
-            request.district_id, request.planting_month
+            request.district_id, request.planting_month, crop.duration_days or 120
         )
         
         # Get soil type (use confirmed or predominant)
         soil_type = request.confirmed_soil_type
         
-        # Calculate yield
+        # Calculate yield (agronomic model)
         yield_tons_per_ha = self.calculate_yield(
             crop, request.land_area_ha, rainfall_mm, soil_type, request.confirmed_soil_type
         )
         estimated_yield_tons = yield_tons_per_ha * request.land_area_ha
+
+        # ML-based yield prediction
+        ml_yield_tons_per_ha = None
+        ml_yield_tons = None
+        recommended_crops = None
         
+        try:
+            if district:
+                state_name = district.state
+                district_name = district.name
+            else:
+                state_name = "Maharashtra"
+                district_name = f"District_{request.district_id}"
+            
+            planting_month = request.planting_month or 6
+            if planting_month in [6, 7, 8, 9, 10]:
+                season = "Kharif"
+            elif planting_month in [11, 12, 1, 2, 3]:
+                season = "Rabi"
+            else:
+                season = "Zaid"
+            
+            crop_year = datetime.now().year
+            
+            ml_yield_tons_per_ha = predict_yield(
+                state_name=state_name,
+                district_name=district_name,
+                crop_name=crop.name,
+                season=season,
+                crop_year=crop_year
+            )
+            ml_yield_tons = ml_yield_tons_per_ha * request.land_area_ha
+            
+            recommended_crops = recommend({
+                'n': 50, 'p': 30, 'k': 30,
+                'temperature': 28, 'humidity': 65, 'ph': 6.5,
+                'rainfall': rainfall_mm
+            }, top_k=5)
+            
+        except Exception as e:
+            logger.warning(f"ML prediction failed: {e}")
+
+        # Get costs
         # Get costs
         crop_costs = self.get_crop_costs(crop.id)
         cost_breakdown, total_cost = self.calculate_costs(crop_costs, request.land_area_ha)
         
-        # Get market price
-        price_per_ton = self.get_latest_market_price(crop.id)
+        # Get market price - use district state if available
+        state_name = district.state if district else None
+        price_per_ton = self.get_latest_market_price(crop.id, state_name)
         market_value = estimated_yield_tons * price_per_ton
         
         # Calculate profit metrics
@@ -315,9 +410,12 @@ class SimulationEngine:
             crop, request.land_area_ha, request.budget_inr, total_cost, rainfall_mm, soil_type
         )
         
+        # District name for response (handle None district)
+        district_name = district.name if district else f"District_{request.district_id}"
+        
         return SimulationResponse(
             district_id=request.district_id,
-            district_name=district.name,
+            district_name=district_name,
             selected_crop=request.selected_crop,
             land_area_ha=request.land_area_ha,
             budget_inr=request.budget_inr,
@@ -333,6 +431,9 @@ class SimulationEngine:
             roi_percentage=roi_percentage,
             risk_level=risk_level,
             risk_factors=risk_factors,
+            ml_yield_prediction_tons_per_ha=ml_yield_tons_per_ha,
+            ml_yield_prediction_tons=ml_yield_tons,
+            recommended_crops=recommended_crops,
             model_version="1.0.0",
             generated_at=datetime.utcnow()
         )

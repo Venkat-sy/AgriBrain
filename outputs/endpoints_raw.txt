@@ -1,0 +1,80 @@
+@router.post("/troubleshoot", response_model=ChatResponse)
+async def troubleshoot(request: ChatRequest):
+    """Get farming advice from the AI advisor."""
+    session_id = request.session_id
+    question = request.user_question.lower()
+    
+    # Get session context if available
+    context = sessions.get(session_id, {})
+    
+    # Generate response based on question and context
+    response_text = generate_advice(question, context)
+    
+    return ChatResponse(
+        response=response_text,
+        session_id=session_id,
+        timestamp=datetime.utcnow()
+    )
+
+
+@router.post("/store-session", response_model=StoreSessionResponse)
+async def store_session(request: StoreSessionRequest):
+    """Store session context for chat continuity."""
+    sessions[request.session_id] = {
+        'crop': request.crop,
+        'district': request.district,
+        'state': request.state,
+        'soil_type': request.soil_type,
+        'land_area_ha': request.land_area_ha,
+        'budget_inr': request.budget_inr,
+        'estimated_yield': request.estimated_yield,
+        'roi': request.roi,
+        'risk_level': request.risk_level,
+        'context': request.context,
+        'updated_at': datetime.utcnow()
+    }
+    
+    return StoreSessionResponse(
+        success=True,
+        session_id=request.session_id,
+        timestamp=datetime.utcnow()
+    )
+
+
+@router.get("/session/{session_id}")
+async def get_session(session_id: str):
+    """Get stored session context."""
+    if session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return sessions[session_id]
+
+
+def generate_advice(question: str, context: dict) -> str:
+    """Generate farming advice based on question and context."""
+    crop = context.get('crop', 'your crop')
+    district = context.get('district', 'your district')
+    soil_type = context.get('soil_type', 'your soil type')
+    risk_level = context.get('risk_level', 'unknown')
+    
+    if 'yield' in question or 'increase' in question or 'improve' in question:
+        return "To improve {} yield in {} ({}{} soil):\n\n1. **Soil Health**: Test soil pH and nutrients. {} prefers pH 5.5-7.5. Add lime if too acidic, gypsum if too alkaline.\n2. **Fertilizer Management**: Apply N-P-K based on soil test. Split nitrogen application (basal + top dressing).\n3. **Water Management**: Ensure adequate irrigation during critical stages (flowering, grain filling).\n4. **Seed Treatment**: Treat seeds with fungicide and biofertilizers (Azotobacter, PSB).\n5. **Weed Control**: Timely weeding or pre-emergence herbicide application.\n6. **Pest Monitoring**: Regular scouting for pests like stem borer, fall armyworm.".format(crop, district, soil_type, crop)
+    
+    elif 'fertilizer' in question or 'nutrient' in question or 'npk' in question:
+        return "For {} in {} soil:\n\n**Recommended NPK Schedule:**\n- **Basal (at sowing)**: 50% N, 100% P, 50% K\n- **Tillering (25-30 DAS)**: 25% N\n- **Panicle Initiation (45-50 DAS)**: 25% N\n\n**Organic Options**: FYM 10-15 t/ha, Vermicompost 2-3 t/ha, Green manuring.\n**Biofertilizers**: Azotobacter (N-fixing), PSB (phosphate solubilizing), KSB (potash mobilizing).\n\nAdjust based on your soil test results!".format(crop, soil_type)
+    
+    elif 'water' in question or 'irrigat' in question or 'rain' in question:
+        return "{} water requirements in {}:\n\n**Critical Irrigation Stages:**\n1. **Crown root initiation** (21-25 DAS)\n2. **Tillering** (35-40 DAS)\n3. **Panicle initiation** (50-55 DAS)\n4. **Flowering** (70-80 DAS) - MOST CRITICAL\n5. **Grain filling** (90-100 DAS)\n\n**Water Saving Tips:**\n- Alternate wetting and drying (AWD) for rice\n- Drip/sprinkler irrigation for water efficiency\n- Mulching to reduce evaporation\n- Rainwater harvesting structures".format(crop, district)
+    
+    elif 'pest' in question or 'disease' in question or 'insect' in question:
+        return "Common {} pests & diseases to watch for:\n\n**Major Pests:**\n- Stem borer: Dead hearts, white ears - Trichogramma cards, pheromone traps\n- Fall armyworm: Window panes on leaves - Spinetoram, emamectin benzoate\n- Aphids: Honeydew, sooty mold - Neem oil, imidacloprid\n\n**Major Diseases:**\n- Blast: Diamond lesions - Tricyclazole, isoprothiolane\n- Blight: Water-soaked lesions - Copper oxychloride\n- Smut: Black powdery spores - Seed treatment with carbendazim\n\n**IPM Approach**: Resistant varieties, crop rotation, biological control, need-based chemicals.".format(crop)
+    
+    elif 'harvest' in question or 'when' in question or 'timing' in question:
+        return "{} harvesting guidelines:\n\n**Maturity Indicators:**\n- Grains hard, moisture 20-25%\n- Plants yellow/brown, panicles drooping\n- Grains rattle when shaken\n\n**Harvest Timing:**\n- Too early: High moisture, losses in threshing\n- Too late: Shattering losses, grain breakage\n- Optimal: 20-22% moisture for combine, 18-20% for manual\n\n**Post-Harvest:**\n- Dry to 12-14% moisture for storage\n- Clean grains, store in hermetic bags/silos\n- Treat storage area with malathion".format(crop)
+    
+    elif 'budget' in question or 'cost' in question or 'profit' in question or 'roi' in question:
+        roi = context.get('roi', 'N/A')
+        risk = risk_level
+        return "Financial guidance for {}:\n\n**Current Projection**: ROI {}%, Risk: {}\n\n**Cost Reduction Strategies:**\n1. **Bulk input purchase** with farmer groups\n2. **Custom hiring** for machinery vs ownership\n3. **Balanced fertilization** - avoid excess N\n4. **Integrated pest management** - reduce pesticide sprays\n5. **Direct seeding** where applicable - save labor\n\n**Income Enhancement:**\n- Value addition (processing, branding)\n- Collective marketing for better prices\n- Crop diversification for risk spreading\n- Government schemes (PM-KISAN, crop insurance)".format(crop, roi, risk)
+    
+    else:
+        return "I can help you with {} cultivation in {} ({}{} soil).\n\n**Ask me about:**\n- **Yield improvement** techniques\n- **Fertilizer & nutrient** management\n- **Irrigation & water** scheduling\n- **Pest & disease** control\n- **Harvest timing** & post-harvest\n- **Budget, costs & profitability**\n\nWhat specific aspect would you like guidance on?".format(crop, district, soil_type)

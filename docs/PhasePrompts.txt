@@ -1,0 +1,45 @@
+# AGENT MASTER REQUIREMENTS: AgriBrain Agricultural Digital Twin
+
+## 1. Project Branding & Architecture
+- **Branding:** Officially named **AgriBrain** across all API responses, frontend dashboards, documentation, and log files.
+- **File Isolation:** 
+  - Backend code must reside strictly inside `backend/` (FastAPI, Python services, models).
+  - Frontend code must reside strictly inside `frontend_web/` (Next.js 14 App Router, React, Tailwind CSS).
+  - Never use stubs, placeholders, or `// TODO` comments; every function and button handler must be fully implemented.
+
+## 2. Backend Data Lookup & ML Engine
+- **3-Tier Data Fallback (`backend/services/data_lookup.py`):**
+  - Tier 1: Exact district match from `india_soilgrids_subset.csv`.
+  - Tier 2: State-level average for missing districts.
+  - Tier 3: National soil-type baseline averages.
+  - Must return explicit keys: `N`, `P`, `K`, `ph`, `temperature`, `humidity`, `rainfall`, and `fallback_tier`.
+- **ML Pipeline (`backend/api/simulation.py`):**
+  - Load pre-trained `model.pkl` and `scaler.pkl`.
+  - Input feature vector order must strictly be: `[N, P, K, temperature, humidity, ph, rainfall]`.
+  - Apply `scaler.transform()` before calling model predictions to output top crop recommendations and expected yields (tons/ha).
+
+## 3. Financial & Unit Conversion Engine (CRITICAL MATH)
+- **APMC Mandi Pricing (`backend/services/market_pricing.py`):**
+  - Fetch live modal prices from `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070` using `DATAGOV_API_KEY`.
+- **Mandatory Unit Conversion:**
+  - The API returns prices in **₹/Quintal (100 kg)**, but yield is measured in **Tons (1000 kg)**. 
+  - You MUST multiply the modal price by **10** to get the price per ton: `price_per_ton = float(modal_price) * 10`.
+- **ROI Calculation:**
+  - `revenue = expected_yield_tons * price_per_ton`
+  - `roi_percentage = ((revenue - budget_inr) / budget_inr) * 100` (Prevent negative ROI bugs caused by unscaled units).
+
+## 4. Dual-Mode Gemini Chatbot & Calendar Engine
+- **Chat Routing (`backend/api/chat.py`):**
+  - If `is_context_aware=False` or prompt is a basic greeting ("hi", "hello"), bypass strict system prompts and pass query directly to Gemini API.
+  - If `is_context_aware=True`, inject full farm parameters (`selected_crop`, `district`, `state`, `soil_type`, `planting_season`, `planned_start_date`, `land_area_ha`).
+- **Cultivation Calendar (`backend/services/calendar_generator.py`):**
+  - Parse `planned_start_date` and generate calculated date-ranged stages:
+    - Stage 1: Land Prep & Sowing (Day 0–15)
+    - Stage 2: Vegetative Growth & NPK Application (Day 16–45)
+    - Stage 3: Flowering & Irrigation Window (Day 46–75)
+    - Stage 4: Maturation & Harvest Window (Day 76–120)
+
+## 5. Production Next.js 14 Frontend
+- **Global State (`FarmContext.tsx`):** Manage form inputs, simulation results, and `selectedCrop` globally.
+- **Interactive Crop Cards (`CropCard.tsx`):** Render recommendation cards displaying yield, market price (₹/Ton), confidence %, and ROI %. Allow user to click a card to set `selectedCrop`.
+- **Action Buttons (`ChatAssistant.tsx`):** Wire the three core action buttons ([📅 Generate Cultivation Calendar], [💧 Irrigation Schedule], [🌱 Fertilizer Plan]) to programmatically trigger the chat endpoint with `is_context_aware=True` and the active `selectedCrop`.

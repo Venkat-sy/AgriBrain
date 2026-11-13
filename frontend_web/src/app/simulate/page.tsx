@@ -10,8 +10,35 @@
  import { WeatherWidget } from "@/components/WeatherWidget";
  import { AlertsWidget } from "@/components/AlertsWidget";
  import { DigitalTwinWidget } from "@/components/DigitalTwinWidget";
+import { IndiaMapSelector } from "@/components/IndiaMapSelector";
 
- interface District {
+interface SpatialLookupResponse {
+  district_id: number;
+  district_name: string;
+  state: string;
+  state_code: string;
+  latitude?: number;
+  longitude?: number;
+  soil_type: string;
+  agro_climatic_zone?: string;
+  area_km2?: number;
+  centroid: { lat: number; lon: number };
+  lookup_method: string;
+  distance_km?: number;
+  baseline_parameters: {
+    n: number;
+    p: number;
+    k: number;
+    ph: number;
+    temperature_c: number;
+    humidity_percent: number;
+    rainfall_mm: number;
+    lookup_method: string;
+  };
+  note: string;
+}
+
+interface District {
    id: number;
    name: string;
    rainfall_mm: number;
@@ -53,6 +80,7 @@
    const [isLoading, setIsLoading] = useState(false);
    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
    const [apiError, setApiError] = useState<string | null>(null);
+   const [mapDistrict, setMapDistrict] = useState<SpatialLookupResponse | null>(null);
 
    // Load districts and soil types on mount
    useEffect(() => {
@@ -84,6 +112,10 @@
      }
    }, [farmParams, districts, soilTypes]);
 
+  const handleMapDistrictSelect = (district: SpatialLookupResponse) => {
+      setMapDistrict(district);
+    };
+
    const handleRecommendationSubmit = async (formData: {
      district_id: number;
      soil_type: string;
@@ -105,7 +137,7 @@
        // Store farm params in context
        setFarmParams(formData);
        
-       const response = await fetch("/api/v1/crop/recommend", {
+       const response = await fetch("/api/recommend", {
          method: "POST",
          headers: { "Content-Type": "application/json" },
          body: JSON.stringify({ 
@@ -216,6 +248,22 @@
            <div className="lg:col-span-1">
              {activeTab === "input" && (
                <>
+                 {mapDistrict && (
+                   <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                     <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">Selected Location</h3>
+                     <p className="text-green-700 dark:text-green-300">{mapDistrict.district_name}, {mapDistrict.state}</p>
+                     <div className="grid grid-cols-2 gap-2 mt-2 text-sm text-slate-600 dark:text-slate-400">
+                       <div>N: {mapDistrict.baseline_parameters?.n} kg/ha</div>
+                       <div>P: {mapDistrict.baseline_parameters?.p} kg/ha</div>
+                       <div>K: {mapDistrict.baseline_parameters?.k} kg/ha</div>
+                       <div>pH: {mapDistrict.baseline_parameters?.ph}</div>
+                       <div>Temp: {mapDistrict.baseline_parameters?.temperature_c}°C</div>
+                       <div>Humidity: {mapDistrict.baseline_parameters?.humidity_percent}%</div>
+                       <div>Rainfall: {mapDistrict.baseline_parameters?.rainfall_mm} mm</div>
+                       <div>Soil: {mapDistrict.soil_type}</div>
+                     </div>
+                   </div>
+                 )}
                  <InputPanel 
                    onSubmit={handleRecommendationSubmit} 
                    isLoading={isLoading} 
@@ -256,6 +304,16 @@
              
              {/* Sidebar Widgets - always visible */}
              <div className="mt-6 space-y-6">
+               {activeTab === "input" && (
+                 <div className="animate-slide-up">
+                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Farm Location</h3>
+                   <IndiaMapSelector
+                     onDistrictSelect={handleMapDistrictSelect}
+                     initialCenter={[20.5937, 78.9629]}
+                     initialZoom={5}
+                   />
+                 </div>
+               )}
                <WeatherWidget />
                <AlertsWidget />
                <DigitalTwinWidget />

@@ -36,7 +36,7 @@ export function SimulationPanel({ recommendations }: SimulationPanelProps) {
     setIsSimulating(true);
     try {
       // Get district_id, soil_type, rainfall_mm from the form context
-      const response = await fetch("/api/v1/simulate", {
+      const response = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

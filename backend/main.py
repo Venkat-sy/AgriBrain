@@ -10,7 +10,10 @@ from backend.api import (
     soil_router,
     crop_router,
     simulation_router,
-    roadmap_router
+    roadmap_router,
+    chat,
+    baseline,
+    spatial
 )
 from backend.api import crop_recommendation
 
@@ -50,6 +53,9 @@ app.include_router(crop_router)
 app.include_router(crop_recommendation.router)
 app.include_router(simulation_router)
 app.include_router(roadmap_router)
+app.include_router(chat.router)
+app.include_router(baseline.router)
+app.include_router(spatial.router)
 
 
 @app.get("/")

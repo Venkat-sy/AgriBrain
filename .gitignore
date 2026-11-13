@@ -72,3 +72,10 @@ data/*.csv
 .env*
 .vercel_python_packages/
 *.zip
+agribrain_shared_pack/data/*.csv
+datasets/*.csv
+
+# Secrets
+backend/agribrain-*-firebase-adminsdk-*.json
+scripts/list_models.py
+tests/test_gemini.py

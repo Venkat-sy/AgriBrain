@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
 
@@ -24,6 +24,8 @@ class SimulationRequest(BaseModel):
     confirmed_soil_type: str
     rainfall_override_mm: Optional[float] = Field(default=None, ge=0)
     planting_month: Optional[int] = Field(default=None, ge=1, le=12)
+    planting_season: Optional[str] = Field(default=None, description="Kharif, Rabi, Zaid, or Annual")
+    planned_start_date: Optional[date] = Field(default=None, description="Planned start date for cultivation")
 
 
 class CostBreakdownItem(BaseModel):
@@ -55,6 +57,11 @@ class SimulationResponse(BaseModel):
     roi_percentage: float
     risk_level: RiskLevel
     risk_factors: List[str]
+    
+    # ML-based predictions
+    ml_yield_prediction_tons_per_ha: Optional[float] = Field(default=None, description="Yield prediction from ML model (tons/ha)")
+    ml_yield_prediction_tons: Optional[float] = Field(default=None, description="Total yield prediction from ML model (tons)")
+    recommended_crops: Optional[List[Dict[str, Any]]] = Field(default=None, description="ML crop recommendations")
     
     # Metadata
     model_version: str

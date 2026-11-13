@@ -1,0 +1,97 @@
+{
+    "crop_recommendation": {
+        "input_features": [
+            "n",
+            "p",
+            "k",
+            "temperature",
+            "humidity",
+            "ph",
+            "rainfall"
+        ],
+        "target_column": "label_encoded",
+        "num_classes": 22,
+        "scaler_ref": "crop_scaler.pkl",
+        "types": {
+            "n": "float64",
+            "p": "float64",
+            "k": "float64",
+            "temperature": "float64",
+            "humidity": "float64",
+            "ph": "float64",
+            "rainfall": "float64"
+        }
+    },
+    "rainfall": {
+        "description": "Processed rainfall data with monsoon ratio and variability features",
+        "engineered_features": [
+            "Monsoon_Ratio",
+            "Rainfall_Variability"
+        ],
+        "types": {
+            "SUBDIVISION": "object",
+            "YEAR": "int64",
+            "JAN": "float64",
+            "FEB": "float64",
+            "MAR": "float64",
+            "APR": "float64",
+            "MAY": "float64",
+            "JUN": "float64",
+            "JUL": "float64",
+            "AUG": "float64",
+            "SEP": "float64",
+            "OCT": "float64",
+            "NOV": "float64",
+            "DEC": "float64",
+            "ANNUAL": "float64",
+            "Jan-Feb": "float64",
+            "Mar-May": "float64",
+            "Jun-Sep": "float64",
+            "Oct-Dec": "float64",
+            "Monsoon_Ratio": "float64",
+            "Rainfall_Variability": "float64"
+        }
+    },
+    "crop_production": {
+        "description": "District-level crop production data with yield per hectare",
+        "engineered_features": [
+            "Yield_per_ha"
+        ],
+        "encoded_columns": [
+            "State_Name_Encoded",
+            "Crop_Encoded",
+            "Season_Encoded"
+        ],
+        "types": {
+            "State_Name": "object",
+            "District_Name": "object",
+            "Crop_Year": "int64",
+            "Season": "object",
+            "Crop": "object",
+            "Area": "float64",
+            "Production": "float64",
+            "Yield_per_ha": "float64",
+            "State_Name_Encoded": "int32",
+            "Crop_Encoded": "int32",
+            "Season_Encoded": "int32"
+        }
+    },
+    "crop_economics": {
+        "input_features": [
+            "planting_density",
+            "irrigation_cost",
+            "fertilizer_cost",
+            "labor_cost",
+            "yield_kg_per_ha"
+        ],
+        "target_column": "crop_name",
+        "types": {
+            "crop_name": "object",
+            "planting_density": "int64",
+            "irrigation_cost": "int64",
+            "fertilizer_cost": "int64",
+            "labor_cost": "int64",
+            "yield_kg_per_ha": "int64"
+        }
+    }
+}

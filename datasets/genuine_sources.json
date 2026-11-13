@@ -1,0 +1,33 @@
+{
+  "rainfall": {
+    "source_name": "India Meteorological Department (IMD) - Climate Research & Services, Pune",
+    "portal_url": "https://www.imdpune.gov.in",
+    "data_supply_portal": "https://mausam.imd.gov.in (Data Supply Portal referenced)",
+    "contact": "Shri Ranjan Phukan, Scientist D, +91 9435669264, ranjan.phukan@imd.gov.in",
+    "available_formats": "Gridded NetCDF (0.25x0.25), Binary, Merged Gauge+GPM",
+    "district_wise_access": "Not directly downloadable via public URLs. Requires formal request through Data Supply Portal or email contact.",
+    "years_available": "Historical archive available, but district-wise 2021-2025 requires manual request",
+    "status": "MANUAL_DOWNLOAD_REQUIRED",
+    "notes": "Gridded data can be aggregated to districts using GeoJSON boundaries. No public CSV/Excel download for district-wise annual rainfall 2021-2025."
+  },
+  "crop_production": {
+    "source_name": "Directorate of Economics & Statistics (DES), Ministry of Agriculture",
+    "portal_url": "https://eands.dacnet.nic.in (may require VPN/institutional access)",
+    "alternative_portal": "https://mospi.gov.in (MOSPI data portal)",
+    "data_gov_in": "https://data.gov.in (district-wise crop production datasets exist but require API key)",
+    "available_formats": "Excel, CSV via data.gov.in API",
+    "years_available": "Latest agricultural years typically 2019-2023 (varies by state)",
+    "status": "MANUAL_DOWNLOAD_REQUIRED",
+    "notes": "District-wise crop production and yield data for 21 major crops. Requires data.gov.in API registration or manual download from DES publications."
+  },
+  "soil_data": {
+    "source_name": "ICAR-NBSS&LUP (National Bureau of Soil Survey & Land Use Planning) & Soil Health Card Scheme",
+    "portal_url": "https://www.nbsslup.in",
+    "soil_health_card": "https://soilhealth.dac.gov.in",
+    "icar_portal": "https://icar.org.in",
+    "available_formats": "PDF reports, district soil maps, database access (institutional)",
+    "district_coverage": "Partial - detailed soil profiles for benchmark districts, state-level generalizations elsewhere",
+    "status": "INSTITUTIONAL_ACCESS_REQUIRED",
+    "notes": "Actual measured soil data (NPK, pH, EC, OC, micronutrients) available only for benchmark districts. Most districts have estimated/regional values. Soil Health Card data requires state-level access."
+  }
+}

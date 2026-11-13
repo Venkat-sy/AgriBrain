@@ -67,8 +67,9 @@ def test_recommend_returns_top_k(tmp_path: Path):
     y = [0, 1, 0]
     model = train_model(X, y)
 
-    input_features = {"a": 0.5, "b": 0.5}
-    recs = recommend(model, input_features, top_k=3)
+    # Test with real feature names that match the model's expected features
+    input_features = {"n": 0.5, "p": 0.5, "k": 0.5, "temperature": 25, "humidity": 80, "ph": 6.5, "rainfall": 200}
+    recs = recommend(input_features, top_k=3)
     assert isinstance(recs, list)
     assert len(recs) == 3
     for r in recs:

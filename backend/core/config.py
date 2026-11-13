@@ -2,6 +2,8 @@ from functools import lru_cache
 from typing import List, Optional
 from pydantic_settings import BaseSettings
 from pydantic import Field
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 class Settings(BaseSettings):
@@ -31,6 +33,10 @@ class Settings(BaseSettings):
     IMD_API_KEY: Optional[str] = None
     OPENWEATHER_API_KEY: Optional[str] = None
     
+    # Upstash Redis
+    UPSTASH_REDIS_REST_URL: Optional[str] = None
+    UPSTASH_REDIS_REST_TOKEN: Optional[str] = None
+    
     # File Upload
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
     UPLOAD_DIR: str = "uploads"
@@ -38,6 +44,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "allow"
 
 
 # Global settings instance
@@ -49,14 +56,32 @@ def get_settings() -> Settings:
     return settings
 
 
+# Database engine and session factory
+def _get_database_url() -> str:
+    """Get database URL with postgres:// -> postgresql:// fix for SQLAlchemy 1.4+"""
+    url = settings.DATABASE_URL
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    return url
+
+
+def _create_engine():
+    """Create SQLAlchemy engine with appropriate connect args"""
+    database_url = _get_database_url()
+    is_sqlite = database_url.startswith("sqlite")
+    
+    connect_args = {"check_same_thread": False} if is_sqlite else {}
+    
+    return create_engine(database_url, connect_args=connect_args)
+
+
+# Create engine and session factory at module level
+engine = _create_engine()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
 # Dependency for FastAPI
 def get_db():
-    from sqlalchemy import create_engine
-    from sqlalchemy.orm import sessionmaker
-    
-    engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {})
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    
     db = SessionLocal()
     try:
         yield db

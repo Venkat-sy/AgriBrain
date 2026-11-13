@@ -6,7 +6,7 @@ from training_data import prepare_training_data
 def test_task7_processes_economics(tmp_path, monkeypatch):
     """Ensure task7 reads the economics CSV, creates processed file and updates config."""
     # Ensure the expected dataset path exists – the repository already contains the CSV.
-    eco_path = os.path.join(prepare_training_data.DATASETS_DIR, "04_crop_economics", "crop_economics.csv")
+    eco_path = os.path.join(prepare_training_data.DATASETS_DIR, "economics", "crop_economics.csv")
     assert os.path.isfile(eco_path)
 
     # Run task7 directly

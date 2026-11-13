@@ -12,6 +12,13 @@ from backend.schemas import (
     CropCostResponse,
     CropPriceResponse
 )
+import importlib
+import backend.services.crop_recommendation_service as svc
+importlib.reload(svc)
+# Import inside function to avoid caching issues
+def get_recommend_crops():
+    from backend.services.crop_recommendation_service import recommend_crops
+    return recommend_crops
 
 router = APIRouter(prefix="/api/v1/crop", tags=["crop"])
 
@@ -22,99 +29,45 @@ async def recommend_crops(
     db: Session = Depends(get_db)
 ):
     """
-    Recommend crops based on soil, climate, and location parameters.
-    This uses a rule-based scoring system (can be replaced with ML model).
+    Recommend crops using the trained ML model (RandomForest).
+    Takes soil and climate parameters, returns top-K crop predictions with confidence scores.
     """
-    # Verify district exists
-    district = db.query(District).filter(District.id == request.district_id).first()
-    if not district:
-        raise HTTPException(status_code=404, detail="District not found")
+    # Map API request fields to ML model feature names
+    # API uses: n, p, k, temperature_c, humidity_percent, ph, rainfall_mm
+    # ML expects: n, p, k, temperature, humidity, ph, rainfall
+    input_features = {
+        'N': request.n,
+        'P': request.p,
+        'K': request.k,
+        'temperature': request.temperature_c,
+        'humidity': request.humidity_percent,
+        'ph': request.ph,
+        'rainfall': request.rainfall_mm,
+    }
     
-    # Get all crop profiles
-    all_crops = db.query(CropProfile).all()
+    # Filter out None values - ML service will handle defaults
+    input_features = {k: v for k, v in input_features.items() if v is not None}
     
+    # Get ML-based recommendations
+    ml_recommendations = get_recommend_crops()(input_features, top_k=request.top_k)
+    
+    # Convert ML response to API response format
     recommendations = []
-    
-    for crop in all_crops:
-        score = 0.0
-        match_reasons = []
-        
-        # Soil type matching (40% weight)
-        if crop.suitable_soil_types and request.soil_type in crop.suitable_soil_types:
-            score += 0.4
-            match_reasons.append(f"Suitable for {request.soil_type}")
-        
-        # Rainfall matching (25% weight)
-        if crop.rainfall_min_mm and crop.rainfall_max_mm:
-            if crop.rainfall_min_mm <= request.rainfall_mm <= crop.rainfall_max_mm:
-                score += 0.25
-                match_reasons.append(f"Rainfall ({request.rainfall_mm}mm) within optimal range ({crop.rainfall_min_mm}-{crop.rainfall_max_mm}mm)")
-            elif request.rainfall_mm < crop.rainfall_min_mm:
-                score += 0.1
-                match_reasons.append(f"Rainfall below optimal (needs {crop.rainfall_min_mm}mm+)")
-            else:
-                score += 0.1
-                match_reasons.append(f"Rainfall above optimal (max {crop.rainfall_max_mm}mm)")
-        
-        # Temperature matching (15% weight)
-        if crop.temp_min_c and crop.temp_max_c and request.temperature_c:
-            if crop.temp_min_c <= request.temperature_c <= crop.temp_max_c:
-                score += 0.15
-                match_reasons.append(f"Temperature ({request.temperature_c}°C) within optimal range")
-            else:
-                score += 0.05
-                match_reasons.append(f"Temperature outside optimal range ({crop.temp_min_c}-{crop.temp_max_c}°C)")
-        
-        # pH matching (10% weight)
-        if crop.ph_min and crop.ph_max and request.ph:
-            if crop.ph_min <= request.ph <= crop.ph_max:
-                score += 0.1
-                match_reasons.append(f"pH ({request.ph}) within optimal range ({crop.ph_min}-{crop.ph_max})")
-            else:
-                score += 0.02
-                match_reasons.append(f"pH outside optimal range")
-        
-        # Nutrient matching (10% weight)
-        nutrient_score = 0
-        nutrient_count = 0
-        if crop.n_requirement and request.n:
-            nutrient_count += 1
-            if request.n >= crop.n_requirement * 0.8:
-                nutrient_score += 1
-        if crop.p_requirement and request.p:
-            nutrient_count += 1
-            if request.p >= crop.p_requirement * 0.8:
-                nutrient_score += 1
-        if crop.k_requirement and request.k:
-            nutrient_count += 1
-            if request.k >= crop.k_requirement * 0.8:
-                nutrient_score += 1
-        
-        if nutrient_count > 0:
-            score += 0.1 * (nutrient_score / nutrient_count)
-            if nutrient_score == nutrient_count:
-                match_reasons.append("Soil nutrients meet requirements")
-        
-        # Only include crops with some positive score
-        if score > 0.1:
-            recommendations.append(CropRecommendationItem(
-                crop_name=crop.name,
-                confidence=round(score, 2),
-                match_reasons=match_reasons,
-                expected_yield_tons_per_ha=crop.expected_yield_tons_per_ha,
-                season=crop.season
-            ))
-    
-    # Sort by confidence descending and take top_k
-    recommendations.sort(key=lambda x: x.confidence, reverse=True)
-    recommendations = recommendations[:request.top_k]
+    for rec in ml_recommendations:
+        recommendations.append(CropRecommendationItem(
+            crop_name=rec['crop_name'],
+            confidence=round(rec['confidence'], 4),
+            match_reasons=rec.get('match_reasons', []),
+            expected_yield_tons_per_ha=None,  # ML model doesn't provide yield estimates
+            season=None  # ML model doesn't provide season info
+        ))
     
     return CropRecommendationResponse(
         district_id=request.district_id,
         soil_type=request.soil_type,
         rainfall_mm=request.rainfall_mm,
         recommendations=recommendations,
-        model_version="rule_based_v1.0",
+        model_version="randomforest_v1.0",
         generated_at=datetime.utcnow()
     )
 

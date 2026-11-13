@@ -6,33 +6,28 @@ import os
 # Add the project root to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 from backend.models import Base
-from backend.core.config import get_settings
+from backend.core.config import engine, SessionLocal
 
 
 def init_database():
     """Create all tables and insert sample data."""
-    settings = get_settings()
-    engine = create_engine(settings.DATABASE_URL)
-    
     # Create all tables
     print("Creating tables...")
     Base.metadata.create_all(bind=engine)
     print("Tables created successfully!")
     
     # Create a session for inserting sample data
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     db = SessionLocal()
     
     try:
         # Check if data already exists
-        from backend.models import District, CropProfile, RainfallMonthly, CropCost, CropPrice
+        from backend.models import District, CropProfile, RainfallMonthly, CropCost, CropPrice, SoilType, DistrictSoilType
         
         existing_districts = db.query(District).count()
-        if existing_districts > 0:
-            print(f"Database already has {existing_districts} districts. Skipping sample data insertion.")
+        existing_soils = db.query(SoilType).count()
+        if existing_districts > 0 and existing_soils > 0:
+            print(f"Database already has {existing_districts} districts and {existing_soils} soil types. Skipping sample data insertion.")
             return
         
         print("Inserting sample data...")
@@ -55,6 +50,39 @@ def init_database():
             district = District(**d)
             db.add(district)
         
+        # Sample soil types
+        soil_types_data = [
+            {"name": "Alluvial", "description": "Fertile young soils found in river basins", "typical_crops": ["Rice", "Wheat", "Sugarcane"], "color_hex": "#E8D5B7"},
+            {"name": "Black Soil", "description": "High clay content, good moisture retention", "typical_crops": ["Cotton", "Soybean", "Sugarcane"], "color_hex": "#3D3D3D"},
+            {"name": "Red Soil", "description": "Acidic, low CEC, requires liming", "typical_crops": ["Groundnut", "Millets", "Pulses"], "color_hex": "#B22222"},
+            {"name": "Laterite", "description": "Highly weathered, acidic, low fertility", "typical_crops": ["Cashew", "Mango", "Tea"], "color_hex": "#8B4513"},
+            {"name": "Desert", "description": "Sandy, alkaline, low organic matter", "typical_crops": ["Bajra", "Guar", "Moth Bean"], "color_hex": "#F4A460"},
+            {"name": "Peaty", "description": "High organic matter, acidic", "typical_crops": ["Rice", "Vegetables"], "color_hex": "#2F4F2F"},
+        ]
+        
+        for s in soil_types_data:
+            soil = SoilType(**s)
+            db.add(soil)
+        db.flush()  # Get IDs for soil types
+        
+        # Sample district-soil type associations
+        district_soil_data = [
+            {"district_id": 1, "soil_type_id": 1, "percentage": 80.0, "is_predominant": True},   # Ludhiana - Alluvial
+            {"district_id": 2, "soil_type_id": 1, "percentage": 75.0, "is_predominant": True},   # Karnal - Alluvial
+            {"district_id": 3, "soil_type_id": 3, "percentage": 70.0, "is_predominant": True},   # Coimbatore - Red Soil
+            {"district_id": 4, "soil_type_id": 2, "percentage": 65.0, "is_predominant": True},   # Nashik - Black Soil
+            {"district_id": 5, "soil_type_id": 1, "percentage": 85.0, "is_predominant": True},   # East Godavari - Alluvial
+            {"district_id": 6, "soil_type_id": 2, "percentage": 60.0, "is_predominant": True},   # Guntur - Black Soil
+            {"district_id": 7, "soil_type_id": 2, "percentage": 55.0, "is_predominant": True},   # Ahmednagar - Black Soil
+            {"district_id": 8, "soil_type_id": 2, "percentage": 50.0, "is_predominant": True},   # Sangli - Black Soil
+            {"district_id": 9, "soil_type_id": 3, "percentage": 75.0, "is_predominant": True},   # Belgaum - Red Soil
+            {"district_id": 10, "soil_type_id": 3, "percentage": 70.0, "is_predominant": True},  # Nalgonda - Red Soil
+        ]
+        
+        for ds in district_soil_data:
+            dst = DistrictSoilType(**ds)
+            db.add(dst)
+        
         # Sample crop profiles
         crops_data = [
             {
@@ -69,8 +97,8 @@ def init_database():
                 "k_requirement": 40.0,
                 "rainfall_min_mm": 1000,
                 "rainfall_max_mm": 2000,
-                "temperature_min_c": 20.0,
-                "temperature_max_c": 35.0,
+                "temp_min_c": 20.0,
+                "temp_max_c": 35.0,
                 "ph_min": 5.5,
                 "ph_max": 7.0,
                 "suitable_soil_types": ["Alluvial Soil", "Clay Soil", "Clay Loam"],
@@ -90,8 +118,8 @@ def init_database():
                 "k_requirement": 40.0,
                 "rainfall_min_mm": 300,
                 "rainfall_max_mm": 600,
-                "temperature_min_c": 12.0,
-                "temperature_max_c": 25.0,
+                "temp_min_c": 12.0,
+                "temp_max_c": 25.0,
                 "ph_min": 6.0,
                 "ph_max": 7.5,
                 "suitable_soil_types": ["Alluvial Soil", "Loamy Soil", "Clay Loam"],
@@ -119,8 +147,8 @@ def init_database():
                 "k_requirement": 50.0,
                 "rainfall_min_mm": 500,
                 "rainfall_max_mm": 1000,
-                "temperature_min_c": 18.0,
-                "temperature_max_c": 32.0,
+                "temp_min_c": 18.0,
+                "temp_max_c": 32.0,
                 "ph_min": 5.5,
                 "ph_max": 7.5,
                 "suitable_soil_types": ["Alluvial Soil", "Red Soil", "Loamy Soil"],
@@ -140,8 +168,8 @@ def init_database():
                 "k_requirement": 60.0,
                 "rainfall_min_mm": 500,
                 "rainfall_max_mm": 1200,
-                "temperature_min_c": 20.0,
-                "temperature_max_c": 35.0,
+                "temp_min_c": 20.0,
+                "temp_max_c": 35.0,
                 "ph_min": 5.5,
                 "ph_max": 8.0,
                 "suitable_soil_types": ["Black Soil", "Red Soil", "Alluvial Soil"],
@@ -161,8 +189,8 @@ def init_database():
                 "k_requirement": 40.0,
                 "rainfall_min_mm": 600,
                 "rainfall_max_mm": 1000,
-                "temperature_min_c": 20.0,
-                "temperature_max_c": 30.0,
+                "temp_min_c": 20.0,
+                "temp_max_c": 30.0,
                 "ph_min": 6.0,
                 "ph_max": 7.5,
                 "suitable_soil_types": ["Black Soil", "Red Soil", "Loamy Soil"],
@@ -182,8 +210,8 @@ def init_database():
                 "k_requirement": 40.0,
                 "rainfall_min_mm": 500,
                 "rainfall_max_mm": 1000,
-                "temperature_min_c": 22.0,
-                "temperature_max_c": 32.0,
+                "temp_min_c": 22.0,
+                "temp_max_c": 32.0,
                 "ph_min": 6.0,
                 "ph_max": 7.0,
                 "suitable_soil_types": ["Red Soil", "Sandy Loam", "Alluvial Soil"],
@@ -203,8 +231,8 @@ def init_database():
                 "k_requirement": 200.0,
                 "rainfall_min_mm": 1000,
                 "rainfall_max_mm": 2000,
-                "temperature_min_c": 20.0,
-                "temperature_max_c": 35.0,
+                "temp_min_c": 20.0,
+                "temp_max_c": 35.0,
                 "ph_min": 6.0,
                 "ph_max": 8.0,
                 "suitable_soil_types": ["Alluvial Soil", "Black Soil", "Red Soil"],
@@ -224,8 +252,8 @@ def init_database():
                 "k_requirement": 30.0,
                 "rainfall_min_mm": 300,
                 "rainfall_max_mm": 600,
-                "temperature_min_c": 10.0,
-                "temperature_max_c": 25.0,
+                "temp_min_c": 10.0,
+                "temp_max_c": 25.0,
                 "ph_min": 6.0,
                 "ph_max": 8.0,
                 "suitable_soil_types": ["Alluvial Soil", "Black Soil", "Loamy Soil"],
@@ -267,97 +295,114 @@ def init_database():
         for r in rainfall_data:
             db.add(RainfallMonthly(**r))
         
-        # Sample crop costs (per hectare)
+        # Sample crop costs (per hectare) - Realistic Indian farming costs
         # Get crop IDs
         crops = db.query(CropProfile).all()
         for crop in crops:
             if crop.name == "Rice":
                 costs = [
-                    ("Seeds", "kg", 80, 50),
-                    ("Fertilizer (N)", "kg", 60, 120),
-                    ("Fertilizer (P)", "kg", 45, 60),
-                    ("Fertilizer (K)", "kg", 30, 40),
-                    ("Labor", "hr", 300, 200),
-                    ("Irrigation", "ha", 5000, 1),
-                    ("Pesticides", "ha", 3000, 1),
-                    ("Machinery", "hr", 800, 15),
+                    ("Land Preparation (Puddling)", "ha", 4000, 1),
+                    ("Seeds", "kg", 25, 40),
+                    ("Transplanting", "ha", 3500, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 4500, 1),
+                    ("Top Dressing - Nitrogen", "ha", 2500, 2),
+                    ("Pesticides/Insecticides", "ha", 2500, 2),
+                    ("Weeding", "ha", 2000, 2),
+                    ("Irrigation", "ha", 3000, 8),
+                    ("Harvesting", "ha", 4000, 1),
+                    ("Threshing & Winnowing", "ha", 2500, 1),
+                    ("Labor", "day", 400, 50),
                 ]
             elif crop.name == "Wheat":
                 costs = [
-                    ("Seeds", "kg", 60, 100),
-                    ("Fertilizer (N)", "kg", 60, 150),
-                    ("Fertilizer (P)", "kg", 45, 60),
-                    ("Fertilizer (K)", "kg", 30, 40),
-                    ("Labor", "hr", 300, 150),
-                    ("Irrigation", "ha", 4000, 1),
-                    ("Pesticides", "ha", 2000, 1),
-                    ("Machinery", "hr", 800, 12),
+                    ("Land Preparation", "ha", 3000, 1),
+                    ("Seeds", "kg", 40, 100),
+                    ("Sowing", "ha", 2500, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 4000, 1),
+                    ("Top Dressing - Nitrogen", "ha", 2500, 2),
+                    ("Pesticides/Weedicides", "ha", 1500, 1),
+                    ("Irrigation", "ha", 3000, 4),
+                    ("Harvesting", "ha", 3500, 1),
+                    ("Threshing", "ha", 2000, 1),
+                    ("Labor", "day", 350, 40),
                 ]
             elif crop.name == "Maize":
                 costs = [
-                    ("Seeds", "kg", 150, 20),
-                    ("Fertilizer (N)", "kg", 60, 180),
-                    ("Fertilizer (P)", "kg", 45, 70),
-                    ("Fertilizer (K)", "kg", 30, 50),
-                    ("Labor", "hr", 300, 120),
-                    ("Irrigation", "ha", 3000, 1),
-                    ("Pesticides", "ha", 2500, 1),
-                    ("Machinery", "hr", 800, 10),
+                    ("Land Preparation", "ha", 3000, 1),
+                    ("Seeds", "kg", 180, 20),
+                    ("Sowing", "ha", 2500, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 4000, 1),
+                    ("Top Dressing - Nitrogen", "ha", 2500, 2),
+                    ("Pesticides/Weedicides", "ha", 1500, 1),
+                    ("Irrigation", "ha", 2500, 3),
+                    ("Harvesting", "ha", 3000, 1),
+                    ("Shelling/Drying", "ha", 2000, 1),
+                    ("Labor", "day", 350, 35),
                 ]
             elif crop.name == "Cotton":
                 costs = [
-                    ("Seeds", "kg", 800, 2.5),
-                    ("Fertilizer (N)", "kg", 60, 120),
-                    ("Fertilizer (P)", "kg", 45, 60),
-                    ("Fertilizer (K)", "kg", 30, 60),
-                    ("Labor", "hr", 300, 300),
-                    ("Irrigation", "ha", 6000, 1),
-                    ("Pesticides", "ha", 8000, 1),
-                    ("Machinery", "hr", 800, 20),
+                    ("Land Preparation", "ha", 3500, 1),
+                    ("Seeds (Bt Cotton)", "kg", 800, 2.5),
+                    ("Sowing", "ha", 2000, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 5000, 1),
+                    ("Top Dressing - Nitrogen", "ha", 3000, 3),
+                    ("Pesticides/Insecticides", "ha", 8000, 4),
+                    ("Weeding", "ha", 3000, 3),
+                    ("Irrigation", "ha", 6000, 5),
+                    ("Harvesting (Multiple pickings)", "ha", 10000, 1),
+                    ("Post-harvest Handling", "ha", 3000, 1),
+                    ("Labor", "day", 400, 80),
                 ]
             elif crop.name == "Soybean":
                 costs = [
-                    ("Seeds", "kg", 80, 75),
-                    ("Fertilizer (N)", "kg", 60, 20),
-                    ("Fertilizer (P)", "kg", 45, 60),
-                    ("Fertilizer (K)", "kg", 30, 40),
-                    ("Labor", "hr", 300, 100),
-                    ("Irrigation", "ha", 2000, 1),
-                    ("Pesticides", "ha", 2000, 1),
-                    ("Machinery", "hr", 800, 8),
+                    ("Land Preparation", "ha", 3000, 1),
+                    ("Seeds", "kg", 70, 75),
+                    ("Sowing", "ha", 2500, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 3500, 1),
+                    ("Top Dressing", "ha", 2000, 1),
+                    ("Pesticides/Weedicides", "ha", 1500, 1),
+                    ("Irrigation", "ha", 2000, 2),
+                    ("Harvesting", "ha", 2500, 1),
+                    ("Threshing", "ha", 1500, 1),
+                    ("Labor", "day", 350, 30),
                 ]
             elif crop.name == "Groundnut":
                 costs = [
-                    ("Seeds", "kg", 100, 100),
-                    ("Fertilizer (N)", "kg", 60, 20),
-                    ("Fertilizer (P)", "kg", 45, 40),
-                    ("Fertilizer (K)", "kg", 30, 40),
-                    ("Labor", "hr", 300, 150),
-                    ("Irrigation", "ha", 2500, 1),
-                    ("Pesticides", "ha", 2500, 1),
-                    ("Machinery", "hr", 800, 10),
+                    ("Land Preparation", "ha", 3500, 1),
+                    ("Seeds", "kg", 90, 100),
+                    ("Sowing", "ha", 3000, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 4000, 1),
+                    ("Gypsum Application", "ha", 2000, 1),
+                    ("Pesticides/Weedicides", "ha", 2000, 1),
+                    ("Irrigation", "ha", 2500, 3),
+                    ("Harvesting", "ha", 4000, 1),
+                    ("Threshing/Drying", "ha", 2500, 1),
+                    ("Labor", "day", 400, 45),
                 ]
             elif crop.name == "Sugarcane":
                 costs = [
+                    ("Land Preparation", "ha", 5000, 1),
                     ("Seeds (Setts)", "qtl", 3000, 30),
-                    ("Fertilizer (N)", "kg", 60, 250),
-                    ("Fertilizer (P)", "kg", 45, 100),
-                    ("Fertilizer (K)", "kg", 30, 200),
-                    ("Labor", "hr", 300, 500),
-                    ("Irrigation", "ha", 10000, 1),
-                    ("Pesticides", "ha", 5000, 1),
-                    ("Machinery", "hr", 800, 30),
+                    ("Planting", "ha", 4000, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 8000, 1),
+                    ("Top Dressing - Nitrogen", "ha", 4000, 3),
+                    ("Earthing Up", "ha", 3000, 2),
+                    ("Pesticides/Weedicides", "ha", 5000, 3),
+                    ("Irrigation", "ha", 10000, 12),
+                    ("Harvesting & Loading", "ha", 8000, 1),
+                    ("Labor", "day", 450, 150),
                 ]
             elif crop.name == "Chickpea":
                 costs = [
+                    ("Land Preparation", "ha", 2500, 1),
                     ("Seeds", "kg", 80, 80),
-                    ("Fertilizer (N)", "kg", 60, 20),
-                    ("Fertilizer (P)", "kg", 45, 50),
-                    ("Fertilizer (K)", "kg", 30, 30),
-                    ("Labor", "hr", 300, 100),
-                    ("Irrigation", "ha", 2000, 1),
-                    ("Pesticides", "ha", 1500, 1),
-                    ("Machinery", "hr", 800, 8),
+                    ("Sowing", "ha", 2000, 1),
+                    ("Basal Fertilizer (NPK)", "ha", 2500, 1),
+                    ("Pesticides/Weedicides", "ha", 1500, 1),
+                    ("Irrigation", "ha", 1500, 1),
+                    ("Harvesting", "ha", 2500, 1),
+                    ("Threshing", "ha", 1500, 1),
+                    ("Labor", "day", 350, 25),
                 ]
             else:
                 continue
@@ -391,7 +436,7 @@ def init_database():
                     crop_id=crop.id,
                     price_per_ton=price_data[crop.name],
                     price_date=date.today() - timedelta(days=30),
-                    market_name="National Average",
+                    market="National Average",
                     source="AgMarkNet"
                 ))
         

@@ -1,0 +1,134 @@
+def generate_advice(question: str, context: dict, is_context_aware: bool = False) -> str:
+    """Generate farming advice based on question and context."""
+    crop = context.get('crop', 'your crop')
+    district = context.get('district', 'your district')
+    state = context.get('state', 'your state')
+    soil_type = context.get('soil_type', 'your soil type')
+    risk_level = context.get('risk_level', 'unknown')
+    land_area_ha = context.get('land_area_ha', 1.0)
+    planting_season = context.get('planting_season', 'Kharif')
+    planned_start_date_str = context.get('planned_start_date')
+    
+    # Parse planned start date
+    planned_start_date = None
+    if planned_start_date_str:
+        try:
+            planned_start_date = datetime.fromisoformat(planned_start_date_str).date()
+        except:
+            pass
+    
+    # If context-aware mode and asking for a plan/calendar, generate cultivation calendar
+    question_lower = question.lower()
+    if is_context_aware and (('calendar' in question_lower or 'plan' in question_lower or 'schedule' in question_lower or 'timeline' in question_lower)):
+        return generate_cultivation_calendar(crop, district, state, soil_type, planned_start_date, planting_season, land_area_ha)
+    
+    # Yield advice
+    if 'yield' in question_lower or 'increase' in question_lower or 'improve' in question_lower:
+        return f"""To improve {crop} yield in {district}, {state} ({soil_type} soil):
+
+1. **Soil Health**: Test soil pH and nutrients. {crop} prefers pH 5.5-7.5. Add lime if too acidic, gypsum if saline.
+2. **Variety Selection**: Use high-yielding, disease-resistant varieties suited to {planting_season} season in {state}.
+3. **Timely Sowing**: Optimal window for {planting_season} {crop} in {district} - follow local agri-calendar.
+4. **Seed Treatment**: Treat seeds with fungicide and biofertilizers (Azotobacter, PSB).
+5. **Weed Control**: Timely weeding or pre-emergence herbicide application.
+6. **Pest Monitoring**: Regular scouting for pests like stem borer, fall armyworm.
+
+**Specific to {soil_type} soil**: {'Add organic matter to improve structure' if 'clay' in soil_type.lower() else 'Ensure good drainage' if 'loam' in soil_type.lower() else 'Monitor nutrient leaching'}."""
+
+    elif 'fertilizer' in question_lower or 'nutrient' in question_lower or 'npk' in question_lower:
+        return f"""For {crop} in {soil_type} soil ({district}, {state}):
+
+**Recommended NPK Schedule:**
+- **Basal (at sowing)**: 50% N, 100% P, 50% K
+- **Tillering (25-30 DAS)**: 25% N
+- **Panicle Initiation (45-50 DAS)**: 25% N
+
+**Organic Options**: FYM 10-15 t/ha, Vermicompost 2-3 t/ha, Green manuring.
+**Biofertilizers**: Azotobacter (N-fixing), PSB (phosphate solubilizing), KSB (potash mobilizing).
+
+Adjust based on your soil test results!"""
+
+    elif 'water' in question_lower or 'irrigat' in question_lower or 'rain' in question_lower:
+        return f"""{crop} water requirements in {district}, {state}:
+
+**Critical Irrigation Stages:**
+1. **Crown root initiation** (21-25 DAS)
+2. **Tillering** (35-40 DAS)
+3. **Panicle initiation** (50-55 DAS)
+4. **Flowering** (70-80 DAS) - MOST CRITICAL
+5. **Grain filling** (90-100 DAS)
+
+**Water Saving Tips:**
+- Alternate wetting and drying (AWD) for rice
+- Drip/sprinkler irrigation for water efficiency
+- Mulching to reduce evaporation
+- Rainwater harvesting structures"""
+
+    elif 'pest' in question_lower or 'disease' in question_lower or 'insect' in question_lower:
+        return f"""Common {crop} pests & diseases to watch for:
+
+**Major Pests:**
+- Stem borer: Dead hearts, white ears - Trichogramma cards, pheromone traps
+- Fall armyworm: Window panes on leaves - Spinetoram, emamectin benzoate
+- Aphids: Honeydew, sooty mold - Neem oil, imidacloprid
+
+**Major Diseases:**
+- Blast: Diamond lesions - Tricyclazole, isoprothiolane
+- Blight: Water-soaked lesions - Copper oxychloride
+- Smut: Black powdery spores - Seed treatment with carbendazim
+
+**IPM Approach**: Resistant varieties, crop rotation, biological control, need-based chemicals."""
+
+    elif 'harvest' in question_lower or 'when' in question_lower or 'timing' in question_lower:
+        return f"""{crop} harvesting guidelines:
+
+**Maturity Indicators:**
+- Grains hard, moisture 20-25%
+- Plants yellow/brown, panicles drooping
+- Grains rattle when shaken
+
+**Harvest Timing:**
+- Too early: High moisture, losses in threshing
+- Too late: Shattering losses, grain breakage
+- Optimal: 20-22% moisture for combine, 18-20% for manual
+
+**Post-Harvest:**
+- Dry to 12-14% moisture for storage
+- Clean grains, store in hermetic bags/silos
+- Treat storage area with malathion"""
+
+    elif 'budget' in question_lower or 'cost' in question_lower or 'profit' in question_lower or 'roi' in question_lower:
+        roi = context.get('roi', 'N/A')
+        risk = risk_level
+        return f"""Financial guidance for {crop}:
+
+**Current Projection**: ROI {roi}%, Risk: {risk}
+
+**Cost Reduction Strategies:**
+1. **Bulk input purchase** with farmer groups
+2. **Custom hiring** for machinery vs ownership
+3. **Balanced fertilization** - avoid excess N
+4. **Integrated pest management** - reduce pesticide sprays
+5. **Direct seeding** where applicable - save labor
+
+**Income Enhancement:**
+- Value addition (processing, branding)
+- Collective marketing for better prices
+- Crop diversification for risk spreading
+- Government schemes (PM-KISAN, crop insurance)"""
+
+    else:
+        base_context = f"I can help you with {crop} cultivation in {district}, {state} ({soil_type} soil)."
+        if is_context_aware:
+            base_context += f"\n\n**Your Context**: {planting_season} season, starting {planned_start_date_str or 'not specified'}, {land_area_ha} ha land."
+        
+        return f"""{base_context}
+
+**Ask me about:**
+- **Yield improvement** techniques
+- **Fertilizer & nutrient** management
+- **Irrigation & water** scheduling
+- **Pest & disease** control
+- **Harvest timing** & post-harvest
+- **Budget, costs & profitability**"""
+

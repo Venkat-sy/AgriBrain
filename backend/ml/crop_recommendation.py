@@ -5,7 +5,7 @@ preserve the public import path used by the test suite we simply re‑export the
 objects.
 """
 
-from ml.inference.crop_recommendation import (  # noqa: F401
+from backend.ml.inference.crop_recommendation import (  # noqa: F401
     merge_data,
     train_model,
     recommend,

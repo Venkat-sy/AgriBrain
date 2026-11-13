@@ -26,19 +26,23 @@ async def run_simulation(
     db: Session = Depends(get_db)
 ):
     """Run a crop simulation with the given parameters."""
-    # Validate district
-    district = db.query(District).filter(District.id == request.district_id).first()
-    if not district:
-        raise HTTPException(status_code=404, detail="District not found")
-    
     # Validate crop
     crop = db.query(CropProfile).filter(CropProfile.name.ilike(request.selected_crop)).first()
     if not crop:
         raise HTTPException(status_code=404, detail=f"Crop '{request.selected_crop}' not found")
     
-    # Run simulation engine
+    # Try to get district from DB (optional - for metadata only)
+    district = db.query(District).filter(District.id == request.district_id).first()
+    district_name = district.name if district else f"District_{request.district_id}"
+    district_state = district.state if district else "Unknown"
+    
+    # Run simulation engine (pass district object or None)
     engine = SimulationEngine(db)
     result = engine.run_simulation(request, district, crop)
+    
+    # Override district name in response if district wasn't in DB
+    if not district:
+        result.district_name = district_name
     
     return result
 
@@ -50,17 +54,20 @@ async def save_simulation(
     db: Session = Depends(get_db)
 ):
     """Run and save a simulation result."""
-    # Validate district
-    district = db.query(District).filter(District.id == request.district_id).first()
-    if not district:
-        raise HTTPException(status_code=404, detail="District not found")
-    
     # Validate crop
     crop = db.query(CropProfile).filter(CropProfile.name.ilike(request.selected_crop)).first()
     if not crop:
         raise HTTPException(status_code=404, detail=f"Crop '{request.selected_crop}' not found")
     
+    # Try to get district from DB (optional - for metadata only)
+    district = db.query(District).filter(District.id == request.district_id).first()
+    district_name = district.name if district else f"District_{request.district_id}"
+    district_state = district.state if district else "Unknown"
+    
     # Run simulation
+    engine = SimulationEngine(db)
+    sim_result = engine.run_simulation(request, district, crop)
+
     engine = SimulationEngine(db)
     sim_result = engine.run_simulation(request, district, crop)
     

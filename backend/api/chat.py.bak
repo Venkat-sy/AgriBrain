@@ -1,0 +1,377 @@
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, ConfigDict
+from typing import Optional, Dict, Any, List
+from datetime import datetime, date, timedelta
+import json
+
+router = APIRouter(prefix='/api/v1/chat', tags=['chat'])
+
+
+class ChatRequest(BaseModel):
+    session_id: str
+    user_question: str
+
+
+class ChatResponse(BaseModel):
+    response: str
+    session_id: str
+    timestamp: datetime
+
+    model_config = ConfigDict(protected_namespaces=())
+
+
+class StoreSessionRequest(BaseModel):
+    session_id: str
+    crop: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    soil_type: Optional[str] = None
+    land_area_ha: Optional[float] = None
+    budget_inr: Optional[float] = None
+    estimated_yield: Optional[float] = None
+    roi: Optional[float] = None
+    risk_level: Optional[str] = None
+    context: Optional[Dict[str, Any]] = None
+
+
+class StoreSessionResponse(BaseModel):
+    success: bool
+    session_id: str
+    timestamp: datetime
+
+    model_config = ConfigDict(protected_namespaces=())
+
+
+# In-memory session storage (in production, use Redis or database)
+sessions = {}
+
+@router.post("/troubleshoot", response_model=ChatResponse)
+async def troubleshoot(request: ChatRequest):
+    """Get farming advice from the AI advisor."""
+    session_id = request.session_id
+    question = request.user_question
+    
+    # Get session context if available
+    context = sessions.get(session_id, {})
+    
+    # Check if this is context-aware mode
+    is_context_aware = "[CONTEXT_AWARE_MODE]" in question
+    if is_context_aware:
+        question = question.replace("[CONTEXT_AWARE_MODE]", "").strip()
+    
+    # Generate response based on question and context
+    response_text = generate_advice(question, context, is_context_aware)
+    
+    return ChatResponse(
+        response=response_text,
+        session_id=session_id,
+        timestamp=datetime.utcnow()
+    )
+
+
+@router.post("/store-session", response_model=StoreSessionResponse)
+async def store_session(request: StoreSessionRequest):
+    """Store session context for chat continuity."""
+    sessions[request.session_id] = {
+        'crop': request.crop,
+        'district': request.district,
+        'state': request.state,
+        'soil_type': request.soil_type,
+        'land_area_ha': request.land_area_ha,
+        'budget_inr': request.budget_inr,
+        'estimated_yield': request.estimated_yield,
+        'roi': request.roi,
+        'risk_level': request.risk_level,
+        'context': request.context,
+        'updated_at': datetime.utcnow()
+    }
+
+    return StoreSessionResponse(
+        success=True,
+        session_id=request.session_id,
+        timestamp=datetime.utcnow()
+    )
+
+
+@router.get("/session/{session_id}")
+async def get_session(session_id: str):
+    """Get stored session context."""
+    if session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return sessions[session_id]
+
+def generate_advice(question: str, context: dict, is_context_aware: bool = False) -> str:
+    """Generate farming advice based on question and context."""
+    crop = context.get('crop', 'your crop')
+    district = context.get('district', 'your district')
+    state = context.get('state', 'your state')
+    soil_type = context.get('soil_type', 'your soil type')
+    risk_level = context.get('risk_level', 'unknown')
+    land_area_ha = context.get('land_area_ha', 1.0)
+    planting_season = context.get('planting_season', 'Kharif')
+    planned_start_date_str = context.get('planned_start_date')
+    
+    # Parse planned start date
+    planned_start_date = None
+    if planned_start_date_str:
+        try:
+            planned_start_date = datetime.fromisoformat(planned_start_date_str).date()
+        except:
+            pass
+    
+    # If context-aware mode and asking for a plan/calendar, generate cultivation calendar
+    question_lower = question.lower()
+    if is_context_aware and (('calendar' in question_lower or 'plan' in question_lower or 'schedule' in question_lower or 'timeline' in question_lower)):
+        return generate_cultivation_calendar(crop, district, state, soil_type, planned_start_date, planting_season, land_area_ha)
+    
+    # Yield advice
+    if 'yield' in question_lower or 'increase' in question_lower or 'improve' in question_lower:
+        return f"""To improve {crop} yield in {district}, {state} ({soil_type} soil):
+
+1. **Soil Health**: Test soil pH and nutrients. {crop} prefers pH 5.5-7.5. Add lime if too acidic, gypsum if saline.
+2. **Variety Selection**: Use high-yielding, disease-resistant varieties suited to {planting_season} season in {state}.
+3. **Timely Sowing**: Optimal window for {planting_season} {crop} in {district} - follow local agri-calendar.
+4. **Seed Treatment**: Treat seeds with fungicide and biofertilizers (Azotobacter, PSB).
+5. **Weed Control**: Timely weeding or pre-emergence herbicide application.
+6. **Pest Monitoring**: Regular scouting for pests like stem borer, fall armyworm.
+
+**Specific to {soil_type} soil**: {'Add organic matter to improve structure' if 'clay' in soil_type.lower() else 'Ensure good drainage' if 'loam' in soil_type.lower() else 'Monitor nutrient leaching'}."""
+
+    elif 'fertilizer' in question_lower or 'nutrient' in question_lower or 'npk' in question_lower:
+        return f"""For {crop} in {soil_type} soil ({district}, {state}):
+
+**Recommended NPK Schedule:**
+- **Basal (at sowing)**: 50% N, 100% P, 50% K
+- **Tillering (25-30 DAS)**: 25% N
+- **Panicle Initiation (45-50 DAS)**: 25% N
+
+**Organic Options**: FYM 10-15 t/ha, Vermicompost 2-3 t/ha, Green manuring.
+**Biofertilizers**: Azotobacter (N-fixing), PSB (phosphate solubilizing), KSB (potash mobilizing).
+
+Adjust based on your soil test results!"""
+
+    elif 'water' in question_lower or 'irrigat' in question_lower or 'rain' in question_lower:
+        return f"""{crop} water requirements in {district}, {state}:
+
+**Critical Irrigation Stages:**
+1. **Crown root initiation** (21-25 DAS)
+2. **Tillering** (35-40 DAS)
+3. **Panicle initiation** (50-55 DAS)
+4. **Flowering** (70-80 DAS) - MOST CRITICAL
+5. **Grain filling** (90-100 DAS)
+
+**Water Saving Tips:**
+- Alternate wetting and drying (AWD) for rice
+- Drip/sprinkler irrigation for water efficiency
+- Mulching to reduce evaporation
+- Rainwater harvesting structures"""
+
+    elif 'pest' in question_lower or 'disease' in question_lower or 'insect' in question_lower:
+        return f"""Common {crop} pests & diseases to watch for:
+
+**Major Pests:**
+- Stem borer: Dead hearts, white ears - Trichogramma cards, pheromone traps
+- Fall armyworm: Window panes on leaves - Spinetoram, emamectin benzoate
+- Aphids: Honeydew, sooty mold - Neem oil, imidacloprid
+
+**Major Diseases:**
+- Blast: Diamond lesions - Tricyclazole, isoprothiolane
+- Blight: Water-soaked lesions - Copper oxychloride
+- Smut: Black powdery spores - Seed treatment with carbendazim
+
+**IPM Approach**: Resistant varieties, crop rotation, biological control, need-based chemicals."""
+
+    elif 'harvest' in question_lower or 'when' in question_lower or 'timing' in question_lower:
+        return f"""{crop} harvesting guidelines:
+
+**Maturity Indicators:**
+- Grains hard, moisture 20-25%
+- Plants yellow/brown, panicles drooping
+- Grains rattle when shaken
+
+**Harvest Timing:**
+- Too early: High moisture, losses in threshing
+- Too late: Shattering losses, grain breakage
+- Optimal: 20-22% moisture for combine, 18-20% for manual
+
+**Post-Harvest:**
+- Dry to 12-14% moisture for storage
+- Clean grains, store in hermetic bags/silos
+- Treat storage area with malathion"""
+
+    elif 'budget' in question_lower or 'cost' in question_lower or 'profit' in question_lower or 'roi' in question_lower:
+        roi = context.get('roi', 'N/A')
+        risk = risk_level
+        return f"""Financial guidance for {crop}:
+
+**Current Projection**: ROI {roi}%, Risk: {risk}
+
+**Cost Reduction Strategies:**
+1. **Bulk input purchase** with farmer groups
+2. **Custom hiring** for machinery vs ownership
+3. **Balanced fertilization** - avoid excess N
+4. **Integrated pest management** - reduce pesticide sprays
+5. **Direct seeding** where applicable - save labor
+
+**Income Enhancement:**
+- Value addition (processing, branding)
+- Collective marketing for better prices
+- Crop diversification for risk spreading
+- Government schemes (PM-KISAN, crop insurance)"""
+
+    else:
+        base_context = f"I can help you with {crop} cultivation in {district}, {state} ({soil_type} soil)."
+        if is_context_aware:
+            base_context += f"\n\n**Your Context**: {planting_season} season, starting {planned_start_date_str or 'not specified'}, {land_area_ha} ha land."
+        
+        return f"""{base_context}
+
+**Ask me about:**
+- **Yield improvement** techniques
+- **Fertilizer & nutrient** management
+- **Irrigation & water** scheduling
+- **Pest & disease** control
+- **Harvest timing** & post-harvest
+- **Budget, costs & profitability**"""
+
+
+def generate_cultivation_calendar(crop: str, district: str, state: str, soil_type: str,
+                                   planned_start_date, planting_season: str,
+                                   land_area_ha: float) -> str:
+    """Generate a detailed cultivation calendar for the crop."""
+    from datetime import date, timedelta
+
+    if planned_start_date is None:
+        if planting_season == 'Kharif':
+            planned_start_date = date(date.today().year, 6, 15)
+        elif planting_season == 'Rabi':
+            planned_start_date = date(date.today().year, 10, 15)
+        else:
+            planned_start_date = date(date.today().year, 3, 1)
+
+    crop_stages = {
+        "rice": {
+            "Sowing/Transplanting": (0, 0),
+            "Seedling Establishment": (10, 15),
+            "Tillering": (25, 40),
+            "Panicle Initiation": (50, 60),
+            "Flowering": (75, 90),
+            "Grain Filling": (90, 110),
+            "Maturity": (110, 130),
+            "Harvest": (130, 140)
+        },
+        "wheat": {
+            "Sowing": (0, 0),
+            "Germination": (7, 14),
+            "Tillering": (21, 40),
+            "Jointing": (40, 60),
+            "Booting": (60, 75),
+            "Flowering": (75, 90),
+            "Grain Filling": (90, 110),
+            "Maturity": (110, 125),
+            "Harvest": (125, 135)
+        },
+        "maize": {
+            "Sowing": (0, 0),
+            "Germination": (7, 10),
+            "Vegetative (V6-V12)": (25, 50),
+            "Tasseling/Silking": (55, 70),
+            "Grain Filling": (70, 100),
+            "Maturity": (100, 115),
+            "Harvest": (115, 125)
+        },
+        "cotton": {
+            "Sowing": (0, 0),
+            "Germination": (7, 14),
+            "Vegetative Growth": (30, 70),
+            "Flowering": (70, 110),
+            "Boll Development": (110, 150),
+            "Boll Opening": (150, 170),
+            "Harvest": (170, 190)
+        },
+        "soybean": {
+            "Sowing": (0, 0),
+            "Germination": (5, 10),
+            "Vegetative": (20, 45),
+            "Flowering": (45, 70),
+            "Pod Formation": (70, 95),
+            "Seed Filling": (95, 115),
+            "Maturity": (115, 130),
+            "Harvest": (130, 140)
+        }
+    }
+
+    crop_lower = crop.lower()
+    stages = crop_stages.get(crop_lower, crop_stages["rice"])
+
+    calendar_lines = []
+    calendar_lines.append(f"# 🌾 {crop.title()} Cultivation Calendar")
+    calendar_lines.append(f"**Location**: {district}, {state} | **Soil**: {soil_type} | **Season**: {planting_season}")
+    calendar_lines.append(f"**Planned Start**: {planned_start_date.strftime('%d %b %Y')} | **Area**: {land_area_ha} ha")
+    calendar_lines.append("")
+
+    for stage_name, (start_day, end_day) in stages.items():
+        start_date = planned_start_date + timedelta(days=start_day)
+        end_date = planned_start_date + timedelta(days=end_day) if end_day > start_day else start_date
+
+        if start_day == 0 and end_day == 0:
+            calendar_lines.append(f"## 📅 {stage_name}")
+            calendar_lines.append(f"   **Date**: {start_date.strftime('%d %b %Y')}")
+        else:
+            calendar_lines.append(f"## 📅 {stage_name} ({start_day}-{end_day} DAS)")
+            calendar_lines.append(f"   **Period**: {start_date.strftime('%d %b')} - {end_date.strftime('%d %b %Y')}")
+
+        advice = get_stage_advice(stage_name, crop_lower, soil_type)
+        if advice:
+            calendar_lines.append(f"   **Key Activities**: {advice}")
+        calendar_lines.append("")
+
+    calendar_lines.append("---")
+    calendar_lines.append("## 📦 Input Schedule Summary")
+    calendar_lines.append("")
+    calendar_lines.append("| Stage | Fertilizer | Pest Control | Irrigation |")
+    calendar_lines.append("|-------|------------|--------------|------------|")
+
+    if crop_lower in ["rice", "wheat"]:
+        calendar_lines.append("| Basal | 50% N, 100% P, 50% K | Seed treatment | Light irrigation |")
+        calendar_lines.append("| Tillering | 25% N | Weed control | Maintain 3-5cm water |")
+        calendar_lines.append("| Panicle Initiation | 25% N | Stem borer monitoring | Critical - no stress |")
+        calendar_lines.append("| Flowering | - | Blast/blight watch | Critical - no stress |")
+        calendar_lines.append("| Grain Filling | - | Pest scouting | Reduce gradually |")
+    else:
+        calendar_lines.append("| Sowing | Basal NPK + FYM | Seed treatment | Light irrigation |")
+        calendar_lines.append("| Vegetative | Top dressing N | Weed/pest control | As needed |")
+        calendar_lines.append("| Flowering | - | Pest monitoring | Critical stage |")
+        calendar_lines.append("| Maturity | - | Pre-harvest check | Stop irrigation |")
+
+    calendar_lines.append("")
+    calendar_lines.append("---")
+    calendar_lines.append("*Note: Adjust dates based on local weather and variety. Consult local KVK for precise timing.*")
+
+    return "\n".join(calendar_lines)
+
+
+def get_stage_advice(stage_name: str, crop: str, soil_type: str) -> str:
+    """Get stage-specific advice."""
+    advice_map = {
+        "Sowing/Transplanting": "Use certified seeds, treat with fungicide+biofertilizer, maintain optimal spacing",
+        "Sowing": "Use certified seeds, treat with fungicide+biofertilizer, maintain optimal spacing",
+        "Seedling Establishment": "Maintain water level, gap filling, early weed control",
+        "Germination": "Ensure soil moisture, protect from birds/pests",
+        "Tillering": "Apply 1st top dressing N, weed control, monitor for stem borer",
+        "Vegetative (V6-V12)": "Nitrogen top dressing, weed control, earthing up for maize",
+        "Vegetative Growth": "Nitrogen management, pest monitoring, inter-cultivation",
+        "Jointing": "2nd N application, irrigation critical, disease monitoring",
+        "Panicle Initiation": "2nd N top dressing, water management critical, pest scouting",
+        "Tasseling/Silking": "Water stress avoidance, pollination monitoring, pest control",
+        "Booting": "Flag leaf protection, disease monitoring, adequate water",
+        "Flowering": "MOST CRITICAL - no water stress, disease/pest surveillance, avoid spraying",
+        "Boll Development": "Bollworm monitoring, potassium nutrition, irrigation scheduling",
+        "Pod Formation": "Moisture conservation, pod borer monitoring, nutrient top-up",
+        "Grain Filling": "Maintain soil moisture, prevent lodging, disease management",
+        "Seed Filling": "Adequate moisture, pod/pest protection, nutrient balance",
+        "Boll Opening": "Reduce irrigation, prepare for picking, bollworm watch",
+        "Maturity": "Monitor grain moisture, plan harvest, stop irrigation",
+        "Harvest": "Harvest at optimal moisture, proper drying, storage preparation"
+    }
+    return advice_map.get(stage_name, "")
