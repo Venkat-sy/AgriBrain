@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { InputPanel } from "@/components/InputPanel";
 import { SimulationPanel } from "@/components/SimulationPanel";
 import { CropCard } from "@/components/CropCard";
@@ -9,7 +10,6 @@ import { useFarm } from "@/context/FarmContext";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { AlertsWidget } from "@/components/AlertsWidget";
 import { DigitalTwinWidget } from "@/components/DigitalTwinWidget";
-import { IndiaMapSelector } from "@/components/IndiaMapSelector";
 
 interface SpatialLookupResponse {
   district_id: number;
@@ -74,6 +74,22 @@ export default function SimulatePage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [mapDistrict, setMapDistrict] = useState<SpatialLookupResponse | null>(null);
 
+  // Dynamic import with ssr: false to prevent Leaflet SSR crash
+  const IndiaMapSelector = dynamic(
+    () => import("@/components/IndiaMapSelector").then((mod) => mod.IndiaMapSelector),
+    {
+      ssr: false,
+      loading: () => (
+        <div className="h-[400px] w-full bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 animate-pulse flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Loading map...</p>
+          </div>
+        </div>
+      ),
+    }
+  );
+
   // Handle map click / district selection -> auto-fetch soil + rainfall into global state
   const handleMapDistrictSelect = (district: SpatialLookupResponse) => {
     setMapDistrict(district);
@@ -86,7 +102,7 @@ export default function SimulatePage() {
       setSoilParams({
         ph: bp.ph,
         texture: district.soil_type,
-        organic_carbon: 0.6, // baseline organic carbon estimate for Indian soils
+        organic_carbon: 0.6,
         n: bp.n,
         p: bp.p,
         k: bp.k,
@@ -95,31 +111,19 @@ export default function SimulatePage() {
     }
   };
 
-  const handleRecommendationSubmit = async (formData: {
-    district_id: number;
-    soil_type: string;
-    rainfall_mm: number;
-    temperature_c?: number;
-    humidity_percent?: number;
-    ph?: number;
-    n?: number;
-    p?: number;
-    k?: number;
-    land_area_ha: number;
-    budget_inr: number;
-    planting_season: string;
-    planned_start_date: string;
-  }) => {
+  // Form submit -> get crop recommendations
+  const handleRecommendationSubmit = async (formData: any) => {
     setIsLoading(true);
     setApiError(null);
-    try {
-      setFarmParams(formData);
+    setActiveTab("simulate");
+    setCurrentStep(2);
 
+    try {
       const response = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          district_id: formData.district_id,
+          district_id: formData.district_id || mapDistrict?.district_id,
           soil_type: formData.soil_type,
           rainfall_mm: formData.rainfall_mm,
           temperature_c: formData.temperature_c,
@@ -133,37 +137,32 @@ export default function SimulatePage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Failed to get recommendations");
+        const err = await response.json();
+        throw new Error(err.error || `API error: ${response.status}`);
       }
 
-      const data: ApiResponse = await response.json();
-      setRecommendations(data.recommendations || []);
-      setActiveTab("simulate");
-      setCurrentStep(2);
-    } catch (error) {
-      setApiError(error instanceof Error ? error.message : "Unknown error");
+      const data = await response.json();
+      if (data.recommendations?.length > 0) {
+        setRecommendations(data.recommendations);
+      }
+    } catch (err: any) {
+      setApiError(err.message || "Failed to get recommendations. Check backend connectivity.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSimulationComplete = (results: any) => {
-    setSimulationResults(results);
+  // Crop selection -> store in global state
+  const handleCropSelect = (rec: Recommendation) => {
+    setSelectedCrop(rec.crop_name);
     setCurrentStep(3);
   };
 
-  const handleCropSelect = (crop: Recommendation) => {
-    setSelectedCrop(crop.crop_name);
+  // Simulation complete -> store results + navigate
+  const handleSimulationComplete = (results: any) => {
+    setSimulationResults(results);
+    setCurrentStep(4);
   };
-
-  // Progress indicator
-  const steps = [
-    { number: 1, label: "Farm Input", active: currentStep >= 1 },
-    { number: 2, label: "Crop Selection", active: currentStep >= 2 },
-    { number: 3, label: "Simulation Results", active: currentStep >= 3 },
-    { number: 4, label: "Calendar", active: currentStep >= 4 },
-  ];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -180,161 +179,183 @@ export default function SimulatePage() {
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white">AgriBrain</h1>
               </Link>
             </div>
-            <nav className="flex gap-4">
-              <Link href="/" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
-              <Link href="/simulate" className="px-4 py-2 text-sm font-medium text-green-600 dark:text-green-400">Simulation</Link>
-              <Link href="/calendar" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Calendar</Link>
-              <Link href="/expert-chat" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Expert Chat</Link>
+
+            <nav className="flex items-center gap-1">
+              <Link
+                href="/simulate"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg"
+              >
+                <span className="w-4 h-4 rounded-full bg-green-500"></span>
+                Simulation
+              </Link>
+              <Link
+                href="/calendar"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Calendar
+              </Link>
+              <Link
+                href="/expert-chat"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Expert Chat
+              </Link>
             </nav>
           </div>
         </div>
       </header>
 
-      {/* Progress Indicator */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => (
-              <div key={step.number} className="flex items-center">
-                <div className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
-                    step.active
-                      ? "bg-green-600 text-white"
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Progress Tracker */}
+          <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
+            {[
+              { label: "Farm Input", step: 1 },
+              { label: "Crop Selection", step: 2 },
+              { label: "Simulation", step: 3 },
+              { label: "Calendar", step: 4 },
+              { label: "Expert Chat", step: 5 },
+            ].map((item, idx) => (
+              <div key={item.label} className="flex items-center gap-1 whitespace-nowrap">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                    currentStep >= item.step
+                      ? "bg-green-500 text-white"
                       : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
-                  }`}>
-                    {step.active ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : step.number}
-                  </div>
-                  <span className={`ml-2 text-sm font-medium ${step.active ? "text-green-600 dark:text-green-400" : "text-slate-500 dark:text-slate-400"}`}>
-                    {step.label}
-                  </span>
+                  }`}
+                >
+                  {item.step}
                 </div>
-                {index < steps.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-2 ${step.active ? "bg-green-500" : "bg-slate-200 dark:bg-slate-700"}`} />
+                <span
+                  className={`hidden sm:block text-sm font-medium ${
+                    currentStep >= item.step
+                      ? "text-green-700 dark:text-green-300"
+                      : "text-slate-500 dark:text-slate-400"
+                  }`}
+                >
+                  {item.label}
+                </span>
+                {idx < 4 && (
+                  <div
+                    className={`hidden lg:block w-12 h-0.5 rounded ${
+                      currentStep > item.step
+                        ? "bg-green-500"
+                        : "bg-slate-200 dark:bg-slate-700"
+                    }`}
+                  />
                 )}
               </div>
             ))}
           </div>
-        </div>
-      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
-            {activeTab === "input" && (
-              <>
-                {/* Interactive India map */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Farm Location</h3>
+          <div className="grid lg:grid-cols-12 gap-6">
+            {/* Map Panel - 7/12 width */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Interactive District Map</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Click a district to auto-fill soil parameters and get crop recommendations</p>
+                </div>
+                <div className="p-4">
                   <IndiaMapSelector
                     onDistrictSelect={handleMapDistrictSelect}
+                    isLoading={isLoading}
                     initialCenter={[20.5937, 78.9629]}
                     initialZoom={5}
                   />
-                </div>
 
-                {/* Auto-fetched soil / rainfall summary */}
-                {mapDistrict && (
-                  <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
-                      Auto-Fetched Location Data
-                    </h3>
-                    <p className="text-green-700 dark:text-green-300 mb-2">
-                      {mapDistrict.district_name}, {mapDistrict.state}
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 dark:text-slate-400">
-                      <div>Soil: {mapDistrict.soil_type}</div>
-                      <div>pH: {mapDistrict.baseline_parameters?.ph}</div>
-                      <div>N: {mapDistrict.baseline_parameters?.n} kg/ha</div>
-                      <div>P: {mapDistrict.baseline_parameters?.p} kg/ha</div>
-                      <div>K: {mapDistrict.baseline_parameters?.k} kg/ha</div>
-                      <div>Rainfall: {mapDistrict.baseline_parameters?.rainfall_mm} mm</div>
-                      <div>Temp: {mapDistrict.baseline_parameters?.temperature_c}°C</div>
-                      <div>Humidity: {mapDistrict.baseline_parameters?.humidity_percent}%</div>
+                  {mapDistrict && (
+                    <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg animate-slide-up">
+                      <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
+                        {mapDistrict.district_name}, {mapDistrict.state}
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-slate-600 dark:text-slate-400">
+                        <div>Soil: {mapDistrict.soil_type}</div>
+                        <div>Zone: {mapDistrict.agro_climatic_zone || "N/A"}</div>
+                        <div>N: {mapDistrict.baseline_parameters?.n} kg/ha</div>
+                        <div>P: {mapDistrict.baseline_parameters?.p} kg/ha</div>
+                        <div>K: {mapDistrict.baseline_parameters?.k} kg/ha</div>
+                        <div>pH: {mapDistrict.baseline_parameters?.ph}</div>
+                        <div>Temp: {mapDistrict.baseline_parameters?.temperature_c}°C</div>
+                        <div>Humidity: {mapDistrict.baseline_parameters?.humidity_percent}%</div>
+                        <div>Rainfall: {mapDistrict.baseline_parameters?.rainfall_mm} mm</div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
+                  {apiError && (
+                    <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm text-red-600 dark:text-red-400">{apiError}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {activeTab === "simulate" && recommendations.length > 0 && (
+                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 animate-slide-up">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Select Crop to Simulate</h2>
+                  <p className="text-slate-600 dark:text-slate-400 mb-6">Click on a crop card to select it, then run the digital twin simulation.</p>
+                  <div className="grid grid-cols-1 gap-4">
+                    {recommendations.map((rec, index) => (
+                      <CropCard
+                        key={`${rec.crop_name}-${index}`}
+                        recommendation={rec}
+                        rank={index + 1}
+                        onClick={() => handleCropSelect(rec)}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setActiveTab("input")}
+                    className="mt-6 w-full py-2 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                  >
+                    Back to Input
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Sidebar - 5/12 width */}
+            <div className="lg:col-span-5 space-y-6">
+              {activeTab === "input" && (
                 <InputPanel
                   onSubmit={handleRecommendationSubmit}
                   isLoading={isLoading}
                   hasRecommendations={recommendations.length > 0}
                 />
-                {apiError && (
-                  <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <p className="text-sm text-red-600 dark:text-red-400">{apiError}</p>
+              )}
+
+              {activeTab === "simulate" && (
+                <SimulationPanel
+                  recommendations={recommendations}
+                  onSimulationComplete={handleSimulationComplete}
+                  selectedCrop={selectedCrop}
+                />
+              )}
+
+              {/* Sidebar Widgets */}
+              <WeatherWidget />
+              <AlertsWidget />
+              <DigitalTwinWidget />
+
+              {/* Continue to Calendar */}
+              {simulationResults && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 animate-slide-up">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">Simulation Complete!</h3>
+                      <p className="text-green-700 dark:text-green-300">Your digital twin simulation for <strong>{selectedCrop}</strong> is ready with yield, revenue, and ROI predictions.</p>
+                    </div>
+                    <Link
+                      href="/calendar"
+                      className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-500/30 transition-all whitespace-nowrap"
+                    >
+                      View Cultivation Calendar →
+                    </Link>
                   </div>
-                )}
-              </>
-            )}
-
-            {activeTab === "simulate" && recommendations.length > 0 && (
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 animate-slide-up">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Select Crop to Simulate</h2>
-                <p className="text-slate-600 dark:text-slate-400 mb-6">Click on a crop card to select it, then run the digital twin simulation.</p>
-                <div className="grid grid-cols-1 gap-4">
-                  {recommendations.map((rec, index) => (
-                    <CropCard
-                      key={`${rec.crop_name}-${index}`}
-                      recommendation={rec}
-                      rank={index + 1}
-                      onClick={() => handleCropSelect(rec)}
-                    />
-                  ))}
                 </div>
-                <button
-                  onClick={() => setActiveTab("input")}
-                  className="mt-6 w-full py-2 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                >
-                  Back to Input
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-2 space-y-6">
-            {activeTab === "simulate" && (
-              <SimulationPanel
-                recommendations={recommendations}
-                onSimulationComplete={handleSimulationComplete}
-                selectedCrop={selectedCrop}
-              />
-            )}
-
-            {activeTab === "input" && (
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Simulation Results</h2>
-                <p className="text-slate-600 dark:text-slate-400 text-center py-12">
-                  Click a district on the map or fill the form, get crop recommendations, then run a simulation.
-                </p>
-              </div>
-            )}
-
-            {/* Sidebar Widgets */}
-            <WeatherWidget />
-            <AlertsWidget />
-            <DigitalTwinWidget />
-
-            {/* Continue to Calendar */}
-            {simulationResults && (
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 animate-slide-up">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">Simulation Complete!</h3>
-                    <p className="text-green-700 dark:text-green-300">Your digital twin simulation for <strong>{selectedCrop}</strong> is ready with yield, revenue, and ROI predictions.</p>
-                  </div>
-                  <Link
-                    href="/calendar"
-                    className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-500/30 transition-all whitespace-nowrap"
-                  >
-                    View Cultivation Calendar →
-                  </Link>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </main>

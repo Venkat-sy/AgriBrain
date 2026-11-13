@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, ChevronDown, ChevronUp, MapPin, Sprout } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp, MapPin, Sprout, Eye, EyeOff, ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface District {
   id: number;
@@ -121,372 +121,362 @@ export function InputPanel({ onSubmit, isLoading, hasRecommendations }: InputPan
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
-    const parsed = type === "number" ? parseFloat(value) : value;
-    setFormData((prev) => ({ ...prev, [name]: parsed }));
+    if (type === "number") {
+      setFormData((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = parseInt(e.target.value);
-    const district = filteredDistricts.find((d) => d.id === id);
+  const handleSoilTypeChange = (soilType: string) => {
     setFormData((prev) => ({
       ...prev,
-      district_id: id,
-      rainfall_mm: district?.rainfall_mm || prev.rainfall_mm,
-    }));
-  };
-
-  const handleSoilChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const soil = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      soil_type: soil,
-      rainfall_mm: DEFAULT_RAINFALL[soil] || prev.rainfall_mm,
+      soil_type: soilType,
+      rainfall_mm: DEFAULT_RAINFALL[soilType] || prev.rainfall_mm,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.district_id) return;
-    onSubmit(formData);
+    if (formData.district_id) {
+      onSubmit(formData);
+    }
   };
 
-  const selectClass =
-    "w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm";
-
-  const inputClass =
-    "w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50 text-sm";
-
-  const labelClass = "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5";
+  const glassCard = "bg-white/5 dark:bg-slate-900/5 backdrop-blur-md border border-white/10 dark:border-slate-800/50 rounded-2xl shadow-xl shadow-slate-900/5";
+  const inputClass = "w-full px-4 py-3 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-700/50 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+  const labelClass = "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2";
+  const selectClass = "w-full px-4 py-3 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-700/50 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent transition-all appearance-none";
 
   return (
-    <div className="sticky top-24 space-y-4">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <Sprout className="w-5 h-5 text-green-600 dark:text-green-400" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Farm Parameters</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Enter your farm details for ML-powered recommendations
-            </p>
-          </div>
-        </div>
-
-        {locationError && (
-          <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-700 dark:text-amber-300">
-            {locationError}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* ── LOCATION ── */}
-          <div>
-            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-3 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-green-600" />
-              Location
-            </h3>
-
-            {/* State selector */}
-            <div className="mb-3">
-              <label className={labelClass}>
-                State <span className="text-red-500">*</span>
-              </label>
-              {locationLoading ? (
-                <div className="flex items-center gap-2 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <Loader2 className="w-4 h-4 animate-spin text-green-600" />
-                  <span className="text-sm text-slate-500">Loading states...</span>
-                </div>
-              ) : (
-                <select
-                  value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
-                  className={selectClass}
-                  disabled={isLoading || states.length === 0}
-                >
-                  {states.length === 0 && (
-                    <option value="">No states available</option>
-                  )}
-                  {states.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            {/* District selector — cascades from state */}
-            <div>
-              <label className={labelClass}>
-                District <span className="text-red-500">*</span>
-              </label>
-              {locationLoading ? (
-                <div className="flex items-center gap-2 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <Loader2 className="w-4 h-4 animate-spin text-green-600" />
-                  <span className="text-sm text-slate-500">Loading districts...</span>
-                </div>
-              ) : (
-                <select
-                  value={formData.district_id || ""}
-                  onChange={handleDistrictChange}
-                  className={selectClass}
-                  disabled={isLoading || filteredDistricts.length === 0}
-                >
-                  {filteredDistricts.length === 0 && (
-                    <option value="">No districts for selected state</option>
-                  )}
-                  {filteredDistricts.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {!locationLoading && filteredDistricts.length > 0 && (
-                <p className="mt-1 text-xs text-slate-400">
-                  {filteredDistricts.length} district
-                  {filteredDistricts.length !== 1 ? "s" : ""} in {selectedState}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* ── SOIL ── */}
-          <div>
-            <label className={labelClass}>
-              Soil Type <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="soil_type"
-              value={formData.soil_type}
-              onChange={handleSoilChange}
-              className={selectClass}
-              disabled={isLoading}
-            >
-              {SOIL_TYPES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* ── FARM BASICS ── */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>
-                Land Area (ha) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="land_area_ha"
-                value={formData.land_area_ha}
-                onChange={handleChange}
-                min="0.1"
-                max="1000"
-                step="0.1"
-                className={inputClass}
-                disabled={isLoading}
-              />
+    <div className="animate-fade-in">
+      {/* Glassmorphism Card */}
+      <div className={glassCard}>
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+              <MapPin className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <label className={labelClass}>
-                Budget (₹) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="budget_inr"
-                value={formData.budget_inr}
-                onChange={handleChange}
-                min="1000"
-                max="10000000"
-                step="1000"
-                className={inputClass}
-                disabled={isLoading}
-              />
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Farm Parameters</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Configure your farm details for accurate recommendations</p>
             </div>
           </div>
 
-          {/* ── RAINFALL & SEASON ── */}
-          <div>
-            <label className={labelClass}>Rainfall (mm)</label>
-            <input
-              type="number"
-              name="rainfall_mm"
-              value={formData.rainfall_mm}
-              onChange={handleChange}
-              min="0"
-              max="5000"
-              step="1"
-              className={inputClass}
-              disabled={isLoading}
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* ── LOCATION SECTION ── */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Location
+              </h4>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Planting Season</label>
-              <select
-                name="planting_season"
-                value={formData.planting_season}
-                onChange={handleChange}
-                className={selectClass}
-                disabled={isLoading}
-              >
-                {PLANTING_SEASONS.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelClass}>Start Date</label>
-              <input
-                type="date"
-                name="planned_start_date"
-                value={formData.planned_start_date}
-                onChange={handleChange}
-                className={inputClass}
-                disabled={isLoading}
-              />
-            </div>
-          </div>
-
-          {/* ── ADVANCED TOGGLE ── */}
-          <button
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 rounded-lg transition-colors"
-            disabled={isLoading}
-          >
-            <span>Advanced Soil & Climate Parameters</span>
-            {showAdvanced ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-          </button>
-
-          {showAdvanced && (
-            <div className="space-y-4 border-t border-slate-200 dark:border-slate-700 pt-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelClass}>Temperature (°C)</label>
-                  <input
-                    type="number"
-                    name="temperature_c"
-                    value={formData.temperature_c}
-                    onChange={handleChange}
-                    min="-10"
-                    max="50"
-                    step="0.5"
-                    className={inputClass}
-                    disabled={isLoading}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Humidity (%)</label>
-                  <input
-                    type="number"
-                    name="humidity_percent"
-                    value={formData.humidity_percent}
-                    onChange={handleChange}
-                    min="0"
-                    max="100"
-                    step="1"
-                    className={inputClass}
-                    disabled={isLoading}
-                  />
+              {/* State Select */}
+              <div>
+                <label className={labelClass}>State</label>
+                <div className="relative">
+                  <select
+                    name="state"
+                    value={selectedState}
+                    onChange={(e) => setSelectedState(e.target.value)}
+                    disabled={isLoading || locationLoading}
+                    className={selectClass + " pr-10"}
+                  >
+                    {locationLoading ? (
+                      <option value="">Loading states...</option>
+                    ) : (
+                      <>
+                        <option value="">Select a state</option>
+                        {states.map((state) => (
+                          <option key={state} value={state}>
+                            {state}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+
+              {/* District Select */}
+              <div>
+                <label className={labelClass}>District</label>
+                <div className="relative">
+                  <select
+                    name="district_id"
+                    value={formData.district_id}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, district_id: parseInt(e.target.value) }))}
+                    disabled={isLoading || locationLoading}
+                    className={selectClass + " pr-10"}
+                  >
+                    <option value="0">Select a district</option>
+                    {filteredDistricts.map((district) => (
+                      <option key={district.id} value={district.id}>
+                        {district.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                </div>
+                {locationError && (
+                  <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <span className="w-3 h-3" />{locationError}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent dark:via-slate-700/50 my-4" />
+
+            {/* ── BASIC FARM PARAMETERS ── */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Basic Parameters
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Soil pH</label>
+                  <label className={labelClass}>Soil Type</label>
+                  <div className="relative">
+                    <select
+                      name="soil_type"
+                      value={formData.soil_type}
+                      onChange={(e) => handleSoilTypeChange(e.target.value)}
+                      disabled={isLoading}
+                      className={selectClass + " pr-10"}
+                    >
+                      {SOIL_TYPES.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Land Area (hectares)</label>
                   <input
                     type="number"
-                    name="ph"
-                    value={formData.ph}
+                    name="land_area_ha"
+                    value={formData.land_area_ha}
                     onChange={handleChange}
-                    min="3"
-                    max="10"
+                    min="0.1"
+                    max="10000"
                     step="0.1"
                     className={inputClass}
                     disabled={isLoading}
                   />
                 </div>
+
                 <div>
-                  <label className={labelClass}>Nitrogen (kg/ha)</label>
+                  <label className={labelClass}>Budget (₹)</label>
                   <input
                     type="number"
-                    name="n"
-                    value={formData.n}
+                    name="budget_inr"
+                    value={formData.budget_inr}
                     onChange={handleChange}
-                    min="0"
-                    max="500"
-                    step="1"
+                    min="1000"
+                    max="100000000"
+                    step="1000"
                     className={inputClass}
                     disabled={isLoading}
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+
                 <div>
-                  <label className={labelClass}>Phosphorus (kg/ha)</label>
+                  <label className={labelClass}>Planting Season</label>
+                  <div className="relative">
+                    <select
+                      name="planting_season"
+                      value={formData.planting_season}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, planting_season: e.target.value }))}
+                      disabled={isLoading}
+                      className={selectClass + " pr-10"}
+                    >
+                      {PLANTING_SEASONS.map((season) => (
+                        <option key={season} value={season}>
+                          {season}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Planting Date</label>
                   <input
-                    type="number"
-                    name="p"
-                    value={formData.p}
-                    onChange={handleChange}
-                    min="0"
-                    max="200"
-                    step="1"
+                    type="date"
+                    name="planned_start_date"
+                    value={formData.planned_start_date}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, planned_start_date: e.target.value }))}
                     className={inputClass}
                     disabled={isLoading}
                   />
                 </div>
+
                 <div>
-                  <label className={labelClass}>Potassium (kg/ha)</label>
+                  <label className={labelClass}>Rainfall (mm/year)</label>
                   <input
                     type="number"
-                    name="k"
-                    value={formData.k}
+                    name="rainfall_mm"
+                    value={formData.rainfall_mm}
                     onChange={handleChange}
                     min="0"
-                    max="500"
-                    step="1"
+                    max="5000"
+                    step="10"
                     className={inputClass}
                     disabled={isLoading}
                   />
                 </div>
               </div>
             </div>
-          )}
 
-          {/* ── SUBMIT ── */}
-          <button
-            type="submit"
-            disabled={isLoading || !formData.district_id}
-            className="w-full py-3 px-6 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Analyzing farm data...
-              </>
-            ) : (
-              "Get Crop Recommendations"
+            {/* ── ADVANCED PARAMETERS TOGGLE ── */}
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Sprout className="w-4 h-4" />
+                Advanced Soil Parameters
+              </span>
+              {showAdvanced ? (
+                <ChevronUp className="w-5 h-5 transition-transform" />
+              ) : (
+                <ChevronDown className="w-5 h-5 transition-transform" />
+              )}
+            </button>
+
+            {showAdvanced && (
+              <div className="space-y-4 animate-slide-up border-t border-white/10 dark:border-slate-700/50 pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>Temperature (°C)</label>
+                    <input
+                      type="number"
+                      name="temperature_c"
+                      value={formData.temperature_c}
+                      onChange={handleChange}
+                      min="-10"
+                      max="50"
+                      step="0.5"
+                      className={inputClass}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Humidity (%)</label>
+                    <input
+                      type="number"
+                      name="humidity_percent"
+                      value={formData.humidity_percent}
+                      onChange={handleChange}
+                      min="0"
+                      max="100"
+                      step="1"
+                      className={inputClass}
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>Soil pH</label>
+                    <input
+                      type="number"
+                      name="ph"
+                      value={formData.ph}
+                      onChange={handleChange}
+                      min="3"
+                      max="10"
+                      step="0.1"
+                      className={inputClass}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Nitrogen (kg/ha)</label>
+                    <input
+                      type="number"
+                      name="n"
+                      value={formData.n}
+                      onChange={handleChange}
+                      min="0"
+                      max="500"
+                      step="1"
+                      className={inputClass}
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>Phosphorus (kg/ha)</label>
+                    <input
+                      type="number"
+                      name="p"
+                      value={formData.p}
+                      onChange={handleChange}
+                      min="0"
+                      max="200"
+                      step="1"
+                      className={inputClass}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Potassium (kg/ha)</label>
+                    <input
+                      type="number"
+                      name="k"
+                      value={formData.k}
+                      onChange={handleChange}
+                      min="0"
+                      max="500"
+                      step="1"
+                      className={inputClass}
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              </div>
             )}
-          </button>
 
-          {hasRecommendations && (
-            <p className="text-center text-sm text-green-600 dark:text-green-400 font-medium">
-              ✓ Recommendations ready — scroll right to view results
-            </p>
-          )}
-        </form>
+            {/* ── SUBMIT ── */}
+            <button
+              type="submit"
+              disabled={isLoading || !formData.district_id}
+              className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-600 focus:ring-4 focus:ring-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 shadow-lg shadow-green-500/25"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Analyzing farm data...</span>
+                </>
+              ) : (
+                <>
+                  <Sprout className="w-5 h-5" />
+                  <span>Get Crop Recommendations</span>
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+
+            {hasRecommendations && (
+              <p className="text-center text-sm text-green-500 dark:text-green-400 font-medium flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                Recommendations ready — view results
+              </p>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );
