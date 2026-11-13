@@ -13,9 +13,6 @@ soft-ui-dashboard
 .kilo
 .claude
 *.db
-*.txt
-*.json
-*.md
-*.jpg
-!vercel.json
-!frontend/react-app/package.json
+*.py
+*.pkl
+*.h5
