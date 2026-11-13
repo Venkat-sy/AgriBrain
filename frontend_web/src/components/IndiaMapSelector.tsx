@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import "leaflet/dist/leaflet.css";
+// leaflet CSS loaded dynamically in useEffect to avoid Turbopack SSR crash
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -175,8 +175,16 @@ export function IndiaMapSelector({
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [iconClass, setIconClass] = useState<any>(null);
 
-  // Load Icon class on client side
+  // Load Icon class on client side + inject Leaflet CSS dynamically
   useEffect(() => {
+    // Inject leaflet CSS as a <link> tag to avoid Turbopack SSR crash
+    if (!document.getElementById("leaflet-css")) {
+      const link = document.createElement("link");
+      link.id = "leaflet-css";
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
+    }
     import("leaflet").then((mod) => {
       setIconClass(mod.Icon);
     });

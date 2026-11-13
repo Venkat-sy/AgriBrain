@@ -5,7 +5,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:800
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     const response = await fetch(`${BACKEND_URL}/api/v1/chat/troubleshoot`, {
       method: "POST",
       headers: {
@@ -14,11 +14,22 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         session_id: body.session_id || "default_session",
         user_question: body.message,
+        context: body.is_context_aware
+          ? {
+              selected_crop: body.context?.selectedCrop,
+              farm_params: body.context?.farmParams,
+              simulation_results: body.context?.simulationResults,
+              calendar_stages: body.context?.calendarStages,
+              coordinates: body.coordinates,
+              soil_params: body.soilParams,
+              annual_rainfall: body.annualRainfall,
+            }
+          : undefined,
       }),
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
       return NextResponse.json(error, { status: response.status });
     }
 
