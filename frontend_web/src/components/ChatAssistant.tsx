@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Loader2, Sprout, AlertCircle, RefreshCw, WifiOff } from "lucide-react";
 import { useFarm } from "@/context/FarmContext";
 import { ApiService, withRetry } from "@/services/api";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   role: "user" | "assistant";
@@ -184,7 +186,13 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
                     : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm"
                 }`}
               >
-                {msg.content}
+              {msg.role === "assistant" ? (
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                </div>
+              ) : (
+                msg.content
+              )}
               </div>
               <span className="text-[10px] text-slate-400 px-1">{formatTime(msg.timestamp)}</span>
             </div>

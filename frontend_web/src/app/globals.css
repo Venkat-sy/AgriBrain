@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@plugin "@tailwindcss/typography";
+
 :root {
   --background: #f8fafc;
   --foreground: #1e293b;
@@ -10,6 +12,67 @@
   --color-foreground: var(--foreground);
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --foreground: #e2e8f0;
+  }
+}
+
+/* Premium Digital Twin Gradient Background */
+.bg-digital-twin {
+  @apply bg-gradient-to-br from-slate-950 via-emerald-950/30 to-slate-950;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  @apply bg-white/5 dark:bg-slate-900/10 backdrop-blur-md border border-white/10 dark:border-slate-700/50 rounded-2xl shadow-xl shadow-slate-900/10;
+}
+
+/* Glassmorphism Input */
+.glass-input {
+  @apply w-full px-4 py-3 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-700/50 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Premium Button */
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-600 focus:ring-4 focus:ring-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/25;
+}
+
+/* Card Hover Effect */
+.card-hover {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10;
+}
+
+/* Prose overrides for chat */
+.prose {
+  @apply text-slate-300 dark:text-slate-300;
+}
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply text-white dark:text-white;
+}
+.prose code {
+  @apply bg-white/10 dark:bg-slate-800/50 px-1.5 py-0.5 rounded text-emerald-300;
+}
+.prose pre {
+  @apply bg-slate-900/50 dark:bg-slate-900/50 border border-white/10 dark:border-slate-700/50;
+}
+.prose pre code {
+  @apply bg-transparent p-0 text-slate-100;
+}
+.prose ul, .prose ol {
+  @apply text-slate-300 dark:text-slate-300;
+}
+.prose strong {
+  @apply text-white dark:text-white;
+}
+.prose a {
+  @apply text-emerald-400 hover:text-emerald-300;
+}
+.prose blockquote {
+  @apply border-l-4 border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-900/10;
 }
 
 @media (prefers-color-scheme: dark) {

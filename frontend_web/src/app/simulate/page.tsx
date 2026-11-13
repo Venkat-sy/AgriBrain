@@ -38,10 +38,10 @@ interface SpatialLookupResponse {
 }
 
 interface Recommendation {
-  crop_name: string;
+        <div className="h-[400px] w-full glass-card animate-pulse flex items-center justify-center">
   confidence: number;
   match_reasons: string[];
-  expected_yield_tons_per_ha: number | null;
+            <p className="text-slate-400 text-sm">Loading map...</p>
   season: string | null;
 }
 
@@ -123,7 +123,7 @@ export default function SimulatePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          district_id: formData.district_id || mapDistrict?.district_id,
+    <div className="min-h-screen bg-digital-twin transition-colors">
           soil_type: formData.soil_type,
           rainfall_mm: formData.rainfall_mm,
           temperature_c: formData.temperature_c,
@@ -134,27 +134,27 @@ export default function SimulatePage() {
           k: formData.k,
           top_k: 5,
         }),
-      });
+                <h1 className="text-2xl font-bold text-white tracking-tight">AgriBrain</h1>
 
       if (!response.ok) {
         const err = await response.json();
         throw new Error(err.error || `API error: ${response.status}`);
       }
 
-      const data = await response.json();
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-400 bg-green-500/20 rounded-lg"
       if (data.recommendations?.length > 0) {
         setRecommendations(data.recommendations);
       }
     } catch (err: any) {
       setApiError(err.message || "Failed to get recommendations. Check backend connectivity.");
     } finally {
-      setIsLoading(false);
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
     }
   };
 
   // Crop selection -> store in global state
   const handleCropSelect = (rec: Recommendation) => {
-    setSelectedCrop(rec.crop_name);
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
     setCurrentStep(3);
   };
 
@@ -211,8 +211,8 @@ export default function SimulatePage() {
           <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
             {[
               { label: "Farm Input", step: 1 },
-              { label: "Crop Selection", step: 2 },
-              { label: "Simulation", step: 3 },
+                  <h2 className="text-xl font-bold text-white">Interactive District Map</h2>
+                  <p className="text-sm text-slate-400 mt-1">Click a district to auto-fill soil parameters and get crop recommendations</p>
               { label: "Calendar", step: 4 },
               { label: "Expert Chat", step: 5 },
             ].map((item, idx) => (
@@ -223,7 +223,7 @@ export default function SimulatePage() {
                       ? "bg-green-500 text-white"
                       : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
                   }`}
-                >
+                    <div className="mt-4 p-4 glass-card border-green-500/30 animate-slide-up">
                   {item.step}
                 </div>
                 <span
@@ -242,7 +242,7 @@ export default function SimulatePage() {
                         ? "bg-green-500"
                         : "bg-slate-200 dark:bg-slate-700"
                     }`}
-                  />
+                    <div className="mt-4 p-4 glass-card border-red-500/30">
                 )}
               </div>
             ))}
@@ -250,9 +250,9 @@ export default function SimulatePage() {
 
           <div className="grid lg:grid-cols-12 gap-6">
             {/* Map Panel - 7/12 width */}
-            <div className="lg:col-span-7 space-y-6">
+                <div className="glass-card p-6 animate-slide-up">
               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+                  <p className="text-slate-400 mb-6">Click on a crop card to select it, then run the digital twin simulation.</p>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">Interactive District Map</h2>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Click a district to auto-fill soil parameters and get crop recommendations</p>
                 </div>
@@ -265,7 +265,7 @@ export default function SimulatePage() {
                   />
 
                   {mapDistrict && (
-                    <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg animate-slide-up">
+                    className="mt-6 w-full py-2 px-4 bg-white/10 text-slate-300 font-medium rounded-lg hover:bg-white/20 transition-colors"
                       <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
                         {mapDistrict.district_name}, {mapDistrict.state}
                       </h4>
@@ -298,15 +298,15 @@ export default function SimulatePage() {
                   <div className="grid grid-cols-1 gap-4">
                     {recommendations.map((rec, index) => (
                       <CropCard
-                        key={`${rec.crop_name}-${index}`}
+                <div className="glass-card border-green-500/30 p-6 animate-slide-up">
                         recommendation={rec}
                         rank={index + 1}
-                        onClick={() => handleCropSelect(rec)}
-                      />
+                      <h3 className="text-lg font-semibold text-green-400">Simulation Complete!</h3>
+                      <p className="text-green-300">Your digital twin simulation for <strong>{selectedCrop}</strong> is ready with yield, revenue, and ROI predictions.</p>
                     ))}
                   </div>
                   <button
-                    onClick={() => setActiveTab("input")}
+                      className="btn-primary"
                     className="mt-6 w-full py-2 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
                   >
                     Back to Input
