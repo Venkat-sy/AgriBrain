@@ -108,6 +108,23 @@ export default function SimulatePage() {
     }
   };
 
+  // Handle map click anywhere -> auto-fetch soil + rainfall via spatial lookup API
+  const handleMapClick = async (lat: number, lng: number) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/districts?lat=${lat}&lon=${lng}`);
+      if (!response.ok) throw new Error("Failed to lookup location");
+      const district = await response.json();
+      if (district) {
+        handleMapDistrictSelect(district);
+      }
+    } catch (err) {
+      console.error("Map click lookup failed:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Form submit -> get crop recommendations
   const handleRecommendationSubmit = async (formData: any) => {
     setIsLoading(true);
@@ -251,7 +268,7 @@ export default function SimulatePage() {
               <div className="glass-card overflow-hidden">
                 <div className="p-4 border-b border-white/10 dark:border-slate-700/50">
                   <h2 className="text-xl font-bold text-white">Interactive District Map</h2>
-                  <p className="text-sm text-slate-400 mt-1">Click a district to auto-fill soil parameters and get crop recommendations</p>
+                  <p className="text-sm text-slate-400 mt-1">Click anywhere on the map to auto-fill soil parameters and get crop recommendations</p>
                 </div>
                 <div className="p-4">
                   <MapUI
@@ -259,6 +276,7 @@ export default function SimulatePage() {
                     isLoading={isLoading}
                     initialCenter={[20.5937, 78.9629]}
                     initialZoom={5}
+                    onMapClick={handleMapClick}
                   />
 
                   {mapDistrict && (

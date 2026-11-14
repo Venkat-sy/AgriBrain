@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { useMapEvents } from "react-leaflet";
 // Leaflet CSS loaded dynamically to avoid SSR issues
 
 const MapContainer = dynamic(
@@ -76,6 +77,7 @@ interface MapUIProps {
   isLoading?: boolean;
   initialCenter?: [number, number];
   initialZoom?: number;
+  onMapClick?: (lat: number, lng: number) => void;
 }
 
 // District GeoJSON loader component
@@ -132,7 +134,6 @@ const DistrictLayer = ({
   );
 };
 
-// Selected district marker
 // Leaflet marker icon - created once at module level
 let markerIcon: any = null;
 
@@ -177,17 +178,34 @@ const SelectedMarker = ({
   );
 };
 
+// Separate component for handling map clicks with useMapEvents hook
+function MapClickHandler({ onClick }: { onClick?: (lat: number, lng: number) => void }) {
+  const handleClick = useCallback((e: any) => {
+    if (!onClick) return;
+    const { lat, lng } = e.latlng;
+    onClick(lat, lng);
+  }, [onClick]);
+
+  useMapEvents({
+    click: handleClick,
+  });
+
+  return null;
+}
+
 export function MapUI({
   onDistrictSelect,
   isLoading = false,
   initialCenter = [20.5937, 78.9629],
   initialZoom = 5,
+  onMapClick,
 }: MapUIProps) {
   const [geojsonData, setGeojsonData] = useState<DistrictGeoJSON | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<DistrictFeature | null>(null);
   const [lookupResult, setLookupResult] = useState<SpatialLookupResponse | null>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clickMarker, setClickMarker] = useState<[number, number] | null>(null);
 
   // Load district GeoJSON on mount
   useEffect(() => {
@@ -216,10 +234,7 @@ export function MapUI({
     setError(null);
 
     try {
-      const geom = feature.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
-      const [lat, lon] = geom?.coordinates?.[0]?.[0]
-        ? [geom.coordinates[0][0][1], geom.coordinates[0][0][0]]
-        : feature.properties?.latitude && feature.properties?.longitude
+      const [lat, lon] = feature.properties?.latitude && feature.properties?.longitude
         ? [feature.properties.latitude, feature.properties.longitude]
         : [20.5937, 78.9629];
 
@@ -245,6 +260,7 @@ export function MapUI({
     if (selectedDistrict?.properties?.latitude && selectedDistrict?.properties?.longitude) {
       return [selectedDistrict.properties.latitude, selectedDistrict.properties.longitude];
     }
+    if (clickMarker) return clickMarker;
     return null;
   };
 
@@ -280,13 +296,17 @@ export function MapUI({
           position={getSelectedCentroid()}
           districtName={selectedDistrict?.properties?.name || ""}
         />
+        <MapClickHandler onClick={onMapClick} />
       </MapContainer>
 
       {/* Instructions */}
       <div className="absolute bottom-4 left-4 right-4 pointer-events-none">
         <div className="bg-white/10 dark:bg-slate-900/80 backdrop-blur-sm rounded-lg p-3 shadow-lg max-w-md mx-auto pointer-events-auto border border-white/10">
-          <p className="text-sm text-slate-300 text-center">
-            Click on a district to select it and view soil parameters
+          <p className="text-sm text-slate-300 text-center mb-1">
+            Click on a district or anywhere on the map to select location
+          </p>
+          <p className="text-xs text-slate-500 text-center">
+            A pin will be dropped and soil parameters auto-filled
           </p>
         </div>
       </div>
@@ -336,3 +356,5 @@ export function MapUI({
     </div>
   );
 }
+
+export default MapUI;
