@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     # External APIs
     IMD_API_KEY: Optional[str] = None
     OPENWEATHER_API_KEY: Optional[str] = None
+    WEATHER_API_KEY: Optional[str] = None
     GROQ_API_KEY: Optional[str] = None
     OPENROUTER_API_KEY: Optional[str] = None
     

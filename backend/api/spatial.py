@@ -3,6 +3,7 @@ Spatial lookup API for Pan-India district identification from coordinates.
 Uses point-in-polygon queries with district boundary data.
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import json
@@ -12,6 +13,7 @@ import pandas as pd
 from backend.core.config import get_db, settings
 from backend.models import District
 from backend.schemas import DistrictResponse
+from backend.services.weather_service import get_live_weather
 
 router = APIRouter(prefix="/api/v1/spatial", tags=["spatial"])
 
@@ -270,7 +272,19 @@ async def spatial_lookup(
         temperature_c = 27.0
     if humidity_percent is None:
         humidity_percent = 60
-    
+
+    # Live weather overlay: real-time IMD data for the reverse-geocoded
+    # district. Falls back to the historical averages above when the API
+    # is unreachable or the city is missing from its response.
+    weather = await run_in_threadpool(
+        get_live_weather,
+        district_name,
+        {"temperature": temperature_c, "humidity": humidity_percent, "rainfall": rainfall_mm},
+    )
+    temperature_c = weather["temperature"]
+    humidity_percent = weather["humidity"]
+    rainfall_mm = weather["rainfall"]
+
     district_info.update({
         "baseline_parameters": {
             "n": round(n, 1),
@@ -280,7 +294,15 @@ async def spatial_lookup(
             "temperature_c": round(temperature_c, 1),
             "humidity_percent": round(humidity_percent, 1),
             "rainfall_mm": round(rainfall_mm, 1),
-            "lookup_method": lookup_method
+            "lookup_method": lookup_method,
+            "weather_source": weather["source"]
+        },
+        "weather": {
+            "source": weather["source"],
+            "sources": weather["sources"],
+            "city": weather["city"],
+            "fetched_at": weather["fetched_at"],
+            "error": weather["error"]
         },
         "soil_type": soil_type,
         "note": f"Parameters derived via {lookup_method}"

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, timedelta
@@ -12,6 +13,7 @@ from backend.schemas import (
     CropCostResponse,
     CropPriceResponse
 )
+from backend.services.weather_service import get_live_weather
 import importlib
 import backend.services.crop_recommendation_service as svc
 importlib.reload(svc)
@@ -32,6 +34,18 @@ async def recommend_crops(
     Recommend crops using the trained ML model (RandomForest).
     Takes soil and climate parameters, returns top-K crop predictions with confidence scores.
     """
+    # Fill missing climate features with live weather for the district so the
+    # XGBoost model always receives a complete payload. The weather service
+    # falls back to historical averages if the API is unavailable.
+    if request.temperature_c is None or request.humidity_percent is None:
+        district = db.query(District).filter(District.id == request.district_id).first()
+        if district:
+            weather = await run_in_threadpool(get_live_weather, district.name)
+            if request.temperature_c is None:
+                request.temperature_c = weather["temperature"]
+            if request.humidity_percent is None:
+                request.humidity_percent = weather["humidity"]
+
     # Map API request fields to ML model feature names
     # API uses: n, p, k, temperature_c, humidity_percent, ph, rainfall_mm
     # ML expects: n, p, k, temperature, humidity, ph, rainfall
@@ -67,7 +81,7 @@ async def recommend_crops(
         soil_type=request.soil_type,
         rainfall_mm=request.rainfall_mm,
         recommendations=recommendations,
-        model_version="xgboost_v2.0",
+        version="xgboost_v2.0",
         generated_at=datetime.utcnow()
     )
 

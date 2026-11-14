@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
@@ -57,10 +57,8 @@ class CropRecommendationResponse(BaseModel):
     soil_type: str
     rainfall_mm: float
     recommendations: List[CropRecommendationItem]
-    model_version: str
+    version: str
     generated_at: datetime
-
-    model_config = ConfigDict(protected_namespaces=())
 
 
 class CropCostResponse(BaseModel):

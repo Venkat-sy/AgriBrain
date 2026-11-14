@@ -1,4 +1,4 @@
-\"\"\"backend.ml.inference.crop_recommendation
+"""backend.ml.inference.crop_recommendation
 ==========================================
 
 Production crop-recommendation inference module (XGBoost v2).
@@ -14,8 +14,8 @@ The bundle contains:
     feature_columns -- ordered list of 7 feature names
 
 Falls back to the legacy RandomForest pipeline when the XGBoost bundle is
-\"\"\"
-\"\"\"
+not found.
+"""
 
 from __future__ import annotations
 

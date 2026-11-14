@@ -15,7 +15,9 @@
          sync: false
        - key: GOOGLE_API_KEY
          sync: false
-       - key: ALLOWED_ORIGINS
+       - key: WEATHER_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
          value: "https://agribrain-frontend.onrender.com,https://*.onrender.com"
      healthCheckPath: /health
      autoDeploy: true

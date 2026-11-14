@@ -150,7 +150,7 @@ async def delete_session(session_id: str):
     return {"success": success, "session_id": session_id}
 
 
-def generate_advice(question: str, chat_history: list, is_context_aware: bool = False) -> str:
+async def generate_advice(question: str, chat_history: list, is_context_aware: bool = False) -> str:
     """Generate farming advice based on the question and optional chat context.
 
     Uses Groq API (Llama 3) as primary AI engine.
