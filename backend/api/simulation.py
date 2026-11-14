@@ -19,6 +19,71 @@ from backend.services.simulation_engine import SimulationEngine
 from pydantic import BaseModel
 from typing import Optional
 
+from pydantic import BaseModel
+from typing import Optional
+
+router = APIRouter(prefix="/api/v1/simulation", tags=["simulation"])
+
+class TimelineStage(BaseModel):
+    stage_name: str
+    estimated_days: int
+    agronomy_advice: str
+
+
+class TimelineResponse(BaseModel):
+    crop_name: str
+    stages: List[TimelineStage]
+
+
+CROP_TIMELINES = {
+    "rice": [
+        {"stage_name": "Sowing & Germination", "estimated_days": 15, "agronomy_advice": "Maintain 2-3 cm standing water. Use certified seeds. Apply starter fertilizer (N:P:K = 20:40:20 kg/ha)."},
+        {"stage_name": "Vegetative Stage", "estimated_days": 35, "agronomy_advice": "Apply 50% N at tillering. Maintain 5 cm water depth. Monitor for stem borer and leaf folder."},
+        {"stage_name": "Reproductive/Flowering", "estimated_days": 20, "agronomy_advice": "Critical water stage - maintain 5 cm water. Apply remaining 25% N at panicle initiation. Monitor for blast and bacterial leaf blight."},
+        {"stage_name": "Ripening", "estimated_days": 25, "agronomy_advice": "Drain field 10-15 days before harvest. Stop irrigation. Monitor for grain discoloration and pests."},
+        {"stage_name": "Harvesting", "estimated_days": 10, "agronomy_advice": "Harvest at 20-22% moisture. Use combine or manual harvest. Dry to 14% moisture for storage."}
+    ],
+    "wheat": [
+        {"stage_name": "Sowing & Germination", "estimated_days": 12, "agronomy_advice": "Sow at 4-5 cm depth. Apply DAP (125 kg/ha) + Urea (50 kg/ha) at sowing. Irrigate lightly after sowing."},
+        {"stage_name": "Vegetative Stage", "estimated_days": 30, "agronomy_advice": "First irrigation at 21 days (CRI stage). Apply remaining 50% N. Monitor for termites and aphids."},
+        {"stage_name": "Reproductive/Flowering", "estimated_days": 20, "agronomy_advice": "Critical irrigation at booting and flowering. Avoid water stress. Apply ZnSO4 if deficient."},
+        {"stage_name": "Ripening", "estimated_days": 20, "agronomy_advice": "Stop irrigation at dough stage. Monitor for rust and aphids. Prepare for harvest."},
+        {"stage_name": "Harvesting", "estimated_days": 7, "agronomy_advice": "Harvest at 12-14% moisture. Combine harvest preferred. Dry to 12% for storage."}
+    ],
+    "cotton": [
+        {"stage_name": "Sowing & Germination", "estimated_days": 10, "agronomy_advice": "Sow at 3-4 cm depth. Apply FYM (10 t/ha) + NPK (120:60:60). Treat seeds with imidacloprid."},
+        {"stage_name": "Vegetative Stage", "estimated_days": 40, "agronomy_advice": "Intercrop with pulses. Apply 2nd split of N at squaring. Monitor for jassids and thrips."},
+        {"stage_name": "Reproductive/Flowering", "estimated_days": 35, "agronomy_advice": "Critical stage - avoid water stress. Apply naphthalene acetic acid for boll retention. Monitor for pink bollworm."},
+        {"stage_name": "Ripening", "estimated_days": 25, "agronomy_advice": "Reduce irrigation. Apply potassium for boll development. Monitor for boll rot."},
+        {"stage_name": "Harvesting", "estimated_days": 15, "agronomy_advice": "Pick in 3-4 flushes. Morning picking preferred. Grade and store properly."}
+    ],
+    "maize": [
+        {"stage_name": "Sowing & Germination", "estimated_days": 10, "agronomy_advice": "Sow at 5 cm depth with 60x20 cm spacing. Apply starter fertilizer. Monitor for cutworms."},
+        {"stage_name": "Vegetative Stage", "estimated_days": 30, "agronomy_advice": "Earth up at knee-high stage. Apply 50% N at knee-high. Monitor for fall armyworm."},
+        {"stage_name": "Reproductive/Flowering", "estimated_days": 20, "agronomy_advice": "Critical water stage - tasseling to silking. Avoid water stress. Detassel if seed production."},
+        {"stage_name": "Ripening", "estimated_days": 20, "agronomy_advice": "Monitor grain fill. Reduce irrigation. Protect from birds and pests."},
+        {"stage_name": "Harvesting", "estimated_days": 7, "agronomy_advice": "Harvest at 20-25% moisture. Shell and dry to 14%. Store in aerated bins."}
+    ],
+    "sugarcane": [
+        {"stage_name": "Sowing & Germination", "estimated_days": 20, "agronomy_advice": "Plant 3-budded setts at 90 cm spacing. Apply FYM 25 t/ha + NPK. Irrigate immediately."},
+        {"stage_name": "Vegetative Stage", "estimated_days": 90, "agronomy_advice": "Earthing up at 45 and 90 days. Split N application (4 splits). Monitor for early shoot borer."},
+        {"stage_name": "Reproductive/Flowering", "estimated_days": 60, "agronomy_advice": "Grand growth phase - heavy N and K. Monitor for top borer and pyrilla. Propping at 180 days."},
+        {"stage_name": "Ripening", "estimated_days": 60, "agronomy_advice": "Stop irrigation 3 weeks before harvest. Cane maturity at 18-20% brix. Burning if needed."},
+        {"stage_name": "Harvesting", "estimated_days": 10, "agronomy_advice": "Harvest at ground level. Crush within 24 hours. Ratoon management for next crop."}
+    ]
+}
+
+
+@router.get("/timeline", response_model=TimelineResponse)
+async def get_cultivation_timeline(crop_name: str = Query(..., description="Name of the crop")):
+    """Get cultivation timeline for a specific crop."""
+    crop_key = crop_name.lower()
+    if crop_key not in CROP_TIMELINES:
+        raise HTTPException(status_code=404, detail=f"No timeline data for crop: {crop_name}")
+    
+    stages = CROP_TIMELINES[crop_key]
+    return TimelineResponse(crop_name=crop_name.capitalize(), stages=stages)
+
 class TimelineStage(BaseModel):
     stage_name: str
     estimated_days: int

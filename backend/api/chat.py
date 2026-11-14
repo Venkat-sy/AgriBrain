@@ -3,9 +3,10 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional, Dict, Any, List
 from datetime import datetime, date, timedelta
 import json
+import os
 
 from backend.core.redis_client import get_session as redis_get_session, save_session as redis_save_session, delete_session as redis_delete_session
-import httpx
+from groq import Groq
 from backend.core.config import settings
 
 router = APIRouter(prefix='/api/v1/chat', tags=['chat'])
@@ -178,25 +179,16 @@ async def generate_advice(question: str, chat_history: list, is_context_aware: b
         messages.append({"role": "user", "content": f"Context:\n{context}"})
     messages.append({"role": "user", "content": question})
 
-    # Call Groq API
+    # Call Groq API using official client
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {settings.GROQ_API_KEY}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": "llama3-8b-8192",
-                    "messages": messages,
-                    "temperature": 0.7,
-                    "max_tokens": 1024,
-                },
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data["choices"][0]["message"]["content"].strip()
+        client = Groq(api_key=os.getenv("GROQ_API_KEY") or settings.GROQ_API_KEY)
+        response = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=1024,
+        )
+        return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"Groq API error: {e}")
         # Fallback to conversational fallback
