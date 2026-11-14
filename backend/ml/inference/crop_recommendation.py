@@ -1,4 +1,4 @@
-"""backend.ml.inference.crop_recommendation
+\"\"\"backend.ml.inference.crop_recommendation
 ==========================================
 
 Production crop-recommendation inference module (XGBoost v2).
@@ -9,13 +9,13 @@ Loads the trained XGBoost model bundle from
 - predict_yield(): yield prediction in tons per hectare  (unchanged)
 
 The bundle contains:
-    model           – fitted XGBClassifier
-    label_encoder   – fitted LabelEncoder  (int ↔ crop name)
-    feature_columns – ordered list of 7 feature names
+    model           -- fitted XGBClassifier
+    label_encoder   -- fitted LabelEncoder  (int <-> crop name)
+    feature_columns -- ordered list of 7 feature names
 
 Falls back to the legacy RandomForest pipeline when the XGBoost bundle is
-not found, so nothing breaks before the first training run.
-"""
+\"\"\"
+\"\"\"
 
 from __future__ import annotations
 
@@ -53,23 +53,27 @@ YIELD_FEATURE_COLUMNS = ["State_Name_Encoded", "District_Encoded", "Crop_Encoded
 # ---------------------------------------------------------------------------
 # XGBoost model loader (primary)
 # ---------------------------------------------------------------------------
-_XGB_BUNDLE: Optional[Dict[str, Any]] = None
+_XGB_PIPELINE: Optional[Any] = None
 
 
 def _load_xgboost_bundle() -> Dict[str, Any]:
-    """Load the XGBoost model bundle from disk."""
-    bundle = joblib.load(XGBOOST_BUNDLE_PATH)
-    print(f"[ML] Loaded XGBoost crop model  ({bundle.get('test_accuracy', '?'):.4f} accuracy, "
-          f"{bundle.get('num_classes', '?')} classes)")
-    return bundle
+    """Load the XGBoost pipeline from disk."""
+    pipeline = joblib.load(XGBOOST_BUNDLE_PATH)
+    print(f"[ML] Loaded XGBoost crop model pipeline")
+    # Return a bundle-like dict for backward compatibility
+    return {
+        "model": pipeline,
+        "label_encoder": pipeline.named_steps["xgb"],
+        "feature_columns": ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"],
+    }
 
 
 def _get_xgboost_bundle() -> Optional[Dict[str, Any]]:
-    """Lazy-load the XGBoost bundle. Returns None if not on disk yet."""
-    global _XGB_BUNDLE
-    if _XGB_BUNDLE is None and XGBOOST_BUNDLE_PATH.is_file():
-        _XGB_BUNDLE = _load_xgboost_bundle()
-    return _XGB_BUNDLE
+    """Lazy-load the XGBoost pipeline. Returns None if not on disk yet."""
+    global _XGB_PIPELINE
+    if _XGB_PIPELINE is None and XGBOOST_BUNDLE_PATH.is_file():
+        _XGB_PIPELINE = _load_xgboost_bundle()
+    return _XGB_PIPELINE
 
 
 # ---------------------------------------------------------------------------
@@ -100,11 +104,13 @@ def _load_model_and_scaler() -> Tuple[RandomForestClassifier, StandardScaler, Di
     with open(label_mapping_path, "r") as f:
         label_mapping = json.load(f)
 
+    # Reverse mapping: encoded_label -> crop_name
     idx_to_crop = {int(v): k for k, v in label_mapping.items()}
+
     return model, scaler, idx_to_crop
 
 
-def _get_legacy_artifacts():
+def _get_legacy_artifacts() -> Tuple[RandomForestClassifier, StandardScaler, Dict[int, str]]:
     """Lazy-load legacy RandomForest model artifacts."""
     global _MODEL, _SCALER, _IDX_TO_CROP
     if _MODEL is None:
@@ -115,6 +121,8 @@ def _get_legacy_artifacts():
 # ---------------------------------------------------------------------------
 # Yield model (unchanged)
 # ---------------------------------------------------------------------------
+
+
 _YIELD_MODEL = None
 _YIELD_DISTRICT_ENCODER = None
 _YIELD_MODEL_INFO = None
@@ -135,7 +143,7 @@ def _load_yield_model() -> Tuple[RandomForestRegressor, LabelEncoder, Dict[str, 
     return model, district_encoder, model_info
 
 
-def _get_yield_model_artifacts():
+def _get_yield_model_artifacts() -> Tuple[RandomForestRegressor, LabelEncoder, Dict[str, Any]]:
     global _YIELD_MODEL, _YIELD_DISTRICT_ENCODER, _YIELD_MODEL_INFO
     if _YIELD_MODEL is None:
         _YIELD_MODEL, _YIELD_DISTRICT_ENCODER, _YIELD_MODEL_INFO = _load_yield_model()
@@ -156,7 +164,7 @@ def _get_yield_encoders():
 
 
 # ---------------------------------------------------------------------------
-# Public API — recommend()
+# Public API -- recommend()
 # ---------------------------------------------------------------------------
 def recommend(
     input_features: Dict[str, Any],
@@ -167,7 +175,7 @@ def recommend(
     Parameters
     ----------
     input_features:
-        Mapping of feature name → value.
+        Mapping of feature name -> value.
         Accepts both upper (N, P, K) and lower (n, p, k) keys.
     top_k:
         Number of top recommendations to return.
@@ -191,11 +199,11 @@ def _recommend_xgboost(
     top_k: int,
 ) -> List[Dict[str, Any]]:
     """Inference using the XGBoost model bundle."""
-    model = bundle["model"]
-    le: LabelEncoder = bundle["label_encoder"]
-    feature_cols = bundle["feature_columns"]   # ["N","P","K","temperature","humidity","ph","rainfall"]
+    pipeline = bundle["model"]
+    le = bundle["label_encoder"]
+    feature_cols = bundle["feature_columns"]
 
-    # Build a single-row DataFrame — accept both upper and lower key variants
+    # Build a single-row DataFrame -- accept both upper and lower key variants
     row = []
     for col in feature_cols:
         val = (
@@ -208,8 +216,9 @@ def _recommend_xgboost(
 
     X = pd.DataFrame([row], columns=feature_cols)
 
-    # Get prediction probabilities
-    probs = model.predict_proba(X)[0]
+    # Get prediction probabilities from the XGB classifier in the pipeline
+    xgb_model = pipeline.named_steps["xgb"]
+    probs = xgb_model.predict_proba(X)[0]
     sorted_indices = np.argsort(probs)[::-1][:top_k]
 
     recommendations = []
@@ -312,9 +321,11 @@ def predict_yield(
     if state_encoder is None:
         state_encoder = LabelEncoder()
         state_encoder.fit(df['State_Name'].astype(str))
+
     if crop_encoder is None:
         crop_encoder = LabelEncoder()
         crop_encoder.fit(df['Crop'].astype(str))
+
     if season_encoder is None:
         season_encoder = LabelEncoder()
         season_encoder.fit(df['Season'].astype(str))
@@ -323,14 +334,17 @@ def predict_yield(
         state_encoded = state_encoder.transform([state_name])[0]
     except ValueError:
         state_encoded = 0
+
     try:
         district_encoded = district_encoder.transform([district_name])[0]
     except ValueError:
         district_encoded = 0
+
     try:
         crop_encoded = crop_encoder.transform([crop_name])[0]
     except ValueError:
         crop_encoded = 0
+
     try:
         season_encoded = season_encoder.transform([season])[0]
     except ValueError:
@@ -345,4 +359,5 @@ def predict_yield(
     }])
 
     yield_pred = yield_model.predict(X)[0]
+
     return max(0.0, float(yield_pred))

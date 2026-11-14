@@ -1,266 +1,176 @@
-"""
-backend/ml/train_crop_model.py
-==============================
-Multi-dataset XGBoost Crop Recommendation training pipeline.
+#!/usr/bin/env python3
 
-- Dynamically ingests every CSV in  backend/ml/datasets/
-- Standardises column names -> N, P, K, temperature, humidity, ph, rainfall, label
-- Handles duplicates, nulls (median imputation for features)
-- Trains an XGBClassifier with RandomizedSearchCV hyper-tuning
-- Persists  {model, label_encoder, feature_columns}  as a single joblib bundle
-  to  backend/ml/saved_models/xgboost_crop_model.joblib
+""""
+Train Crop Recommendation Model with XGBoost + Hyperparameter Tuning
+====================================================================
+Loads the agricultural dataset, applies SMOTE for class balancing,
+performs RandomizedSearchCV for hyperparameter optimization,
+and exports the best model to saved_models/xgboost_crop_model.joblib
 """
 
-from __future__ import annotations
-
-import glob
 import os
-import sys
+import json
 import warnings
 from pathlib import Path
-from typing import Dict, List
 
-import numpy as np
-import pandas as pd
-from scipy.stats import randint, uniform
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, classification_report
-from xgboost import XGBClassifier
-import joblib
-
-warnings.filterwarnings("ignore")
-
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
-SCRIPT_DIR = Path(__file__).resolve().parent            # backend/ml/
-DATASETS_DIR = SCRIPT_DIR / "datasets"
-SAVED_MODELS_DIR = SCRIPT_DIR / "saved_models"
-OUTPUT_PATH = SAVED_MODELS_DIR / "xgboost_crop_model.joblib"
-
-FEATURE_COLUMNS = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
-TARGET_COLUMN = "label"
-
-# Common aliases found across different CSV sources -> canonical names
-COLUMN_ALIASES: Dict[str, str] = {
-    # Nitrogen
-    "n": "N", "nitrogen": "N", "n_ratio": "N", "nitrogen_ratio": "N",
-    # Phosphorus
-    "p": "P", "phosphorus": "P", "p_ratio": "P", "phosphorus_ratio": "P",
-    # Potassium
-    "k": "K", "potassium": "K", "k_ratio": "K", "potassium_ratio": "K",
-    # Temperature
-    "temperature": "temperature", "temp": "temperature", "temperature_c": "temperature",
-    "avg_temp": "temperature", "avg_temperature": "temperature",
-    # Humidity
-    "humidity": "humidity", "humidity_percent": "humidity",
-    "relative_humidity": "humidity", "avg_humidity": "humidity",
-    # pH
-    "ph": "ph", "ph_value": "ph", "soil_ph": "ph",
-    # Rainfall
-    "rainfall": "rainfall", "rainfall_mm": "rainfall",
-    "annual_rainfall": "rainfall", "avg_rainfall": "rainfall",
-    # Label
-    "label": "label", "crop": "label", "crop_name": "label",
-    "crop_type": "label", "target": "label", "class": "label",
-}
-
-
-def _standardise_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """Rename columns to the canonical feature names."""
-    rename_map: Dict[str, str] = {}
-    for col in df.columns:
-        key = col.strip().lower().replace(" ", "_")
-        if key in COLUMN_ALIASES:
-            rename_map[col] = COLUMN_ALIASES[key]
-    df = df.rename(columns=rename_map)
-    return df
-
-
-def ingest_datasets() -> pd.DataFrame:
-    """Read every CSV in the datasets/ directory, standardise, and merge."""
-    csv_paths = sorted(glob.glob(str(DATASETS_DIR / "*.csv")))
-    if not csv_paths:
-        print("ERROR: No CSV files found in " + str(DATASETS_DIR))
-        sys.exit(1)
-
-    frames: List[pd.DataFrame] = []
-    for path in csv_paths:
-        print("  [+] Loading " + os.path.basename(path) + " ...", end=" ")
-        df = pd.read_csv(path)
-        df = _standardise_columns(df)
-
-        # Keep only the columns we care about
-        available = [c for c in FEATURE_COLUMNS + [TARGET_COLUMN] if c in df.columns]
-        missing = set(FEATURE_COLUMNS + [TARGET_COLUMN]) - set(available)
-        if missing:
-            print("SKIPPED (missing columns: " + str(missing) + ")")
-            continue
-
-        df = df[FEATURE_COLUMNS + [TARGET_COLUMN]]
-        print(str(len(df)) + " rows")
-        frames.append(df)
-
-    if not frames:
-        print("ERROR: No valid datasets found after column validation.")
-        sys.exit(1)
-
-    master = pd.concat(frames, ignore_index=True)
-    print("")
-    print("  -> Combined raw rows: " + str(len(master)))
-
-    # --- Drop unnamed index columns that sneak in as 'Unnamed: 0' etc. ---
-    unnamed_cols = [c for c in master.columns if c.startswith("Unnamed")]
-    if unnamed_cols:
-        master.drop(columns=unnamed_cols, inplace=True)
-
-    # --- Deduplicate ---
-    before = len(master)
-    master.drop_duplicates(inplace=True)
-    dupes = before - len(master)
-    if dupes:
-        print("  -> Dropped " + str(dupes) + " duplicate rows")
-
-    # --- Handle nulls ---
-    # Features: median imputation
-    for col in FEATURE_COLUMNS:
-        n_null = master[col].isnull().sum()
-        if n_null > 0:
-            median_val = master[col].median()
-            master[col].fillna(median_val, inplace=True)
-            print("  -> Filled " + str(n_null) + " nulls in '" + col + "' with median=" + str(round(median_val, 2)))
-
-    # Target: drop rows with no label (can't impute a class)
-    label_nulls = master[TARGET_COLUMN].isnull().sum()
-    if label_nulls > 0:
-        master.dropna(subset=[TARGET_COLUMN], inplace=True)
-        print("  -> Dropped " + str(label_nulls) + " rows with null labels")
-
-    # Normalise label casing (e.g. 'Rice' vs 'rice')
-    master[TARGET_COLUMN] = master[TARGET_COLUMN].str.strip().str.lower()
-
-    print("  -> Final clean rows: " + str(len(master)))
-    print("  -> Unique crops: " + str(master[TARGET_COLUMN].nunique()))
-    return master.reset_index(drop=True)
-
-
-def train(df: pd.DataFrame) -> None:
-    """Train XGBClassifier with RandomizedSearchCV and persist the bundle."""
-
-    X = df[FEATURE_COLUMNS].astype(float)
-    y_raw = df[TARGET_COLUMN]
-
-    # --- Encode labels ---
-    le = LabelEncoder()
-    y = le.fit_transform(y_raw)
-    num_classes = len(le.classes_)
-    print("")
-    print("  Classes (" + str(num_classes) + "): " + str(list(le.classes_)))
-
-    # --- Train / test split ---
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
-    )
-    print("  Train: " + str(len(X_train)) + "  |  Test: " + str(len(X_test)))
-
-    # --- Compute per-class sample weights for imbalance ---
-    class_counts = np.bincount(y_train)
-    total = len(y_train)
-    class_weights = {i: total / (num_classes * c) for i, c in enumerate(class_counts) if c > 0}
-    sample_weights = np.array([class_weights[label] for label in y_train])
-
-    # --- Base estimator ---
-    base_xgb = XGBClassifier(
-        objective="multi:softprob",
-        num_class=num_classes,
-        eval_metric="mlogloss",
-        use_label_encoder=False,
-        tree_method="hist",
-        random_state=42,
-        verbosity=0,
-    )
-
-    # --- Hyper-parameter search space ---
-    param_dist = {
-        "n_estimators": randint(100, 500),
-        "max_depth": randint(3, 12),
-        "learning_rate": uniform(0.01, 0.29),
-    }
-
-    search = RandomizedSearchCV(
-        estimator=base_xgb,
-        param_distributions=param_dist,
-        n_iter=30,
-        scoring="accuracy",
-        cv=5,
-        random_state=42,
-        n_jobs=-1,
-        verbose=0,
-    )
-
-    print("")
-    print("  Running RandomizedSearchCV (30 iters x 5-fold) ...")
-    search.fit(X_train, y_train, sample_weight=sample_weights)
-
-    best = search.best_estimator_
-    print("  Best params: " + str(search.best_params_))
-    print("  Best CV accuracy: " + str(round(search.best_score_, 4)))
-
-    # --- Evaluate on held-out test set ---
-    y_pred = best.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
-    print("")
-    print("  TEST-SET ACCURACY: " + str(round(acc, 4)))
-    print("")
-    print(classification_report(
-        y_test, y_pred, target_names=le.classes_, zero_division=0
-    ))
-
-    # --- Persist model bundle ---
-    SAVED_MODELS_DIR.mkdir(parents=True, exist_ok=True)
-    bundle = {
-        "model": best,
-        "label_encoder": le,
-        "feature_columns": FEATURE_COLUMNS,
-        "num_classes": num_classes,
-        "classes": list(le.classes_),
-        "best_params": search.best_params_,
-        "test_accuracy": acc,
-    }
-    joblib.dump(bundle, OUTPUT_PATH, compress=3)
-    size_kb = OUTPUT_PATH.stat().st_size / 1024
-    print("  Model saved -> " + str(OUTPUT_PATH))
-    print("  File size: " + str(round(size_kb, 1)) + " KB")
-
-
-def main() -> None:
-    print("=" * 60)
-    print("  XGBoost Crop Recommendation -- Training Pipeline")
-    print("=" * 60)
-
-    print("")
-    print("[1/2] Ingesting datasets ...")
-    df = ingest_datasets()
-
-    print("")
-    print("[2/2] Training XGBClassifier ...")
-    train(df)
-
-    print("")
-    print("=" * 60)
-    print("  DONE: Pipeline complete.")
-    print("=" * 60)
-
-
-if __name__ == "__main__":
-    main()
 import pandas as pd
 import numpy as np
 import joblib
 from scipy.stats import uniform, randint
+
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
 from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
+
+warnings.filterwarnings("ignore")
+
+# Paths
+BASE_DIR = Path(r"c:\Users\USER\Downloads\FinalYearProject")
+TRAIN_DATA_DIR = BASE_DIR / "training_data"
+MODEL_DIR = BASE_DIR / "models"
+SAVED_MODELS_DIR = BASE_DIR / "backend" / "ml" / "saved_models"
+
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
+SAVED_MODELS_DIR.mkdir(parents=True, exist_ok=True)
+
+with open(TRAIN_DATA_DIR / "crop_label_mapping.json", "r") as f:
+    LABEL_MAPPING = json.load(f)
+IDX_TO_CROP = {int(v): k for k, v in LABEL_MAPPING.items()}
+NUM_CLASSES = len(LABEL_MAPPING)
+
+def load_data():
+    print("Loading training data...")
+    train_df = pd.read_csv(TRAIN_DATA_DIR / "crop_recommendation_train.csv")
+    val_df = pd.read_csv(TRAIN_DATA_DIR / "crop_recommendation_val.csv")
+    test_df = pd.read_csv(TRAIN_DATA_DIR / "crop_recommendation_test.csv")
+    full_df = pd.concat([train_df, val_df, test_df], ignore_index=True)
+    print(f"Total samples: {len(full_df)}")
+    print(f"Class distribution:\n{full_df['label_encoded'].value_counts().sort_index()}")
+    X = full_df[["feature_a", "feature_b", "feature_c"]].values
+    y = full_df["label_encoded"].values
+    return X, y
+
+def main():
+    print("=" * 60)
+    print("Crop Recommendation Model Training with XGBoost + RandomizedSearchCV")
+    print("=" * 60)
+    X, y = load_data()
+    scaler = StandardScaler()
+    X_train_raw = pd.read_csv(TRAIN_DATA_DIR / "crop_recommendation_train.csv")[["feature_a", "feature_b", "feature_c"]].values
+    scaler.fit(X_train_raw)
+    X_scaled = scaler.transform(X)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_scaled, y, test_size=0.2, random_state=42, stratify=y
+    )
+    print(f"\nTraining set: {len(X_train)} samples")
+    print(f"Test set: {len(X_test)} samples")
+    from imblearn.pipeline import Pipeline as ImbPipeline
+    from imblearn.over_sampling import SMOTE
+    from xgboost import XGBClassifier
+    from scipy.stats import uniform, randint
+    from imblearn.pipeline import Pipeline
+    # Check for NaN values
+    print(f"NaN in X_train: {np.isnan(X_train).sum()}")
+    print(f"NaN in X_test: {np.isnan(X_test).sum()}")
+    # Handle any NaN values
+    if np.isnan(X_train).any() or np.isnan(X_test).any():
+        from sklearn.impute import SimpleImputer
+        imputer = SimpleImputer(strategy='mean')
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        print("NaN values imputed with mean")
+
+    pipeline = Pipeline([
+        ("smote", SMOTE(random_state=42, k_neighbors=3)),
+        ("xgb", XGBClassifier(
+            objective="multi:softprob",
+            num_class=NUM_CLASSES,
+            eval_metric="mlogloss",
+            random_state=42,
+            n_jobs=-1,
+            verbosity=0
+        ))
+    ])
+    param_dist = {
+        "xgb__n_estimators": randint(100, 500),
+        "xgb__max_depth": randint(3, 10),
+        "xgb__learning_rate": uniform(0.01, 0.3),
+        "xgb__subsample": uniform(0.6, 0.4),
+        "xgb__colsample_bytree": uniform(0.6, 0.4),
+        "xgb__gamma": uniform(0, 0.5),
+        "xgb__min_child_weight": randint(1, 10),
+        "xgb__reg_alpha": uniform(0, 1),
+        "xgb__reg_lambda": uniform(0, 1),
+    }
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    random_search = RandomizedSearchCV(
+        estimator=pipeline,
+        param_distributions=param_dist,
+        n_iter=30,
+        cv=5,
+        scoring="accuracy",
+        n_jobs=-1,
+        verbose=1,
+        random_state=42,
+        return_train_score=True
+    )
+    print("\nStarting RandomizedSearchCV...")
+    random_search.fit(X_train, y_train)
+    best_model = random_search.best_estimator_
+    best_params = random_search.best_params_
+    best_cv_score = random_search.best_score_
+    print(f"\n{'='*60}")
+    print("BEST PARAMETERS FOUND:")
+    print(f"{'='*60}")
+    for param, value in best_params.items():
+        print(f"  {param}: {value}")
+    print(f"\nBest CV Accuracy: {best_cv_score:.4f}")
+    y_pred = best_model.predict(X_test)
+    test_accuracy = accuracy_score(y_test, y_pred)
+    print(f"Test Accuracy: {test_accuracy:.4f}")
+    print(f"\nClassification Report:")
+    from sklearn.metrics import classification_report, confusion_matrix
+    print(classification_report(y_test, y_pred, target_names=[IDX_TO_CROP[i] for i in sorted(IDX_TO_CROP.keys())]))
+    from sklearn.metrics import confusion_matrix
+    cm = confusion_matrix(y_test, y_pred)
+    print(f"\nConfusion Matrix:")
+    print(cm)
+    import joblib
+    model_path = SAVED_MODELS_DIR / "xgboost_crop_model.joblib"
+    import joblib
+    joblib.dump(best_model, model_path)
+    print(f"\nBest model saved to: {model_path}")
+    scaler_path = SAVED_MODELS_DIR / "xgboost_crop_scaler.joblib"
+    joblib.dump(scaler, scaler_path)
+    print(f"Scaler saved to: {scaler_path}")
+    feature_info = {
+        "feature_columns": ["feature_a", "feature_b", "feature_c"],
+        "target_column": "label_encoded",
+        "num_classes": NUM_CLASSES,
+        "label_mapping": LABEL_MAPPING,
+        "best_params": {k.replace("xgb__", ""): v for k, v in best_params.items()},
+        "cv_accuracy": float(best_cv_score),
+        "test_accuracy": float(test_accuracy),
+        "model_type": "XGBClassifier",
+    }
+    info_path = SAVED_MODELS_DIR / "xgboost_crop_model_info.json"
+    import json
+    with open(info_path, "w") as f:
+        json.dump(feature_info, f, indent=2)
+    print(f"Model info saved to: {info_path}")
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    joblib.dump(best_model, MODEL_DIR / "xgboost_crop_model.joblib")
+    joblib.dump(scaler, TRAIN_DATA_DIR / "crop_scaler.pkl")
+    print("\n" + "=" * 60)
+    print("TRAINING COMPLETE!")
+    print("=" * 60)
+    print(f"Best model saved to: {model_path}")
+    print(f"Test Accuracy: {test_accuracy:.4f}")
+    return best_model, scaler
+
+if __name__ == "__main__":
+    main()
