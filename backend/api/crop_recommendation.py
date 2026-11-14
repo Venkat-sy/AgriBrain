@@ -67,7 +67,7 @@ async def recommend_crops(
         soil_type=request.soil_type,
         rainfall_mm=request.rainfall_mm,
         recommendations=recommendations,
-        model_version="randomforest_v1.0",
+        model_version="xgboost_v2.0",
         generated_at=datetime.utcnow()
     )
 
