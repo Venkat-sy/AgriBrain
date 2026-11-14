@@ -124,8 +124,8 @@
 
    if (!simulationResults && (!calendarStages || calendarStages.length === 0)) {
      return (
-       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-         <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+       <div className="min-h-screen bg-digital-twin transition-colors">
+         <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
              <div className="flex items-center justify-between h-16">
                <div className="flex items-center gap-3">
@@ -135,27 +135,27 @@
                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
                      </svg>
                    </div>
-                   <h1 className="text-2xl font-bold text-slate-900 dark:text-white">AgriBrain</h1>
+                   <h1 className="text-2xl font-bold text-white">AgriBrain</h1>
                  </Link>
                </div>
                <nav className="flex gap-4">
-                 <Link href="/" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
-                 <Link href="/simulate" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Simulation</Link>
-                 <Link href="/calendar" className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400">Calendar</Link>
-                 <Link href="/expert-chat" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Expert Chat</Link>
+                 <Link href="/" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Home</Link>
+                 <Link href="/simulate" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Simulation</Link>
+                 <Link href="/calendar" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-blue-500/20 rounded-lg">Calendar</Link>
+                 <Link href="/expert-chat" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Expert Chat</Link>
                </nav>
              </div>
            </div>
          </header>
          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1">
            <div className="text-center">
-             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-500/20 flex items-center justify-center">
                <svg className="w-10 h-10 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                </svg>
              </div>
-             <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">No Simulation Data</h1>
-             <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+             <h1 className="text-4xl font-bold text-white mb-4">No Simulation Data</h1>
+             <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
                Please complete a simulation first to view your cultivation calendar. The calendar is generated based on your digital twin simulation results.
              </p>
              <Link 
@@ -186,8 +186,8 @@
    };
 
    return (
-     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+     <div className="min-h-screen bg-digital-twin transition-colors">
+       <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="flex items-center justify-between h-16">
              <div className="flex items-center gap-3">
@@ -197,21 +197,21 @@
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
                    </svg>
                  </div>
-                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white">AgriBrain</h1>
+                 <h1 className="text-2xl font-bold text-white">AgriBrain</h1>
                </Link>
              </div>
              <nav className="flex gap-4">
-               <Link href="/" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
-               <Link href="/simulate" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Simulation</Link>
-               <Link href="/calendar" className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400">Calendar</Link>
-               <Link href="/expert-chat" className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Expert Chat</Link>
+               <Link href="/" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Home</Link>
+               <Link href="/simulate" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Simulation</Link>
+               <Link href="/calendar" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-blue-500/20 rounded-lg">Calendar</Link>
+               <Link href="/expert-chat" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Expert Chat</Link>
              </nav>
            </div>
          </div>
        </header>
 
        {/* Progress Indicator */}
-       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+       <div className="glass-card border-b border-white/10">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
            <div className="flex items-center justify-between">
              {steps.map((step, index) => (
@@ -243,29 +243,29 @@
 
        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
          <div className="mb-8">
-           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Cultivation Timeline</h1>
-           <p className="text-slate-600 dark:text-slate-400">
-             {selectedCrop ? `Growth stages for <strong className="text-slate-900 dark:text-white">${selectedCrop}</strong>` : "Your crop growth timeline based on simulation results"}
+           <h1 className="text-3xl font-bold text-white mb-2">Cultivation Timeline</h1>
+           <p className="text-slate-300">
+             {selectedCrop ? `Growth stages for <strong className="text-white">${selectedCrop}</strong>` : "Your crop growth timeline based on simulation results"}
            </p>
          </div>
 
          {/* Summary Cards */}
          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+           <div className="glass-card p-6 card-hover">
              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Total Duration</p>
-             <p className="text-3xl font-bold text-slate-900 dark:text-white">{stages.length} Months</p>
+             <p className="text-3xl font-bold text-white">{stages.length} Months</p>
            </div>
-           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+           <div className="glass-card p-6 card-hover">
              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Current Stage</p>
              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stages[0]?.stage || "N/A"}</p>
            </div>
-           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+           <div className="glass-card p-6 card-hover">
              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Total Water Need</p>
              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                {stages.reduce((sum, s) => sum + s.water_needed_mm, 0).toFixed(0)} mm
              </p>
            </div>
-           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
+           <div className="glass-card p-6 card-hover">
              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Expected Rainfall</p>
              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                {stages.reduce((sum, s) => sum + s.rainfall_mm, 0).toFixed(0)} mm
@@ -280,15 +280,15 @@
              {stages.map((stage, index) => (
                <div 
                  key={stage.month} 
-                 className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden relative"
+                 className="glass-card overflow-hidden relative card-hover"
                >
                  {/* Timeline connector */}
-                 <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" />
+                 <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-white/10 dark:bg-white/5" />
                  
                  <div className="flex flex-col md:flex-row md:items-start gap-6 p-6">
                    {/* Timeline marker */}
                    <div className="flex-shrink-0 relative z-10">
-                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getStageColor(stage.stage)} border-4 border-white dark:border-slate-800 shadow-lg`}>
+                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getStageColor(stage.stage)} border-4 border-white/20 dark:border-slate-800/50 shadow-xl`}>
                        <span className="text-lg font-bold">{index + 1}</span>
                      </div>
                    </div>
@@ -296,34 +296,34 @@
                    {/* Stage content */}
                    <div className="flex-1">
                      <div className="flex items-center gap-4 mb-3">
-                       <h2 className="text-xl font-bold text-slate-900 dark:text-white">{stage.stage}</h2>
+                       <h2 className="text-xl font-bold text-white">{stage.stage}</h2>
                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStageColor(stage.stage)}`}>
                          Month {stage.month}
                        </span>
                      </div>
                      
-                     <p className="text-slate-600 dark:text-slate-300 mb-4">{stage.description}</p>
+                     <p className="text-slate-300 mb-4">{stage.description}</p>
                      
                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                       <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                         <p className="text-xs text-blue-700 dark:text-blue-300 mb-1">Rainfall</p>
-                         <p className="font-semibold text-blue-900 dark:text-blue-100">{stage.rainfall_mm.toFixed(1)} mm</p>
+                       <div className="p-3 glass-card border-blue-500/20">
+                         <p className="text-xs text-blue-400 mb-1">Rainfall</p>
+                         <p className="font-semibold text-blue-300">{stage.rainfall_mm.toFixed(1)} mm</p>
                        </div>
-                       <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                         <p className="text-xs text-green-700 dark:text-green-300 mb-1">Irrigation Needed</p>
-                         <p className="font-semibold text-green-900 dark:text-green-100">{stage.water_needed_mm.toFixed(1)} mm</p>
+                       <div className="p-3 glass-card border-green-500/20">
+                         <p className="text-xs text-green-400 mb-1">Irrigation Needed</p>
+                         <p className="font-semibold text-green-300">{stage.water_needed_mm.toFixed(1)} mm</p>
                        </div>
-                       <div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                         <p className="text-xs text-purple-700 dark:text-purple-300 mb-1">Period</p>
-                         <p className="font-semibold text-purple-900 dark:text-purple-100 text-sm">{stage.start_date} - {stage.end_date}</p>
+                       <div className="p-3 glass-card border-purple-500/20">
+                         <p className="text-xs text-purple-400 mb-1">Period</p>
+                         <p className="font-semibold text-purple-300 text-sm">{stage.start_date} - {stage.end_date}</p>
                        </div>
                      </div>
                      
                      <div>
-                       <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Key Tasks:</h4>
+                       <h4 className="text-sm font-semibold text-white mb-2">Key Tasks:</h4>
                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                          {stage.tasks.map((task, taskIndex) => (
-                           <li key={taskIndex} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                           <li key={taskIndex} className="flex items-center gap-2 text-sm text-slate-300">
                              <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                              </svg>
@@ -347,11 +347,11 @@
          </div>
 
          {/* Continue to Expert Chat */}
-         <div className="mt-10 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-6 animate-slide-up">
+         <div className="mt-10 glass-card border-purple-500/30 p-6 animate-slide-up">
            <div className="flex items-center justify-between">
              <div>
-               <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100">Ready for Expert Advice?</h3>
-               <p className="text-purple-700 dark:text-purple-300">Chat with our AI agronomist who has full context of your farm, simulation, and cultivation calendar.</p>
+               <h3 className="text-lg font-semibold text-purple-300">Ready for Expert Advice?</h3>
+               <p className="text-purple-400">Chat with our AI agronomist who has full context of your farm, simulation, and cultivation calendar.</p>
              </div>
              <Link 
                href="/expert-chat"

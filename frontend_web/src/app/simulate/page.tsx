@@ -74,17 +74,14 @@ export default function SimulatePage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [mapDistrict, setMapDistrict] = useState<SpatialLookupResponse | null>(null);
 
-  // Dynamic import with ssr: false to prevent Leaflet SSR crash
-  const IndiaMapSelector = dynamic(
-    () => import("@/components/IndiaMapSelector").then((mod) => mod.IndiaMapSelector),
+  // Strict dynamic import with ssr: false - completely blocks SSR for Leaflet
+  const MapUI = dynamic(
+    () => import("@/components/MapUI").then((mod) => mod.MapUI),
     {
       ssr: false,
       loading: () => (
-        <div className="h-[400px] w-full bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 animate-pulse flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Loading map...</p>
-          </div>
+        <div className="h-[400px] w-full bg-slate-800 animate-pulse rounded-xl flex items-center justify-center text-slate-400">
+          Initializing Map Engine...
         </div>
       ),
     }
@@ -165,38 +162,38 @@ export default function SimulatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+    <div className="min-h-screen bg-digital-twin transition-colors">
+      <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
                   </svg>
                 </div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">AgriBrain</h1>
+                <h1 className="text-2xl font-bold text-white tracking-tight">AgriBrain</h1>
               </Link>
             </div>
 
             <nav className="flex items-center gap-1">
               <Link
                 href="/simulate"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-400 bg-green-500/20 rounded-lg"
               >
                 <span className="w-4 h-4 rounded-full bg-green-500"></span>
                 Simulation
               </Link>
               <Link
                 href="/calendar"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
               >
                 Calendar
               </Link>
               <Link
                 href="/expert-chat"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
               >
                 Expert Chat
               </Link>
@@ -221,7 +218,7 @@ export default function SimulatePage() {
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
                     currentStep >= item.step
                       ? "bg-green-500 text-white"
-                      : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
+                      : "bg-white/10 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                   }`}
                 >
                   {item.step}
@@ -229,7 +226,7 @@ export default function SimulatePage() {
                 <span
                   className={`hidden sm:block text-sm font-medium ${
                     currentStep >= item.step
-                      ? "text-green-700 dark:text-green-300"
+                      ? "text-green-400"
                       : "text-slate-500 dark:text-slate-400"
                   }`}
                 >
@@ -240,7 +237,7 @@ export default function SimulatePage() {
                     className={`hidden lg:block w-12 h-0.5 rounded ${
                       currentStep > item.step
                         ? "bg-green-500"
-                        : "bg-slate-200 dark:bg-slate-700"
+                        : "bg-white/10 dark:bg-slate-700"
                     }`}
                   />
                 )}
@@ -251,13 +248,13 @@ export default function SimulatePage() {
           <div className="grid lg:grid-cols-12 gap-6">
             {/* Map Panel - 7/12 width */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Interactive District Map</h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Click a district to auto-fill soil parameters and get crop recommendations</p>
+              <div className="glass-card overflow-hidden">
+                <div className="p-4 border-b border-white/10 dark:border-slate-700/50">
+                  <h2 className="text-xl font-bold text-white">Interactive District Map</h2>
+                  <p className="text-sm text-slate-400 mt-1">Click a district to auto-fill soil parameters and get crop recommendations</p>
                 </div>
                 <div className="p-4">
-                  <IndiaMapSelector
+                  <MapUI
                     onDistrictSelect={handleMapDistrictSelect}
                     isLoading={isLoading}
                     initialCenter={[20.5937, 78.9629]}
@@ -265,11 +262,11 @@ export default function SimulatePage() {
                   />
 
                   {mapDistrict && (
-                    <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg animate-slide-up">
-                      <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
+                    <div className="mt-4 p-4 glass-card border-green-500/30 animate-slide-in">
+                      <h4 className="text-lg font-semibold text-green-400 mb-2">
                         {mapDistrict.district_name}, {mapDistrict.state}
                       </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-slate-400">
                         <div>Soil: {mapDistrict.soil_type}</div>
                         <div>Zone: {mapDistrict.agro_climatic_zone || "N/A"}</div>
                         <div>N: {mapDistrict.baseline_parameters?.n} kg/ha</div>
@@ -284,17 +281,17 @@ export default function SimulatePage() {
                   )}
 
                   {apiError && (
-                    <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                      <p className="text-sm text-red-600 dark:text-red-400">{apiError}</p>
+                    <div className="mt-4 p-4 glass-card border-red-500/30 animate-slide-in">
+                      <p className="text-sm text-red-400">{apiError}</p>
                     </div>
                   )}
                 </div>
               </div>
 
               {activeTab === "simulate" && recommendations.length > 0 && (
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 animate-slide-up">
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Select Crop to Simulate</h2>
-                  <p className="text-slate-600 dark:text-slate-400 mb-6">Click on a crop card to select it, then run the digital twin simulation.</p>
+                <div className="glass-card p-6 animate-slide-in">
+                  <h2 className="text-xl font-bold text-white mb-6">Select Crop to Simulate</h2>
+                  <p className="text-slate-400 mb-6">Click on a crop card to select it, then run the digital twin simulation.</p>
                   <div className="grid grid-cols-1 gap-4">
                     {recommendations.map((rec, index) => (
                       <CropCard
@@ -307,7 +304,7 @@ export default function SimulatePage() {
                   </div>
                   <button
                     onClick={() => setActiveTab("input")}
-                    className="mt-6 w-full py-2 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                    className="mt-6 w-full py-2 px-4 bg-white/10 text-slate-300 font-medium rounded-lg hover:bg-white/20 transition-colors"
                   >
                     Back to Input
                   </button>
@@ -340,15 +337,15 @@ export default function SimulatePage() {
 
               {/* Continue to Calendar */}
               {simulationResults && (
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 animate-slide-up">
+                <div className="glass-card border-green-500/30 p-6 animate-slide-in">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">Simulation Complete!</h3>
-                      <p className="text-green-700 dark:text-green-300">Your digital twin simulation for <strong>{selectedCrop}</strong> is ready with yield, revenue, and ROI predictions.</p>
+                      <h3 className="text-lg font-semibold text-green-400">Simulation Complete!</h3>
+                      <p className="text-green-300">Your digital twin simulation for <strong>{selectedCrop}</strong> is ready with yield, revenue, and ROI predictions.</p>
                     </div>
                     <Link
                       href="/calendar"
-                      className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 focus:ring-4 focus:ring-green-500/30 transition-all whitespace-nowrap"
+                      className="btn-primary"
                     >
                       View Cultivation Calendar →
                     </Link>

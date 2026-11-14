@@ -173,8 +173,7 @@ def generate_advice(question: str, chat_history: list, is_context_aware: bool = 
                     elif role == "assistant":
                         context += f"Advisor: {content}\n"
             
-            prompt = f"""You are an expert agricultural advisor for Indian farmers. 
-Provide practical, actionable advice for farming questions.
+            prompt = f"""You are an expert agricultural advisor for Indian farmers. Speak naturally and conversationally - like a knowledgeable farmer talking to another farmer.
 
 Context:
 {context}
@@ -182,8 +181,13 @@ Context:
 Question: {question}
 
 Provide specific, practical advice suitable for Indian farming conditions. 
-Include relevant details like timing, quantities, and local practices where applicable.
-Keep responses concise but comprehensive."""
+- Be direct and conversational, not formal or academic
+- Use natural language, not bullet-point dumps
+- Include relevant details like timing, quantities, and local practices
+- Keep responses concise but helpful
+- If you don't know something exactly, say so and suggest what to check
+- NO markdown headers (##), NO bullet lists (•), NO bold/italic formatting
+- Just plain, helpful conversation"""
             
             response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
             if response.text:

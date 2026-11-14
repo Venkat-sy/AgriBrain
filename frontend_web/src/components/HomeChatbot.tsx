@@ -104,24 +104,24 @@ export default function HomeChatbot() {
     d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 
   const glassCard = "bg-white/5 dark:bg-slate-900/5 backdrop-blur-md border border-white/10 dark:border-slate-800/50 rounded-2xl shadow-xl shadow-slate-900/5";
-  const inputClass = "w-full px-4 py-3 bg-white/5 dark:bg-slate-800/30 border border-white/10 dark:border-slate-700/50 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+  const inputClass = "w-full px-4 py-3 bg-white/5 bg-white/5 border border-white/10 border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
     <div className={`flex flex-col h-full ${glassCard} overflow-hidden`}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 dark:border-slate-700/50">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10">
         <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
           <Sprout className="w-5 h-5 text-green-500" />
         </div>
         <div className="flex-1">
-          <h2 className="font-bold text-lg text-slate-900 dark:text-white">AgriBrain Assistant</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">AI-powered farming advisor • Always online</p>
+          <h2 className="font-bold text-lg text-white">AgriBrain Assistant</h2>
+          <p className="text-xs text-slate-400">AI-powered farming advisor • Always online</p>
         </div>
         <div className="flex items-center gap-2">
           {connectionError && (
             <button
               onClick={retryLastMessage}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-full hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-amber-400 bg-amber-500/20 border border-amber-500/30 rounded-full hover:bg-amber-500/30 transition-colors"
             >
               <RefreshCw className="w-3 h-3" />
               Retry
@@ -156,19 +156,21 @@ export default function HomeChatbot() {
               <div
                 className={`px-4 py-3 rounded-2xl ${
                   msg.role === "user"
-                    ? "bg-blue-500/10 text-slate-900 dark:text-blue-100 rounded-br-sm"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm"
+                    ? "bg-blue-500/10 text-white rounded-br-sm"
+                    : "glass-card text-white rounded-bl-sm border-white/10"
                 }`}
               >
               {msg.role === "assistant" ? (
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                </div>
+  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+    {msg.content}
+  </ReactMarkdown>
+</div>
               ) : (
                 msg.content
               )}
               </div>
-              <span className="text-[10px] text-slate-400 px-1">{formatTime(msg.timestamp)}</span>
+              <span className="text-[10px] text-slate-500 px-1">{formatTime(msg.timestamp)}</span>
             </div>
           </div>
         ))}
@@ -179,11 +181,11 @@ export default function HomeChatbot() {
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
               <Bot className="w-4 h-4 text-green-500" />
             </div>
-            <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-sm px-4 py-3">
+            <div className="glass-card rounded-2xl rounded-bl-sm px-4 py-3 border-white/10">
               <div className="flex gap-1 items-center h-4">
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:0ms]" />
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:150ms]" />
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce [animation-delay:300ms]" />
               </div>
             </div>
           </div>
@@ -193,17 +195,17 @@ export default function HomeChatbot() {
 
       {/* Suggested questions (shown when only greeting) */}
       {messages.length === 1 && (
-        <div className="px-4 pb-2 border-t border-white/10 dark:border-slate-700/50">
-          <div className="text-center text-slate-500 dark:text-slate-400 py-4 mb-2">
+        <div className="px-4 pb-2 border-t border-white/10">
+          <div className="text-center text-slate-400 py-4 mb-2">
             <p className="text-sm">Ask me anything about crop recommendations, soil health, or farming practices!</p>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">Suggested questions:</p>
+          <p className="text-xs text-slate-500 mb-2 font-medium">Suggested questions:</p>
           <div className="flex flex-wrap gap-2">
             {SUGGESTED_QUESTIONS.map((q) => (
               <button
                 key={q}
                 onClick={() => sendMessage(q)}
-                className="text-xs px-3 py-1.5 bg-green-500/10 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 rounded-full hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
+                className="text-xs px-3 py-1.5 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full hover:bg-green-500/20 transition-colors"
               >
                 {q}
               </button>
@@ -214,13 +216,13 @@ export default function HomeChatbot() {
 
       {/* Connection error banner */}
       {connectionError && !isLoading && (
-        <div className="px-4 py-3 border-t border-white/10 dark:border-slate-700/50 bg-red-500/5 dark:bg-red-900/10">
-          <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+        <div className="px-4 py-3 border-t border-white/10 bg-red-500/10">
+          <div className="flex items-center gap-2 text-sm text-red-400">
             <WifiOff className="w-4 h-4" />
             <span>Connection issue: {connectionError}</span>
             <button
               onClick={retryLastMessage}
-              className="ml-auto px-3 py-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-full hover:bg-red-500/20 transition-colors"
+              className="ml-auto px-3 py-1 text-xs font-medium text-red-400 bg-red-500/20 border border-red-500/30 rounded-full hover:bg-red-500/30 transition-colors"
             >
               Retry
             </button>
@@ -229,7 +231,7 @@ export default function HomeChatbot() {
       )}
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-white/10 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+      <div className="px-4 py-3 border-t border-white/10 bg-white/5">
         <div className="flex gap-2">
           <input
             ref={inputRef}

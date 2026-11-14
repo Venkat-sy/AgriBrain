@@ -1,6 +1,6 @@
 from functools import lru_cache
 from typing import List, Optional
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     # External APIs
     IMD_API_KEY: Optional[str] = None
     OPENWEATHER_API_KEY: Optional[str] = None
+    GOOGLE_API_KEY: Optional[str] = Field(default=None, alias="GEMINI_API_KEY")
     
     # Upstash Redis
     UPSTASH_REDIS_REST_URL: Optional[str] = None
@@ -41,10 +42,11 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
     UPLOAD_DIR: str = "uploads"
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
-        extra = "allow"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra="allow"
+    )
 
 
 # Global settings instance
