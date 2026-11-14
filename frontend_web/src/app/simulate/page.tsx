@@ -168,39 +168,14 @@ export default function SimulatePage() {
     }
   };
 
-    fetchTimeline(rec.crop_name);
   // Crop selection -> store in global state
   const handleCropSelect = (rec: Recommendation) => {
     setSelectedCrop(rec.crop_name);
     setCurrentStep(3);
+    // Timeline is fetched automatically by SimulationCalendar component
   };
 
   // Simulation complete -> store results + navigate
-
-  // State for cultivation timeline
-  const [timeline, setTimeline] = useState<Array<{
-    stage_name: string;
-    estimated_days: number;
-    agronomy_advice: string;
-  }> | null>(null);
-  const [timelineLoading, setTimelineLoading] = useState(false);
-  const [timelineError, setTimelineError] = useState<string | null>(null);
-
-  // Fetch cultivation timeline when crop is selected
-  const fetchTimeline = async (cropName: string) => {
-    setTimelineLoading(true);
-    try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-35zr.onrender.com";
-      const response = await fetch(`${backendUrl}/api/v1/simulation/timeline?crop_name=${encodeURIComponent(cropName)}`);
-      if (!response.ok) throw new Error(`Failed to fetch timeline: ${response.status}`);
-      const data = await response.json();
-      setTimeline(data.stages);
-    } catch (err: any) {
-      console.error("Failed to fetch cultivation timeline:", err);
-    } finally {
-      setTimelineLoading(false);
-    }
-  };
   const handleSimulationComplete = (results: any) => {
     setSimulationResults(results);
     setCurrentStep(4);
@@ -380,6 +355,11 @@ export default function SimulatePage() {
               <WeatherWidget />
               <AlertsWidget />
               <DigitalTwinWidget />
+
+              {/* Cultivation Timeline */}
+              {selectedCrop && (
+                <SimulationCalendar cropName={selectedCrop} />
+              )}
 
               {/* Continue to Calendar */}
               {simulationResults && (

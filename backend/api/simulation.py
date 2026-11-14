@@ -19,9 +19,6 @@ from backend.services.simulation_engine import SimulationEngine
 from pydantic import BaseModel
 from typing import Optional
 
-from pydantic import BaseModel
-from typing import Optional
-
 router = APIRouter(prefix="/api/v1/simulation", tags=["simulation"])
 
 class TimelineStage(BaseModel):
