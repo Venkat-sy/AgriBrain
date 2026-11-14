@@ -112,7 +112,8 @@ export default function SimulatePage() {
   const handleMapClick = async (lat: number, lng: number) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/districts?lat=${lat}&lon=${lng}`);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-35zr.onrender.com";
+      const response = await fetch(`${backendUrl}/api/v1/spatial/lookup?lat=${lat}&lng=${lng}`);
       if (!response.ok) throw new Error("Failed to lookup location");
       const district = await response.json();
       if (district) {

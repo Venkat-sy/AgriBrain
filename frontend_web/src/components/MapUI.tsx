@@ -4,7 +4,16 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useMapEvents } from "react-leaflet";
 import { LatLngBoundsExpression } from "leaflet";
+import L from "leaflet";
 // Leaflet CSS loaded dynamically to avoid SSR issues
+
+// Fix Leaflet marker icon paths for Next.js
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
 
 // Define India's rough bounding box (South-West to North-East)
 const indiaBounds: LatLngBoundsExpression = [
@@ -293,13 +302,13 @@ export function MapUI({
   return (
     <div className="relative w-full h-[400px] rounded-2xl overflow-hidden bg-slate-900/50 border border-white/10">
       <MapContainer
-        center={initialCenter}
-        zoom={initialZoom}
+        center={[20.5937, 78.9629]}
+        zoom={5}
         minZoom={4}
         maxBounds={indiaBounds}
         maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
-        className="h-full w-full"
+        className="h-[400px] w-full rounded-xl z-0"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
