@@ -5,6 +5,8 @@ from datetime import datetime, date, timedelta
 import json
 
 from backend.core.redis_client import get_session as redis_get_session, save_session as redis_save_session, delete_session as redis_delete_session
+import httpx
+from backend.core.config import settings
 
 router = APIRouter(prefix='/api/v1/chat', tags=['chat'])
 
@@ -47,7 +49,7 @@ class StoreSessionResponse(BaseModel):
 
 
 @router.post("/troubleshoot", response_model=ChatResponse)
-async def troubleshoot(request: ChatRequest):
+def troubleshoot(request: ChatRequest):
     """Get farming advice from the AI advisor with persistent chat history."""
     session_id = request.session_id
     question = request.user_question
@@ -61,7 +63,9 @@ async def troubleshoot(request: ChatRequest):
         question = question.replace("[CONTEXT_AWARE_MODE]", "").strip()
 
     # Generate response based on question and context
-    response_text = generate_advice(question, chat_history, is_context_aware)
+    # Run async generate_advice in sync context
+    import asyncio
+    response_text = asyncio.run(generate_advice(question, chat_history, is_context_aware))
 
     # Append user message and AI response to history
     chat_history.append({
@@ -149,53 +153,54 @@ async def delete_session(session_id: str):
 def generate_advice(question: str, chat_history: list, is_context_aware: bool = False) -> str:
     """Generate farming advice based on the question and optional chat context.
 
-    First tries to use Gemini API for intelligent responses.
-    Falls back to conversational fallback if API is unavailable.
+    Uses Groq API (Llama 3) as primary AI engine.
     """
-    # Try to import and use Gemini
+    # Build context from chat history
+    context = ""
+    if is_context_aware and chat_history:
+        for msg in chat_history:
+            role = msg.get("role", "")
+            content = msg.get("content", "")
+            if role == "system":
+                context += f"Farm Context: {content}\n"
+            elif role == "user":
+                context += f"Farmer: {content}\n"
+            elif role == "assistant":
+                context += f"Advisor: {content}\n"
+
+    system_prompt = """You are an expert Indian agronomist. Answer the user's question directly, fluently, and conversationally based on their specific soil type and location. Do NOT use generic markdown templates, do NOT output '## Soil Health', and do NOT use pre-written bullet points. Talk to the user like a human expert giving tailored advice."""
+
+    # Build messages for Groq API
+    messages = [
+        {"role": "system", "content": system_prompt},
+    ]
+    if context:
+        messages.append({"role": "user", "content": f"Context:\n{context}"})
+    messages.append({"role": "user", "content": question})
+
+    # Call Groq API
     try:
-        from google import genai
-        from backend.core.config import settings
-
-        if settings.GOOGLE_API_KEY:
-            client = genai.Client(api_key=settings.GOOGLE_API_KEY)
-
-            # Build context from chat history
-            context = ""
-            if is_context_aware and chat_history:
-                for msg in chat_history:
-                    role = msg.get("role", "")
-                    content = msg.get("content", "")
-                    if role == "system":
-                        context += f"Farm Context: {content}\n"
-                    elif role == "user":
-                        context += f"Farmer: {content}\n"
-                    elif role == "assistant":
-                        context += f"Advisor: {content}\n"
-
-            system_prompt = """You are an expert Indian agronomist. Answer the user's question directly, fluently, and conversationally based on their specific soil type and location. Do NOT use generic markdown templates, do NOT output '## Soil Health', and do NOT use pre-written bullet points. Talk to the user like a human expert giving tailored advice."""
-
-            # Use the new chat API
-            chat = client.chats.create(
-                model="gemini-3.8-flash",
-                config={"system_instruction": system_prompt}
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {settings.GROQ_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "llama3-8b-8192",
+                    "messages": messages,
+                    "temperature": 0.7,
+                    "max_tokens": 1024,
+                },
             )
-
-            full_prompt = f"""Context:
- {context}
-
- Question: {question}"""
-
-            response = chat.send_message(full_prompt)
-            if response.text:
-                return response.text.strip()
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"].strip()
     except Exception as e:
-        # Log error and fall back to conversational fallback
-        print(f"Gemini API error: {e}")
-        pass
-
-    # Fallback: Conversational fallback (no markdown/templates)
-    return generate_conversational_fallback(question, chat_history, is_context_aware)
+        print(f"Groq API error: {e}")
+        # Fallback to conversational fallback
+        return generate_conversational_fallback(question, chat_history, is_context_aware)
 
 
 def generate_conversational_fallback(question: str, chat_history: list, is_context_aware: bool) -> str:

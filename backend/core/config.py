@@ -32,7 +32,8 @@ class Settings(BaseSettings):
     # External APIs
     IMD_API_KEY: Optional[str] = None
     OPENWEATHER_API_KEY: Optional[str] = None
-    GOOGLE_API_KEY: Optional[str] = Field(default=None, alias="GEMINI_API_KEY")
+    GROQ_API_KEY: Optional[str] = None
+    OPENROUTER_API_KEY: Optional[str] = None
     
     # Upstash Redis
     UPSTASH_REDIS_REST_URL: Optional[str] = None
