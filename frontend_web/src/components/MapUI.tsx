@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useMapEvents } from "react-leaflet";
+import { LatLngBoundsExpression } from "leaflet";
 // Leaflet CSS loaded dynamically to avoid SSR issues
+
+// Define India's rough bounding box (South-West to North-East)
+const indiaBounds: LatLngBoundsExpression = [
+  [6.5333, 68.1114],   // South-West corner
+  [35.6745, 97.3956],  // North-East corner
+];
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -288,6 +295,9 @@ export function MapUI({
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
+        minZoom={4}
+        maxBounds={indiaBounds}
+        maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
         className="h-full w-full"
       >
