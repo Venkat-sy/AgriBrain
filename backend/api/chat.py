@@ -173,16 +173,7 @@ def generate_advice(question: str, chat_history: list, is_context_aware: bool = 
                     elif role == "assistant":
                         context += f"Advisor: {content}\n"
 
-            system_prompt = """You are an expert Indian agronomist. Answer the user's specific question directly, conversationally, and concisely without dumping pre-written templates.
-
-Guidelines:
-- Speak like a knowledgeable farmer talking to another farmer
-- Be direct, practical, and specific to Indian conditions
-- No markdown headers (##), no bullet lists (•), no bold/italic
-- No generic template dumps - address the actual question asked
-- If unsure, say so and suggest what to check locally
-- Keep responses under 200 words unless detail is needed
-- Use natural paragraph flow, not formatted sections"""
+            system_prompt = """You are an expert Indian agronomist. Answer the user's question directly, fluently, and conversationally based on their specific soil type and location. Do NOT use generic markdown templates, do NOT output '## Soil Health', and do NOT use pre-written bullet points. Talk to the user like a human expert giving tailored advice."""
 
             # Use the new chat API
             chat = client.chats.create(

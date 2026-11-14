@@ -250,6 +250,14 @@ export function MapUI({
     }
   };
 
+  // Handle map click anywhere -> drop pin and trigger spatial lookup
+  const handleMapClick = useCallback((lat: number, lng: number) => {
+    setClickMarker([lat, lng]);
+    if (onMapClick) {
+      onMapClick(lat, lng);
+    }
+  }, [onMapClick]);
+
   const getSelectedCentroid = (): [number, number] | null => {
     if (lookupResult?.centroid) return [lookupResult.centroid.lat, lookupResult.centroid.lon];
     const selectedGeom = selectedDistrict?.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
@@ -352,6 +360,14 @@ export function MapUI({
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Click marker - shows pin where user clicked on map */}
+      {clickMarker && (
+        <SelectedMarker
+          position={clickMarker}
+          districtName="Selected Location"
+        />
       )}
     </div>
   );
