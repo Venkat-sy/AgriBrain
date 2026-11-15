@@ -12,8 +12,13 @@ from backend.core.config import settings
 
 router = APIRouter(prefix='/api/v1/chat', tags=['chat'])
 
-# Initialize Groq client for vision
-groq_vision_client = Groq(api_key=os.getenv("GROQ_API_KEY", settings.GROQ_API_KEY))
+# Groq client initialized lazily inside route handlers to ensure env vars are loaded
+def get_groq_vision_client():
+    """Get Groq client with API key from environment."""
+    api_key = os.getenv("GROQ_API_KEY") or settings.GROQ_API_KEY
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not configured. Set it in .env or environment variables.")
+    return Groq(api_key=api_key)
 
 
 class ChatRequest(BaseModel):
@@ -143,7 +148,8 @@ If the image shows a plant/leaf, identify any issues (nutrient deficiency, pest,
 Provide specific, actionable advice for Indian farming conditions."""
     
     try:
-        # Call Groq Vision API
+        # Call Groq Vision API - initialize client lazily
+        groq_vision_client = get_groq_vision_client()
         response = groq_vision_client.chat.completions.create(
             model="llama-3.2-11b-vision-preview",
             messages=[
@@ -287,9 +293,9 @@ async def generate_advice(question: str, chat_history: list, is_context_aware: b
         messages.append({"role": "user", "content": f"Context:\n{context}"})
     messages.append({"role": "user", "content": question})
 
-    # Call Groq API using official client
+    # Call Groq API using official client - lazy initialization
     try:
-        client = Groq(api_key=os.getenv("GROQ_API_KEY") or settings.GROQ_API_KEY)
+        client = get_groq_vision_client()
         response = client.chat.completions.create(
             model="llama3-8b-8192",
             messages=messages,

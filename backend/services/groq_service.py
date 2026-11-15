@@ -6,7 +6,12 @@ import os
 import json
 
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY", settings.GROQ_API_KEY))
+def get_groq_client():
+    """Get Groq client with API key from environment (lazy initialization)."""
+    api_key = os.getenv("GROQ_API_KEY") or settings.GROQ_API_KEY
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not configured. Set it in .env or environment variables.")
+    return Groq(api_key=api_key)
 
 
 async def generate_cultivation_timeline(crop_name: str) -> List[Dict[str, Any]]:
@@ -28,6 +33,7 @@ Example format:
 ]"""
     
     try:
+        client = get_groq_client()
         response = client.chat.completions.create(
             model="openai/gpt-oss-20b",
             messages=[
