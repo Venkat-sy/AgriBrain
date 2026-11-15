@@ -430,7 +430,7 @@ async def reverse_geocode(
 ):
     """Reverse geocode lat/lon to district using spatial lookup with Nominatim fallback."""
     # First try spatial lookup from our database
-    spatial_result = await lookup_spatial(lat, lon, db)
+    spatial_result = await spatial_lookup(lat, lon, db)
     
     if spatial_result and spatial_result.get("district_name") and spatial_result["district_name"] != f"District_{spatial_result.get('district_id', 0)}":
         return spatial_result
