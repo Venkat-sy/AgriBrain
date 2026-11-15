@@ -318,7 +318,7 @@ export function MapUI({
         maxBounds={indiaBounds}
         maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
-        className="h-[400px] w-full rounded-xl z-0"
+        className="h-[50vh] md:h-[70vh] w-full rounded-xl z-0"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

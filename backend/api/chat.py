@@ -1,15 +1,19 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, File, UploadFile, Form
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, Dict, Any, List
 from datetime import datetime, date, timedelta
 import json
 import os
+import base64
 
 from backend.core.redis_client import get_session as redis_get_session, save_session as redis_save_session, delete_session as redis_delete_session
 from groq import Groq
 from backend.core.config import settings
 
 router = APIRouter(prefix='/api/v1/chat', tags=['chat'])
+
+# Initialize Groq client for vision
+groq_vision_client = Groq(api_key=os.getenv("GROQ_API_KEY", settings.GROQ_API_KEY))
 
 
 class ChatRequest(BaseModel):
@@ -50,7 +54,7 @@ class StoreSessionResponse(BaseModel):
 
 
 @router.post("/troubleshoot", response_model=ChatResponse)
-def troubleshoot(request: ChatRequest):
+async def troubleshoot(request: ChatRequest):
     """Get farming advice from the AI advisor with persistent chat history."""
     session_id = request.session_id
     question = request.user_question
@@ -63,10 +67,8 @@ def troubleshoot(request: ChatRequest):
     if is_context_aware:
         question = question.replace("[CONTEXT_AWARE_MODE]", "").strip()
 
-    # Generate response based on question and context
-    # Run async generate_advice in sync context
-    import asyncio
-    response_text = asyncio.run(generate_advice(question, chat_history, is_context_aware))
+    # Generate response using Groq LLM
+    response_text = await generate_advice(question, chat_history, is_context_aware)
 
     # Append user message and AI response to history
     chat_history.append({
@@ -83,6 +85,112 @@ def troubleshoot(request: ChatRequest):
     # Save updated history back to Redis
     redis_save_session(session_id, chat_history)
 
+    return ChatResponse(
+        response=response_text,
+        session_id=session_id,
+        timestamp=datetime.utcnow()
+    )
+
+
+@router.post("/troubleshoot-vision", response_model=ChatResponse)
+async def troubleshoot_vision(
+    session_id: str = Form(...),
+    user_question: str = Form(...),
+    image: UploadFile = File(...)
+):
+    """Get farming advice with image analysis using Groq Llama 3.2 Vision."""
+    
+    # Validate image
+    if not image.content_type or not image.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    # Read and encode image
+    image_data = await image.read()
+    image_b64 = base64.b64encode(image_data).decode("utf-8")
+    
+    # Get existing chat history from Redis
+    chat_history = redis_get_session(session_id)
+    
+    # Check if this is context-aware mode
+    is_context_aware = "[CONTEXT_AWARE_MODE]" in user_question
+    if is_context_aware:
+        user_question = user_question.replace("[CONTEXT_AWARE_MODE]", "").strip()
+    
+    # Build context from chat history
+    context = ""
+    if is_context_aware and chat_history:
+        for msg in chat_history:
+            role = msg.get("role", "")
+            content = msg.get("content", "")
+            if role == "system":
+                context += f"Farm Context: {content}\n"
+            elif role == "user":
+                context += f"Farmer: {content}\n"
+            elif role == "assistant":
+                context += f"Advisor: {content}\n"
+    
+    # Prepare vision prompt
+    context_str = f"Context:\n{context}" if context else ""
+    vision_prompt = f"""You are an expert Indian agronomist with vision capabilities. Analyze the uploaded image and answer the farmer's question.
+
+Farmer's Question: {user_question}
+
+{context_str}
+
+If the image shows a crop disease, identify it and provide treatment advice.
+If the image shows soil, identify the soil type and provide management advice.
+If the image shows a plant/leaf, identify any issues (nutrient deficiency, pest, disease).
+Provide specific, actionable advice for Indian farming conditions."""
+    
+    try:
+        # Call Groq Vision API
+        response = groq_vision_client.chat.completions.create(
+            model="llama-3.2-11b-vision-preview",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert Indian agronomist. Analyze crop/soil images and provide specific, actionable farming advice for Indian conditions."
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": vision_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{image.content_type};base64,{image_b64}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            temperature=0.7,
+            max_tokens=1024,
+        )
+        
+        response_text = response.choices[0].message.content.strip()
+        
+    except Exception as e:
+        print(f"Groq Vision API error: {e}")
+        # Fallback to text-only response
+        response_text = await generate_advice(user_question, chat_history, is_context_aware)
+        response_text = f"[Image analysis unavailable: {str(e)}]\n\n{response_text}"
+    
+    # Append user message and AI response to history
+    chat_history.append({
+        "role": "user",
+        "content": f"[Image uploaded] {user_question}",
+        "timestamp": datetime.utcnow().isoformat()
+    })
+    chat_history.append({
+        "role": "assistant",
+        "content": response_text,
+        "timestamp": datetime.utcnow().isoformat()
+    })
+    
+    # Save updated history back to Redis
+    redis_save_session(session_id, chat_history)
+    
     return ChatResponse(
         response=response_text,
         session_id=session_id,

@@ -58,15 +58,50 @@ export class ApiService {
       farmParams?: any;
       simulationResults?: any;
       calendarStages?: any[];
+      image?: string | undefined; // base64 encoded image
+      endpoint?: string; // override endpoint
     }
   ) {
-    return this.request<{ response: string }>("/api/v1/chat/troubleshoot", {
-      method: "POST",
-      body: JSON.stringify({
+    const endpoint = context?.endpoint || "/api/v1/chat/troubleshoot";
+    const hasImage = context?.image != null && context.image.startsWith("data:image/");
+    
+    let body: any;
+    let headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    
+    if (hasImage) {
+      // For vision endpoint, send multipart/form-data
+      body = new FormData();
+      body.append("session_id", "agribrain_chat");
+      body.append("user_question", message || "Analyze this image");
+      
+      // Convert base64 to blob
+      const base64Data = context.image!.split(",")[1];
+      const mimeType = context.image!.split(",")[0].split(":")[1].split(";")[0];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType });
+      body.append("image", blob, "image.jpg");
+      
+      // Don't set Content-Type for FormData - browser will set it with boundary
+      delete headers["Content-Type"];
+    } else {
+      body = JSON.stringify({
         session_id: "agribrain_chat",
         user_question: message,
         context: context?.is_context_aware ? context : undefined,
-      }),
+      });
+    }
+
+    return this.request<{ response: string }>(endpoint, {
+      method: "POST",
+      headers,
+      body,
     });
   }
 

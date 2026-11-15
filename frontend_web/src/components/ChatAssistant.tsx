@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Loader2, Sprout, AlertCircle, RefreshCw, WifiOff } from "lucide-react";
+import { Send, Bot, User, Loader2, Sprout, AlertCircle, RefreshCw, WifiOff, Image, X } from "lucide-react";
 import { useFarm } from "@/context/FarmContext";
 import { ApiService, withRetry } from "@/services/api";
 import ReactMarkdown from "react-markdown";
@@ -11,6 +11,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  image?: string | undefined; // base64 encoded image
 }
 
 interface ChatAssistantProps {
@@ -22,8 +23,11 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     selectedCrop,
     farmParams,
@@ -40,14 +44,20 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
 
   const sendMessage = async (text?: string) => {
     const messageText = text || input.trim();
-    if (!messageText || isLoading) return;
+    if (!messageText && !selectedImage) return;
 
     const userMessage = messageText;
+    const userImage = selectedImage;
+    
+    // Add user message to chat
     setMessages((prev) => [
       ...prev,
-      { role: "user", content: userMessage, timestamp: new Date() },
+      { role: "user", content: userMessage, timestamp: new Date(), image: userImage || undefined },
     ]);
     setInput("");
+    setSelectedImage(undefined);
+    setImagePreview(undefined);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     setIsLoading(true);
     setConnectionError(null);
 
@@ -72,11 +82,16 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
         }
       : undefined;
 
+    // Use vision endpoint if image is provided
+    const endpoint = userImage ? "/api/v1/chat/troubleshoot-vision" : "/api/v1/chat/troubleshoot";
+    
     const result = await withRetry(
       () =>
         ApiService.sendChatMessage(userMessage, {
           is_context_aware,
           ...contextPayload,
+          image: userImage,
+          endpoint,
         }),
       2,
       1000
@@ -109,6 +124,37 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
 
     setIsLoading(false);
     inputRef.current?.focus();
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setConnectionError("Please select an image file");
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setConnectionError("Image must be smaller than 5MB");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setSelectedImage(base64);
+      setImagePreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setSelectedImage(undefined);
+    setImagePreview(undefined);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const retryLastMessage = () => {
@@ -264,7 +310,38 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
 
       {/* Input */}
       <div className="px-4 py-3 border-t border-white/10 bg-white/5">
-        <div className="flex gap-2">
+        {/* Image preview */}
+        {imagePreview && (
+          <div className="mb-2 flex items-center gap-2">
+            <img 
+              src={imagePreview} 
+              alt="Upload preview" 
+              className="w-16 h-16 rounded-lg object-cover border border-white/20"
+            />
+            <span className="text-sm text-slate-400 flex-1">Image attached - will be analyzed</span>
+            <button
+              onClick={removeImage}
+              className="p-1 text-slate-400 hover:text-red-400 transition-colors"
+              aria-label="Remove image"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+        
+        <div className="flex gap-2 items-end">
+          <label className="flex-shrink-0 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" htmlFor="chat-image-upload">
+            <Image className="w-5 h-5 text-slate-400 hover:text-green-400 transition-colors" />
+            <input
+              id="chat-image-upload"
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+              disabled={isLoading}
+            />
+          </label>
           <input
             ref={inputRef}
             type="text"
@@ -274,10 +351,11 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
             placeholder="Ask about crops, soil, rainfall, fertilizers..."
             className={inputClass.replace("bg-white dark:bg-slate-800", "bg-white/10").replace("border-white/10 dark:border-white/10", "border-white/20").replace("text-white", "text-white").replace("placeholder:text-slate-400 dark:placeholder:text-slate-500", "placeholder:text-slate-500")}
             disabled={isLoading}
+            style={{ flex: 1 }}
           />
           <button
             onClick={() => sendMessage()}
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() && !selectedImage || isLoading}
             className="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1.5 shadow-lg shadow-green-500/25"
           >
             {isLoading ? (

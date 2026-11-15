@@ -113,26 +113,35 @@ export default function SimulatePage() {
   const handleMapClick = async (lat: number, lng: number) => {
     try {
       setIsLoading(true);
+
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-35zr.onrender.com";
+      console.log(`[MapClick] Looking up location: lat=${lat}, lng=${lng}`);
       
       // Try reverse-geocode endpoint first (includes Nominatim fallback)
       const response = await fetch(`${backendUrl}/api/v1/spatial/reverse-geocode?lat=${lat}&lon=${lng}`);
       if (!response.ok) {
+        console.error(`[MapClick] Reverse geocode failed: ${response.status} ${response.statusText}`);
         // Fallback to old lookup endpoint
         const fallbackResponse = await fetch(`${backendUrl}/api/v1/spatial/lookup?lat=${lat}&lng=${lng}`);
-        if (!fallbackResponse.ok) throw new Error("Failed to lookup location");
+        if (!fallbackResponse.ok) {
+          console.error(`[MapClick] Fallback lookup failed: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
+          throw new Error("Failed to lookup location - both endpoints failed");
+        }
         const district = await fallbackResponse.json();
         if (district) {
+          console.log(`[MapClick] Fallback lookup success:`, district.district_name);
           handleMapDistrictSelect(district);
         }
       } else {
         const district = await response.json();
         if (district) {
+          console.log(`[MapClick] Reverse geocode success:`, district.district_name);
           handleMapDistrictSelect(district);
         }
       }
-    } catch (err) {
-      console.error("Map click lookup failed:", err);
+    } catch (err: any) {
+      console.error("[MapClick] Map click lookup failed:", err);
+      setApiError(`Location lookup failed: ${err.message}. Check console for details.`);
     } finally {
       setIsLoading(false);
     }
@@ -320,9 +329,9 @@ export default function SimulatePage() {
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-12 gap-6">
-            {/* Map Panel - 7/12 width */}
-            <div className="lg:col-span-7 space-y-6">
+          <div className="grid lg:grid-cols-12 gap-6 md:gap-4">
+            {/* Map Panel - 7/12 width on lg, full width on mobile */}
+            <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
               <div className="glass-card overflow-hidden">
                 <div className="p-4 border-b border-white/10 dark:border-slate-700/50">
                   <h2 className="text-xl font-bold text-white">Interactive District Map</h2>
@@ -410,8 +419,8 @@ export default function SimulatePage() {
               )}
             </div>
 
-            {/* Sidebar - 5/12 width */}
-            <div className="lg:col-span-5 space-y-6">
+            {/* Sidebar - 5/12 width on lg, full width on mobile */}
+            <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
               {activeTab === "input" && (
                 <InputPanel
                   onSubmit={handleRecommendationSubmit}
