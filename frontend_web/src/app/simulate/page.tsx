@@ -116,7 +116,7 @@ export default function SimulatePage() {
     try {
       setIsLoading(true);
 
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-35zr.onrender.com";
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-35zr.onrender.com";
       console.log(`[MapClick] Looking up location: lat=${lat}, lng=${lng}`);
       
       // Try reverse-geocode endpoint first (includes Nominatim fallback)

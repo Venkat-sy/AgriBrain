@@ -419,16 +419,26 @@ async def run_simulation_from_location(
     db: Session = Depends(get_db)
 ):
     """Run full simulation pipeline from map coordinates (lat/lng)."""
-    # Step 1: Reverse geocode to get district info
-    spatial_url = "http://localhost:8000/api/v1/spatial/reverse-geocode"
+    # Step 1: Reverse geocode to get district info (use local spatial lookup, not HTTP call)
+    from backend.api.spatial import spatial_lookup, reverse_geocode_nominatim
+    
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            spatial_response = await client.get(spatial_url, params={"lat": request.lat, "lon": request.lng})
-            if spatial_response.status_code != 200:
-                raise Exception("Spatial lookup failed")
-            spatial_data = spatial_response.json()
+        spatial_data = await spatial_lookup(request.lat, request.lng, db)
+        if not spatial_data or spatial_data.get("district_name", "").startswith("Unknown"):
+            nominatim_result = await reverse_geocode_nominatim(request.lat, request.lng)
+            if nominatim_result:
+                spatial_data = {
+                    "district_name": nominatim_result["district_name"],
+                    "state": nominatim_result["state"],
+                    "latitude": request.lat,
+                    "longitude": request.lng,
+                    "soil_type": "Loamy",
+                    "baseline_parameters": {
+                        "n": 90, "p": 42, "k": 43, "ph": 6.5,
+                        "temperature_c": 27, "humidity_percent": 60, "rainfall_mm": 1000
+                    }
+                }
     except Exception as e:
-        from backend.api.spatial import spatial_lookup, reverse_geocode_nominatim
         spatial_data = await spatial_lookup(request.lat, request.lng, db)
         if not spatial_data or spatial_data.get("district_name", "").startswith("Unknown"):
             nominatim_result = await reverse_geocode_nominatim(request.lat, request.lng)

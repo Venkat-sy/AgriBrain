@@ -44,7 +44,7 @@ export function SimulationCalendar({ cropName, className = "" }: SimulationCalen
       setIsLoading(true);
       setError(null);
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-35zr.onrender.com";
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-35zr.onrender.com";
         const response = await fetch(`${backendUrl}/api/v1/simulation/timeline?crop_name=${encodeURIComponent(cropName)}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch timeline: ${response.status}`);

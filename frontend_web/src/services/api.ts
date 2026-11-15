@@ -1,4 +1,4 @@
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-35zr.onrender.com";
+export const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-35zr.onrender.com";
 
 export interface ApiError extends Error {
   status?: number;
