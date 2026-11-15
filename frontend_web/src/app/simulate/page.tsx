@@ -74,6 +74,8 @@ export default function SimulatePage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const [mapDistrict, setMapDistrict] = useState<SpatialLookupResponse | null>(null);
+  const [digitalTwinLoading, setDigitalTwinLoading] = useState(false);
+  const [digitalTwinError, setDigitalTwinError] = useState<string | null>(null);
 
   // Strict dynamic import with ssr: false - completely blocks SSR for Leaflet
   const MapUI = dynamic(
@@ -144,6 +146,49 @@ export default function SimulatePage() {
       setApiError(`Location lookup failed: ${err.message}. Check console for details.`);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle pin drop -> trigger digital twin simulation immediately
+  const handlePinDrop = async (lat: number, lng: number) => {
+    setDigitalTwinLoading(true);
+    setDigitalTwinError(null);
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-35zr.onrender.com";
+      const endpoint = `${apiUrl}/api/v1/simulation/run-from-location`;
+      
+      console.log(`[PinDrop] Calling digital twin simulation: ${endpoint}`, { lat, lng });
+      
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng }),
+      });
+      
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Simulation API failed: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log("[PinDrop] Digital twin simulation complete:", data);
+      
+      // Switch to simulate tab and update state
+      setActiveTab("simulate");
+      setCurrentStep(3);
+      
+      // If the response contains simulation results, store them
+      if (data.simulation_results) {
+        setSimulationResults(data.simulation_results);
+      }
+      
+    } catch (err: any) {
+      const errorMsg = err.message || "Digital twin simulation failed";
+      console.error("[PinDrop] Error:", errorMsg);
+      setDigitalTwinError(errorMsg);
+    } finally {
+      setDigitalTwinLoading(false);
     }
   };
 
@@ -344,6 +389,7 @@ export default function SimulatePage() {
                     initialCenter={[20.5937, 78.9629]}
                     initialZoom={5}
                     onMapClick={handleMapClick}
+                    onPinDrop={handlePinDrop}
                   />
 
                   {mapDistrict && (
@@ -390,6 +436,27 @@ export default function SimulatePage() {
                   {apiError && (
                     <div className="mt-4 p-4 glass-card border-red-500/30 animate-slide-in">
                       <p className="text-sm text-red-400">{apiError}</p>
+                    </div>
+                  )}
+
+                  {/* Digital Twin Loading/Error Display */}
+                  {digitalTwinLoading && (
+                    <div className="mt-4 p-4 glass-card border-blue-500/30 animate-slide-in">
+                      <div className="flex items-center justify-center gap-2 text-sm text-blue-300">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                        Running Digital Twin Simulation...
+                      </div>
+                    </div>
+                  )}
+
+                  {digitalTwinError && (
+                    <div className="mt-4 p-4 glass-card border-red-500/30 animate-slide-in">
+                      <div className="flex items-center gap-2 text-sm text-red-400">
+                        <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        <span>Digital Twin Error: {digitalTwinError}</span>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -94,6 +94,7 @@ interface MapUIProps {
   initialCenter?: [number, number];
   initialZoom?: number;
   onMapClick?: (lat: number, lng: number) => void;
+  onPinDrop?: (lat: number, lng: number) => void;
 }
 
 // District GeoJSON loader component
@@ -215,6 +216,7 @@ export function MapUI({
   initialCenter = [20.5937, 78.9629],
   initialZoom = 5,
   onMapClick,
+  onPinDrop,
 }: MapUIProps) {
   const [geojsonData, setGeojsonData] = useState<DistrictGeoJSON | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<DistrictFeature | null>(null);
@@ -276,13 +278,21 @@ export function MapUI({
     }
   };
 
-  // Handle map click anywhere -> drop pin and trigger spatial lookup
+  // Handle map click anywhere -> drop pin instantly and trigger spatial lookup + digital twin
   const handleMapClick = useCallback((lat: number, lng: number) => {
+    // Instantly drop pin for immediate visual feedback
     setClickMarker([lat, lng]);
+    
+    // Trigger spatial lookup (district info)
     if (onMapClick) {
       onMapClick(lat, lng);
     }
-  }, [onMapClick]);
+    
+    // Trigger digital twin simulation immediately
+    if (onPinDrop) {
+      onPinDrop(lat, lng);
+    }
+  }, [onMapClick, onPinDrop]);
 
   const getSelectedCentroid = (): [number, number] | null => {
     if (lookupResult?.centroid) return [lookupResult.centroid.lat, lookupResult.centroid.lon];
