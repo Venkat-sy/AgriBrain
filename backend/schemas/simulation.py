@@ -64,10 +64,10 @@ class SimulationResponse(BaseModel):
     recommended_crops: Optional[List[Dict[str, Any]]] = Field(default=None, description="ML crop recommendations")
     
     # Metadata
-    model_version: str
+    version: str = Field(validation_alias="model_version", serialization_alias="version")
     generated_at: datetime
 
-    model_config = ConfigDict(protected_namespaces=())
+    model_config = ConfigDict(protected_namespaces=(), populate_by_name=True)
 
 
 class SimulationResultResponse(BaseModel):

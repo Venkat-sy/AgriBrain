@@ -428,8 +428,8 @@ async def run_simulation_from_location(
                 raise Exception("Spatial lookup failed")
             spatial_data = spatial_response.json()
     except Exception as e:
-        from backend.api.spatial import lookup_spatial, reverse_geocode_nominatim
-        spatial_data = await lookup_spatial(request.lat, request.lng, db)
+        from backend.api.spatial import spatial_lookup, reverse_geocode_nominatim
+        spatial_data = await spatial_lookup(request.lat, request.lng, db)
         if not spatial_data or spatial_data.get("district_name", "").startswith("Unknown"):
             nominatim_result = await reverse_geocode_nominatim(request.lat, request.lng)
             if nominatim_result:
@@ -472,14 +472,34 @@ async def run_simulation_from_location(
     # Step 4: Load and run XGBoost model
     project_root = Path(__file__).resolve().parents[2]
     model_path = project_root / "backend" / "ml" / "saved_models" / "xgboost_crop_model.joblib"
+    info_path = project_root / "backend" / "ml" / "saved_models" / "xgboost_crop_model_info.json"
     
     crop_recommendations = []
     if model_path.exists():
         try:
-            model_bundle = joblib.load(model_path)
-            model = model_bundle["model"]
-            label_encoder = model_bundle["label_encoder"]
-            probas = model.predict_proba(features)[0]
+            # Load the pipeline (SMOTE + XGBoost)
+            pipeline = joblib.load(model_path)
+            
+            # Load label mapping from info file
+            import json
+            label_mapping = {}
+            if info_path.is_file():
+                with open(info_path, 'r') as f:
+                    info = json.load(f)
+                    label_mapping = info.get("label_mapping", {})
+            
+            # Create a simple label encoder-like object for inverse_transform
+            class SimpleLabelEncoder:
+                def __init__(self, mapping):
+                    self.mapping = {int(v): k for k, v in mapping.items()}
+                def inverse_transform(self, indices):
+                    return [self.mapping.get(int(i), f"Unknown_{i}") for i in indices]
+            
+            label_encoder = SimpleLabelEncoder(label_mapping)
+            
+            # Use the XGBoost classifier from the pipeline for prediction
+            xgb_model = pipeline.named_steps["xgb"]
+            probas = xgb_model.predict_proba(features)[0]
             top_indices = np.argsort(probas)[::-1][:request.top_k]
             for idx in top_indices:
                 crop_name = label_encoder.inverse_transform([idx])[0]

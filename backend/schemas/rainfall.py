@@ -31,15 +31,17 @@ class RainfallForecastResponse(BaseModel):
     predicted_mm: float
     lower_bound_mm: Optional[float]
     upper_bound_mm: Optional[float]
-    model_version: str
+    version: str = Field(validation_alias="model_version", serialization_alias="version")
     created_at: datetime
 
-    model_config = ConfigDict(protected_namespaces=())
+    model_config = ConfigDict(protected_namespaces=(), populate_by_name=True)
 
 
 class RainfallForecastListResponse(BaseModel):
     district_id: int
     district_name: str
     forecasts: List[RainfallForecastResponse]
-    model_version: str
+    version: str
     generated_at: datetime
+
+    model_config = ConfigDict(protected_namespaces=(), populate_by_name=True)

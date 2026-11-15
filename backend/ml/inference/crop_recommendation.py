@@ -44,7 +44,7 @@ MODEL_DIR = BASE_DIR / "models"
 XGBOOST_FEATURE_COLUMNS = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
 
 # Legacy feature columns (lowercase) for RandomForest fallback
-LEGACY_FEATURE_COLUMNS = ["n", "p", "k", "temperature", "humidity", "ph", "rainfall"]
+LEGACY_FEATURE_COLUMNS = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
 
 # Yield prediction feature columns
 YIELD_FEATURE_COLUMNS = ["State_Name_Encoded", "District_Encoded", "Crop_Encoded", "Season_Encoded", "Crop_Year"]
@@ -60,10 +60,28 @@ def _load_xgboost_bundle() -> Dict[str, Any]:
     """Load the XGBoost pipeline from disk."""
     pipeline = joblib.load(XGBOOST_BUNDLE_PATH)
     print(f"[ML] Loaded XGBoost crop model pipeline")
+    
+    # Load label mapping from the saved info file
+    import json
+    info_path = XGBOOST_BUNDLE_PATH.parent / "xgboost_crop_model_info.json"
+    label_mapping = {}
+    if info_path.is_file():
+        with open(info_path, 'r') as f:
+            info = json.load(f)
+            label_mapping = info.get("label_mapping", {})
+    
+    # Create a simple label encoder-like object for inverse_transform
+    class SimpleLabelEncoder:
+        def __init__(self, mapping):
+            self.mapping = {int(v): k for k, v in mapping.items()}
+        
+        def inverse_transform(self, indices):
+            return [self.mapping.get(int(i), f"Unknown_{i}") for i in indices]
+    
     # Return a bundle-like dict for backward compatibility
     return {
         "model": pipeline,
-        "label_encoder": pipeline.named_steps["xgb"],
+        "label_encoder": SimpleLabelEncoder(label_mapping),
         "feature_columns": ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"],
     }
 
