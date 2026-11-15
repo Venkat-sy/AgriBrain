@@ -223,19 +223,29 @@ export function MapUI({
   const [error, setError] = useState<string | null>(null);
   const [clickMarker, setClickMarker] = useState<[number, number] | null>(null);
 
-  // Load district GeoJSON on mount
+  // Load district GeoJSON on mount - use local backend endpoint as primary, fallback to GitHub
   useEffect(() => {
     const loadGeoJSON = async () => {
       try {
-        const response = await fetch(
-          "https://raw.githubusercontent.com/datasets/geo-india/master/data/india_district.geojson"
-        );
-        if (!response.ok) throw new Error("Failed to load GeoJSON");
+        // Try local backend first (proxied through Next.js API route)
+        const response = await fetch("/api/districts/geojson");
+        if (!response.ok) throw new Error("Failed to load GeoJSON from backend");
         const data = await response.json();
         setGeojsonData(data);
       } catch (err) {
-        console.error("GeoJSON load error:", err);
-        setError("Failed to load district boundaries. Using fallback...");
+        console.warn("Backend GeoJSON load failed, trying GitHub fallback:", err);
+        try {
+          const response = await fetch(
+            "https://raw.githubusercontent.com/datasets/geo-india/master/data/india_district.geojson"
+          );
+          if (!response.ok) throw new Error("Failed to load GeoJSON from GitHub");
+          const data = await response.json();
+          setGeojsonData(data);
+        } catch (fallbackErr) {
+          console.error("All GeoJSON sources failed:", fallbackErr);
+          // Don't set error - map clicking still works without boundaries
+          setGeojsonData(null);
+        }
       }
     };
     loadGeoJSON();

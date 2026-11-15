@@ -109,16 +109,27 @@ export default function SimulatePage() {
     }
   };
 
-  // Handle map click anywhere -> auto-fetch soil + rainfall via spatial lookup API
+  // Handle map click anywhere -> auto-fetch soil + rainfall via spatial lookup API (with reverse geocoding fallback)
   const handleMapClick = async (lat: number, lng: number) => {
     try {
       setIsLoading(true);
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-35zr.onrender.com";
-      const response = await fetch(`${backendUrl}/api/v1/spatial/lookup?lat=${lat}&lng=${lng}`);
-      if (!response.ok) throw new Error("Failed to lookup location");
-      const district = await response.json();
-      if (district) {
-        handleMapDistrictSelect(district);
+      
+      // Try reverse-geocode endpoint first (includes Nominatim fallback)
+      const response = await fetch(`${backendUrl}/api/v1/spatial/reverse-geocode?lat=${lat}&lon=${lng}`);
+      if (!response.ok) {
+        // Fallback to old lookup endpoint
+        const fallbackResponse = await fetch(`${backendUrl}/api/v1/spatial/lookup?lat=${lat}&lng=${lng}`);
+        if (!fallbackResponse.ok) throw new Error("Failed to lookup location");
+        const district = await fallbackResponse.json();
+        if (district) {
+          handleMapDistrictSelect(district);
+        }
+      } else {
+        const district = await response.json();
+        if (district) {
+          handleMapDistrictSelect(district);
+        }
       }
     } catch (err) {
       console.error("Map click lookup failed:", err);
@@ -173,6 +184,50 @@ export default function SimulatePage() {
     setSelectedCrop(rec.crop_name);
     setCurrentStep(3);
     // Timeline is fetched automatically by SimulationCalendar component
+  };
+
+  // Run full simulation from map location
+  const handleRunSimulationFromLocation = async (lat: number, lng: number, landAreaHa: number = 1.0, budgetInr: number = 50000) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/simulation/location", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng, land_area_ha: landAreaHa, budget_inr: budgetInr, top_k: 3 }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || `API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Set recommendations from the full pipeline
+      if (data.recommendations?.length > 0) {
+        setRecommendations(data.recommendations.map((r: any) => ({
+          crop_name: r.crop_name,
+          confidence: r.confidence,
+          match_reasons: r.match_reasons,
+          expected_yield_tons_per_ha: null,
+          season: null,
+        })));
+        setActiveTab("simulate");
+        setCurrentStep(2);
+      }
+      
+      // Store timelines for use by SimulationCalendar
+      if (data.timelines) {
+        // The timelines will be picked up by the SimulationCalendar component
+        console.log("Timelines received:", data.timelines);
+      }
+      
+      return data;
+    } catch (err: any) {
+      setApiError(err.message || "Failed to run simulation from location.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Simulation complete -> store results + navigate
@@ -298,6 +353,28 @@ export default function SimulatePage() {
                         <div>Humidity: {mapDistrict.baseline_parameters?.humidity_percent}%</div>
                         <div>Rainfall: {mapDistrict.baseline_parameters?.rainfall_mm} mm</div>
                       </div>
+                      <button
+                        onClick={() => handleRunSimulationFromLocation(
+                          mapDistrict.latitude || mapDistrict.centroid?.lat || 20.5937,
+                          mapDistrict.longitude || mapDistrict.centroid?.lon || 78.9629
+                        )}
+                        disabled={isLoading}
+                        className="mt-4 w-full py-2 px-4 bg-green-500/20 text-green-400 font-medium rounded-lg hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-500 border-t-transparent"></div>
+                            Running Full Pipeline...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Run Full Simulation Pipeline
+                          </>
+                        )}
+                      </button>
                     </div>
                   )}
 

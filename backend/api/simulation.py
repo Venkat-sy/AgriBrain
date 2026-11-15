@@ -18,8 +18,30 @@ from backend.schemas import (
 from backend.services.simulation_engine import SimulationEngine
 from pydantic import BaseModel
 from typing import Optional
+from fastapi.concurrency import run_in_threadpool
 
 router = APIRouter(prefix="/api/v1/simulation", tags=["simulation"])
+
+class LocationSimulationRequest(BaseModel):
+    """Request to run simulation from map coordinates."""
+    lat: float
+    lng: float
+    land_area_ha: float = 1.0
+    budget_inr: float = 50000.0
+    top_k: int = 3
+
+
+class LocationSimulationResponse(BaseModel):
+    """Response from location-based simulation."""
+    district_name: str
+    state: str
+    latitude: float
+    longitude: float
+    soil_type: str
+    baseline_parameters: dict
+    weather: dict
+    recommendations: List[dict]
+    timelines: dict
 
 class TimelineStage(BaseModel):
     stage_name: str
@@ -351,3 +373,139 @@ async def delete_simulation_result(result_id: int, db: Session = Depends(get_db)
     db.delete(result)
     db.commit()
     return {"message": "Simulation result deleted successfully"}
+# Import for location-based simulation
+import numpy as np
+import joblib
+from pathlib import Path
+import httpx
+from fastapi.concurrency import run_in_threadpool
+
+
+def _get_fallback_recommendations():
+    return [
+        {"crop_name": "rice", "confidence": 0.8, "match_reasons": ["Default fallback"]},
+        {"crop_name": "wheat", "confidence": 0.7, "match_reasons": ["Default fallback"]},
+        {"crop_name": "maize", "confidence": 0.6, "match_reasons": ["Default fallback"]},
+    ]
+
+
+async def _generate_timelines(crop_recommendations):
+    timelines = {}
+    try:
+        from backend.services.groq_service import generate_cultivation_timeline
+        for rec in crop_recommendations:
+            crop_name = rec["crop_name"]
+            try:
+                timeline = await generate_cultivation_timeline(crop_name)
+                timelines[crop_name] = timeline
+            except Exception as e:
+                print(f"Timeline generation failed for {crop_name}: {e}")
+                from backend.api.simulation import CROP_TIMELINES
+                if crop_name.lower() in CROP_TIMELINES:
+                    timelines[crop_name] = CROP_TIMELINES[crop_name.lower()]
+    except Exception as e:
+        print(f"Groq service unavailable: {e}")
+        from backend.api.simulation import CROP_TIMELINES
+        for rec in crop_recommendations:
+            crop_name = rec["crop_name"].lower()
+            if crop_name in CROP_TIMELINES:
+                timelines[rec["crop_name"]] = CROP_TIMELINES[crop_name]
+    return timelines
+
+
+@router.post("/run-from-location", response_model=LocationSimulationResponse)
+async def run_simulation_from_location(
+    request: LocationSimulationRequest,
+    db: Session = Depends(get_db)
+):
+    """Run full simulation pipeline from map coordinates (lat/lng)."""
+    # Step 1: Reverse geocode to get district info
+    spatial_url = "http://localhost:8000/api/v1/spatial/reverse-geocode"
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            spatial_response = await client.get(spatial_url, params={"lat": request.lat, "lon": request.lng})
+            if spatial_response.status_code != 200:
+                raise Exception("Spatial lookup failed")
+            spatial_data = spatial_response.json()
+    except Exception as e:
+        from backend.api.spatial import lookup_spatial, reverse_geocode_nominatim
+        spatial_data = await lookup_spatial(request.lat, request.lng, db)
+        if not spatial_data or spatial_data.get("district_name", "").startswith("Unknown"):
+            nominatim_result = await reverse_geocode_nominatim(request.lat, request.lng)
+            if nominatim_result:
+                spatial_data = {
+                    "district_name": nominatim_result["district_name"],
+                    "state": nominatim_result["state"],
+                    "latitude": request.lat,
+                    "longitude": request.lng,
+                    "soil_type": "Loamy",
+                    "baseline_parameters": {
+                        "n": 90, "p": 42, "k": 43, "ph": 6.5,
+                        "temperature_c": 27, "humidity_percent": 60, "rainfall_mm": 1000
+                    }
+                }
+    
+    district_name = spatial_data.get("district_name", "Unknown")
+    state = spatial_data.get("state", "Unknown")
+    soil_type = spatial_data.get("soil_type", "Loamy")
+    baseline = spatial_data.get("baseline_parameters", {})
+    
+    # Step 2: Weather from baseline
+    weather_data = {
+        "temperature": baseline.get("temperature_c", 27),
+        "humidity": baseline.get("humidity_percent", 60),
+        "rainfall": baseline.get("rainfall_mm", 1000),
+        "source": baseline.get("weather_source", "unknown")
+    }
+    
+    # Step 3: Prepare features for XGBoost
+    features = np.array([[
+        baseline.get("n", 90),
+        baseline.get("p", 42),
+        baseline.get("k", 43),
+        baseline.get("temperature_c", 27),
+        baseline.get("humidity_percent", 60),
+        baseline.get("ph", 6.5),
+        baseline.get("rainfall_mm", 1000)
+    ]])
+    
+    # Step 4: Load and run XGBoost model
+    project_root = Path(__file__).resolve().parents[2]
+    model_path = project_root / "backend" / "ml" / "saved_models" / "xgboost_crop_model.joblib"
+    
+    crop_recommendations = []
+    if model_path.exists():
+        try:
+            model_bundle = joblib.load(model_path)
+            model = model_bundle["model"]
+            label_encoder = model_bundle["label_encoder"]
+            probas = model.predict_proba(features)[0]
+            top_indices = np.argsort(probas)[::-1][:request.top_k]
+            for idx in top_indices:
+                crop_name = label_encoder.inverse_transform([idx])[0]
+                confidence = float(probas[idx])
+                crop_recommendations.append({
+                    "crop_name": crop_name,
+                    "confidence": confidence,
+                    "match_reasons": [f"Model confidence: {confidence:.1%}"]
+                })
+        except Exception as e:
+            print(f"Model inference error: {e}")
+            crop_recommendations = _get_fallback_recommendations()
+    else:
+        crop_recommendations = _get_fallback_recommendations()
+    
+    # Step 5: Generate timelines
+    timelines = await _generate_timelines(crop_recommendations)
+    
+    return LocationSimulationResponse(
+        district_name=district_name,
+        state=state,
+        latitude=request.lat,
+        longitude=request.lng,
+        soil_type=soil_type,
+        baseline_parameters=baseline,
+        weather=weather_data,
+        recommendations=crop_recommendations,
+        timelines=timelines
+    )

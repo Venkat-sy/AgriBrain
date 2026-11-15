@@ -357,6 +357,54 @@ async def get_all_districts_geojson(
     }
 
 
+# Nominatim reverse geocoding fallback
+async def reverse_geocode_nominatim(lat: float, lon: float) -> Optional[dict]:
+    """Reverse geocode coordinates using OpenStreetMap Nominatim API."""
+    import httpx
+    
+    url = "https://nominatim.openstreetmap.org/reverse"
+    params = {
+        "format": "json",
+        "lat": lat,
+        "lon": lon,
+        "zoom": 10,
+        "addressdetails": 1,
+    }
+    headers = {
+        "User-Agent": "AgriBrain/1.0 (https://agribrain.example.com)"
+    }
+    
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(url, params=params, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                address = data.get("address", {})
+                district = (
+                    address.get("state_district") or
+                    address.get("county") or
+                    address.get("city_district") or
+                    address.get("city") or
+                    address.get("town") or
+                    address.get("village") or
+                    address.get("municipality")
+                )
+                state = address.get("state", "")
+                country = address.get("country_code", "").upper()
+                
+                if district and country == "IN":
+                    return {
+                        "district_name": district,
+                        "state": state,
+                        "country": country,
+                        "full_address": data.get("display_name", "")
+                    }
+    except Exception as e:
+        print(f"Nominatim reverse geocoding error: {e}")
+    
+    return None
+
+
 @router.get("/bounds")
 async def get_india_bounds():
     """Get India's bounding box for map initialization."""
@@ -371,4 +419,122 @@ async def get_india_bounds():
             [0.0, 60.0],
             [40.0, 100.0]
         ]
+    }
+
+
+@router.get("/reverse-geocode")
+async def reverse_geocode(
+    lat: float = Query(..., description="Latitude"),
+    lon: float = Query(..., description="Longitude"),
+    db: Session = Depends(get_db)
+):
+    """Reverse geocode lat/lon to district using spatial lookup with Nominatim fallback."""
+    # First try spatial lookup from our database
+    spatial_result = await lookup_spatial(lat, lon, db)
+    
+    if spatial_result and spatial_result.get("district_name") and spatial_result["district_name"] != f"District_{spatial_result.get('district_id', 0)}":
+        return spatial_result
+    
+    # Fallback to Nominatim
+    nominatim_result = await reverse_geocode_nominatim(lat, lon)
+    
+    if nominatim_result:
+        # Get baseline parameters for the district from master dataset
+        master_df = get_master_dataset()
+        district_name = nominatim_result["district_name"]
+        state = nominatim_result["state"]
+        
+        n, p, k, ph, soil_type = 90, 42, 43, 6.5, "Loamy"
+        rainfall_mm = None
+        temperature_c = None
+        humidity_percent = None
+        agro_zone = None
+        
+        if master_df is not None:
+            mask = (master_df['DISTRICT'].str.strip().str.lower() == district_name.strip().lower()) & \
+                   (master_df['STATE'].str.strip().str.lower() == state.strip().lower())
+            match = master_df[mask]
+            if not match.empty:
+                row = match.iloc[0]
+                n = row.get('N', 90)
+                p = row.get('P', 42)
+                k = row.get('K', 43)
+                ph = row.get('pH', 6.5)
+                soil_type = row.get('SOIL_TYPE', 'Loamy')
+                agro_zone = row.get('AGRO_CLIMATIC_ZONE', None)
+        
+        # Get rainfall from CSV
+        rainfall_df = get_rainfall_csv()
+        if rainfall_df is not None:
+            rainfall_mm = get_rainfall_for_district(rainfall_df, district_name, state)
+        
+        # Try to get live weather for temperature/humidity
+        from backend.services.weather_service import get_live_weather
+        weather = await run_in_threadpool(
+            get_live_weather,
+            district_name,
+            {"temperature": 27.0, "humidity": 60, "rainfall": rainfall_mm or 1000}
+        )
+        temperature_c = weather["temperature"]
+        humidity_percent = weather["humidity"]
+        if rainfall_mm is None:
+            rainfall_mm = weather["rainfall"]
+        
+        # Generate a fake district ID for consistency
+        import hashlib
+        district_id = int(hashlib.md5(f"{district_name},{state}".encode()).hexdigest()[:8], 16) % 100000
+        
+        return {
+            "district_id": district_id,
+            "district_name": district_name,
+            "state": state,
+            "state_code": state[:2].upper() if state else "XX",
+            "latitude": lat,
+            "longitude": lon,
+            "soil_type": soil_type,
+            "agro_climatic_zone": agro_zone,
+            "area_km2": None,
+            "centroid": {"lat": lat, "lon": lon},
+            "lookup_method": "nominatim_reverse_geocode",
+            "distance_km": 0,
+            "baseline_parameters": {
+                "n": round(n, 1),
+                "p": round(p, 1),
+                "k": round(k, 1),
+                "ph": round(ph, 2),
+                "temperature_c": round(temperature_c, 1),
+                "humidity_percent": round(humidity_percent, 1),
+                "rainfall_mm": round(rainfall_mm, 1) if rainfall_mm else 1000,
+                "lookup_method": "nominatim_reverse_geocode",
+                "weather_source": weather["source"]
+            },
+            "note": f"Parameters derived via Nominatim reverse geocoding for {district_name}, {state}"
+        }
+    
+    # Ultimate fallback - return basic location info
+    return {
+        "district_id": 0,
+        "district_name": f"Unknown ({lat:.4f}, {lon:.4f})",
+        "state": "Unknown",
+        "state_code": "XX",
+        "latitude": lat,
+        "longitude": lon,
+        "soil_type": "Loamy",
+        "agro_climatic_zone": None,
+        "area_km2": None,
+        "centroid": {"lat": lat, "lon": lon},
+        "lookup_method": "coordinate_fallback",
+        "distance_km": 0,
+        "baseline_parameters": {
+            "n": 90.0,
+            "p": 42.0,
+            "k": 43.0,
+            "ph": 6.5,
+            "temperature_c": 27.0,
+            "humidity_percent": 60.0,
+            "rainfall_mm": 1000.0,
+            "lookup_method": "coordinate_fallback",
+            "weather_source": "default"
+        },
+        "note": "Using default parameters - location not found in spatial database or Nominatim"
     }
