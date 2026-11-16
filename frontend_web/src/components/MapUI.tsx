@@ -19,6 +19,8 @@ const svgPin = L.divIcon({
 interface MapUIProps {
   pin: { lat: number; lng: number } | null;
   onPinDrop: (lat: number, lng: number) => void;
+  center?: [number, number];
+  zoom?: number;
 }
 
 function ClickHandler({ onPinDrop }: { onPinDrop: (lat: number, lng: number) => void }) {
@@ -30,19 +32,25 @@ function ClickHandler({ onPinDrop }: { onPinDrop: (lat: number, lng: number) => 
   return null;
 }
 
-function MapFlyTo({ pin }: { pin: { lat: number; lng: number } | null }) {
+function MapFlyTo({ pin, center, zoom }: { pin: { lat: number; lng: number } | null; center?: [number, number]; zoom?: number }) {
   const map = useMap();
+  const defaultCenter: [number, number] = center || [20.5937, 78.9629];
+  const defaultZoom: number = zoom || 5;
+  
   useEffect(() => {
     if (pin) {
       map.flyTo([pin.lat, pin.lng], Math.max(map.getZoom(), 7), { duration: 0.75 });
+    } else {
+      map.flyTo(defaultCenter, defaultZoom, { duration: 0.75 });
     }
-  }, [pin, map]);
+  }, [pin, map, defaultCenter, defaultZoom]);
   return null;
 }
 
-export default function MapUI({ pin, onPinDrop }: MapUIProps) {
+export default function MapUI({ pin, onPinDrop, center, zoom }: MapUIProps) {
   const markerRef = useRef<any>(null);
-  const defaultCenter: [number, number] = [20.5937, 78.9629];
+  const defaultCenter: [number, number] = center || [20.5937, 78.9629];
+  const defaultZoom: number = zoom || 5;
   const markerPos: [number, number] | null = pin ? [pin.lat, pin.lng] : null;
 
   const eventHandlers = useMemo(
@@ -60,17 +68,17 @@ export default function MapUI({ pin, onPinDrop }: MapUIProps) {
 
   return (
     <div className="w-full h-[320px] sm:h-[390px] lg:h-[430px] rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative z-0">
-      <MapContainer center={defaultCenter} className="w-full h-full z-0" scrollWheelZoom={true} zoom={5}>
+      <MapContainer center={defaultCenter} className="w-full h-full z-0" scrollWheelZoom={true} zoom={defaultZoom}>
         <TileLayer attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <ClickHandler onPinDrop={onPinDrop}/>
-        <MapFlyTo pin={pin}/>
-        {markerPos && (
+        <MapFlyTo pin={pin} center={center} zoom={zoom}/>
+        {markerPos && pin && (
           <Marker draggable={true} eventHandlers={eventHandlers} icon={svgPin} position={markerPos} ref={markerRef}>
             <Popup>
               <div className="text-xs font-semibold text-slate-900">
-                📍 Farm Pin: {pin?.lat?.toFixed(4)}°N, {pin?.lng?.toFixed(4)}°E
+                📍 Farm Pin: {pin.lat.toFixed(4)}°N, {pin.lng.toFixed(4)}°E
                 <br />
                 <span className="text-emerald-700">(Drag pin or click map to adjust)</span>
               </div>
