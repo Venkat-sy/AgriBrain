@@ -1,588 +1,232 @@
-"""
-Digital Twin Simulation Orchestrator - AgriBrain
-Strict spec: guide2.txt / AGRIBRAIN_STRICT_SPEC.txt
-"""
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
-from typing import List, Optional
-from datetime import datetime
-from pathlib import Path
 import os
 import json
-import numpy as np
-import joblib
 import requests
+from fastapi import APIRouter, Request
+from groq import Groq
+from backend.api.spatial import lookup_spatial
 
-from backend.core.config import get_db
-from backend.models import (
-    District, CropProfile, CropCost, CropPrice, SimulationResult
-)
-from backend.schemas import (
-    SimulationRequest,
-    SimulationResponse,
-    SimulationResultResponse,
-    SimulationListResponse,
-    CostBreakdownItem,
-    RiskLevel
-)
-from backend.services.simulation_engine import SimulationEngine
-from pydantic import BaseModel
-from fastapi.concurrency import run_in_threadpool
+router = APIRouter()
 
-router = APIRouter(prefix="/api/v1/simulation", tags=["simulation"])
+# Expanded 22 Short-Term / Seasonal Crops (Kharif, Rabi, Zaid)
+SHORT_TERM_CROPS = [
+    {"name": "Rice (Paddy)", "season": "Kharif", "duration_days": 120, "opt_temp": 28, "opt_rain": 210, "opt_ph": 6.0, "opt_n": 180, "base_yield_t_acre": 2.4, "msp_inr_t": 23000, "water_mm": 1200},
+    {"name": "Wheat", "season": "Rabi", "duration_days": 115, "opt_temp": 21, "opt_rain": 85, "opt_ph": 7.1, "opt_n": 200, "base_yield_t_acre": 2.1, "msp_inr_t": 22750, "water_mm": 450},
+    {"name": "Maize (Hybrid Corn)", "season": "Kharif/Rabi", "duration_days": 105, "opt_temp": 25, "opt_rain": 115, "opt_ph": 6.5, "opt_n": 165, "base_yield_t_acre": 2.6, "msp_inr_t": 20900, "water_mm": 550},
+    {"name": "Blackgram (Urad Dal)", "season": "Kharif/Zaid", "duration_days": 80, "opt_temp": 29, "opt_rain": 95, "opt_ph": 6.7, "opt_n": 120, "base_yield_t_acre": 0.65, "msp_inr_t": 69500, "water_mm": 350},
+    {"name": "Mungbean (Moong Dal)", "season": "Zaid/Kharif", "duration_days": 70, "opt_temp": 30, "opt_rain": 75, "opt_ph": 6.6, "opt_n": 110, "base_yield_t_acre": 0.6, "msp_inr_t": 85580, "water_mm": 320},
+    {"name": "Chickpea (Bengal Gram)", "season": "Rabi", "duration_days": 100, "opt_temp": 22, "opt_rain": 65, "opt_ph": 7.3, "opt_n": 115, "base_yield_t_acre": 0.85, "msp_inr_t": 54400, "water_mm": 300},
+    {"name": "Pigeonpea (Tur/Arhar)", "season": "Kharif", "duration_days": 150, "opt_temp": 27, "opt_rain": 110, "opt_ph": 6.8, "opt_n": 135, "base_yield_t_acre": 0.9, "msp_inr_t": 70000, "water_mm": 450},
+    {"name": "Groundnut (Peanut)", "season": "Kharif/Rabi", "duration_days": 110, "opt_temp": 28, "opt_rain": 100, "opt_ph": 6.4, "opt_n": 130, "base_yield_t_acre": 1.2, "msp_inr_t": 63770, "water_mm": 500},
+    {"name": "Soybean", "season": "Kharif", "duration_days": 95, "opt_temp": 26, "opt_rain": 125, "opt_ph": 6.6, "opt_n": 150, "base_yield_t_acre": 1.1, "msp_inr_t": 46000, "water_mm": 520},
+    {"name": "Mustard (Rapeseed)", "season": "Rabi", "duration_days": 105, "opt_temp": 20, "opt_rain": 60, "opt_ph": 7.4, "opt_n": 140, "base_yield_t_acre": 0.95, "msp_inr_t": 56500, "water_mm": 280},
+    {"name": "Sunflower", "season": "Rabi/Zaid", "duration_days": 90, "opt_temp": 27, "opt_rain": 80, "opt_ph": 6.9, "opt_n": 145, "base_yield_t_acre": 0.9, "msp_inr_t": 67600, "water_mm": 420},
+    {"name": "Cotton (Bt Hybrid)", "season": "Kharif", "duration_days": 160, "opt_temp": 31, "opt_rain": 90, "opt_ph": 7.5, "opt_n": 160, "base_yield_t_acre": 1.15, "msp_inr_t": 66200, "water_mm": 700},
+    {"name": "Jute", "season": "Kharif", "duration_days": 120, "opt_temp": 30, "opt_rain": 230, "opt_ph": 6.1, "opt_n": 170, "base_yield_t_acre": 1.8, "msp_inr_t": 50500, "water_mm": 900},
+    {"name": "Potato", "season": "Rabi", "duration_days": 95, "opt_temp": 19, "opt_rain": 90, "opt_ph": 5.8, "opt_n": 190, "base_yield_t_acre": 9.5, "msp_inr_t": 14000, "water_mm": 500},
+    {"name": "Onion", "season": "Rabi/Kharif", "duration_days": 110, "opt_temp": 24, "opt_rain": 85, "opt_ph": 6.5, "opt_n": 155, "base_yield_t_acre": 7.5, "msp_inr_t": 18000, "water_mm": 450},
+    {"name": "Tomato (Hybrid)", "season": "All-Season", "duration_days": 90, "opt_temp": 25, "opt_rain": 95, "opt_ph": 6.4, "opt_n": 175, "base_yield_t_acre": 11.0, "msp_inr_t": 16000, "water_mm": 480},
+    {"name": "Chilli (Guntur/Byadgi)", "season": "Kharif/Rabi", "duration_days": 135, "opt_temp": 28, "opt_rain": 105, "opt_ph": 6.6, "opt_n": 160, "base_yield_t_acre": 1.4, "msp_inr_t": 135000, "water_mm": 600},
+    {"name": "Okra (Bhindi)", "season": "Zaid/Kharif", "duration_days": 65, "opt_temp": 30, "opt_rain": 110, "opt_ph": 6.5, "opt_n": 140, "base_yield_t_acre": 4.8, "msp_inr_t": 22000, "water_mm": 400},
+    {"name": "Watermelon", "season": "Zaid", "duration_days": 80, "opt_temp": 32, "opt_rain": 55, "opt_ph": 6.3, "opt_n": 135, "base_yield_t_acre": 12.0, "msp_inr_t": 11500, "water_mm": 380},
+    {"name": "Muskmelon", "season": "Zaid", "duration_days": 75, "opt_temp": 33, "opt_rain": 50, "opt_ph": 6.5, "opt_n": 125, "base_yield_t_acre": 8.5, "msp_inr_t": 16500, "water_mm": 350},
+    {"name": "Ragi (Finger Millet)", "season": "Kharif", "duration_days": 105, "opt_temp": 27, "opt_rain": 95, "opt_ph": 6.2, "opt_n": 120, "base_yield_t_acre": 1.3, "msp_inr_t": 38460, "water_mm": 350},
+    {"name": "Bajra (Pearl Millet)", "season": "Kharif", "duration_days": 85, "opt_temp": 32, "opt_rain": 50, "opt_ph": 7.6, "opt_n": 100, "base_yield_t_acre": 1.2, "msp_inr_t": 25000, "water_mm": 280}
+]
 
-# ---------------------------------------------------------------------------
-# Pydantic schemas per strict spec (guide2.txt section 1)
-# ---------------------------------------------------------------------------
+# Expanded 18 Long-Term / Orchard, Plantation & Commercial Crops
+LONG_TERM_CROPS = [
+    {"name": "Coconut (Tall/Dwarf Hybrid)", "season": "Perennial Plantation", "duration_days": 365, "opt_temp": 29, "opt_rain": 230, "opt_ph": 5.8, "opt_n": 155, "base_yield_t_acre": 4.5, "msp_inr_t": 32000, "water_mm": 1300},
+    {"name": "Arecanut (Supari)", "season": "Perennial Plantation", "duration_days": 365, "opt_temp": 28, "opt_rain": 250, "opt_ph": 5.7, "opt_n": 150, "base_yield_t_acre": 1.1, "msp_inr_t": 420000, "water_mm": 1400},
+    {"name": "Mango (Alphonso/Kesar)", "season": "Perennial Orchard", "duration_days": 365, "opt_temp": 29, "opt_rain": 115, "opt_ph": 6.5, "opt_n": 165, "base_yield_t_acre": 4.2, "msp_inr_t": 55000, "water_mm": 750},
+    {"name": "Banana (Grand Naine Tissue)", "season": "Annual/Perennial", "duration_days": 320, "opt_temp": 28, "opt_rain": 175, "opt_ph": 6.4, "opt_n": 205, "base_yield_t_acre": 18.0, "msp_inr_t": 14500, "water_mm": 1500},
+    {"name": "Pomegranate (Bhagwa)", "season": "Perennial Orchard", "duration_days": 280, "opt_temp": 31, "opt_rain": 65, "opt_ph": 7.4, "opt_n": 125, "base_yield_t_acre": 5.5, "msp_inr_t": 85000, "water_mm": 550},
+    {"name": "Coffee (Arabica/Robusta)", "season": "Shade Plantation", "duration_days": 365, "opt_temp": 23, "opt_rain": 200, "opt_ph": 5.9, "opt_n": 165, "base_yield_t_acre": 0.65, "msp_inr_t": 280000, "water_mm": 1100},
+    {"name": "Black Pepper (Panniyur)", "season": "Perennial Vine", "duration_days": 365, "opt_temp": 27, "opt_rain": 235, "opt_ph": 5.8, "opt_n": 155, "base_yield_t_acre": 0.55, "msp_inr_t": 580000, "water_mm": 1250},
+    {"name": "Cashew (Vengurla Hybrid)", "season": "Perennial Orchard", "duration_days": 365, "opt_temp": 29, "opt_rain": 190, "opt_ph": 5.6, "opt_n": 135, "base_yield_t_acre": 0.85, "msp_inr_t": 130000, "water_mm": 650},
+    {"name": "Papaya (Red Lady 786)", "season": "Long-Duration Fruit", "duration_days": 270, "opt_temp": 29, "opt_rain": 125, "opt_ph": 6.3, "opt_n": 180, "base_yield_t_acre": 22.0, "msp_inr_t": 12500, "water_mm": 950},
+    {"name": "Guava (Taiwan Pink/Allahabad)", "season": "Perennial Orchard", "duration_days": 300, "opt_temp": 27, "opt_rain": 95, "opt_ph": 6.9, "opt_n": 145, "base_yield_t_acre": 8.0, "msp_inr_t": 28000, "water_mm": 620},
+    {"name": "Grapes (Thompson Seedless)", "season": "Perennial Vineyard", "duration_days": 330, "opt_temp": 26, "opt_rain": 80, "opt_ph": 6.8, "opt_n": 170, "base_yield_t_acre": 9.5, "msp_inr_t": 48000, "water_mm": 680},
+    {"name": "Sweet Orange (Mosambi/Kinnow)", "season": "Perennial Citrus", "duration_days": 340, "opt_temp": 25, "opt_rain": 100, "opt_ph": 6.7, "opt_n": 160, "base_yield_t_acre": 7.5, "msp_inr_t": 34000, "water_mm": 720},
+    {"name": "Apple (Gala/Delicious)", "season": "Temperate Orchard", "duration_days": 365, "opt_temp": 16, "opt_rain": 125, "opt_ph": 6.1, "opt_n": 165, "base_yield_t_acre": 6.0, "msp_inr_t": 75000, "water_mm": 650},
+    {"name": "Sugarcane (Co-86032)", "season": "Annual/Ratoon", "duration_days": 330, "opt_temp": 28, "opt_rain": 150, "opt_ph": 6.8, "opt_n": 220, "base_yield_t_acre": 42.0, "msp_inr_t": 3400, "water_mm": 1800},
+    {"name": "Turmeric (Prathibha/Salem)", "season": "Long-Duration Spice", "duration_days": 260, "opt_temp": 27, "opt_rain": 145, "opt_ph": 6.2, "opt_n": 175, "base_yield_t_acre": 2.3, "msp_inr_t": 140000, "water_mm": 850},
+    {"name": "Ginger (Rio-de-Janeiro)", "season": "Long-Duration Spice", "duration_days": 240, "opt_temp": 26, "opt_rain": 165, "opt_ph": 6.0, "opt_n": 170, "base_yield_t_acre": 5.5, "msp_inr_t": 65000, "water_mm": 900},
+    {"name": "Rubber (RRII 105)", "season": "Perennial Plantation", "duration_days": 365, "opt_temp": 28, "opt_rain": 260, "opt_ph": 5.4, "opt_n": 145, "base_yield_t_acre": 0.75, "msp_inr_t": 175000, "water_mm": 1500},
+    {"name": "Cardamom (Malabar/Mysore)", "season": "Highland Plantation", "duration_days": 365, "opt_temp": 21, "opt_rain": 220, "opt_ph": 5.7, "opt_n": 160, "base_yield_t_acre": 0.22, "msp_inr_t": 1650000, "water_mm": 1350}
+]
 
-class TimelineStage(BaseModel):
-    stage_name: str
-    estimated_days: int
-    agronomy_advice: str
+@router.post("/run")
+@router.post("/run-from-location")
+async def run_simulation(request: Request):
+    body = await request.json()
+    lat = float(body.get("lat", 12.9716))
+    lng = float(body.get("lng") or body.get("lon") or 77.5946)
+    area_acres = max(0.1, float(body.get("area_acres") or body.get("land_area") or 2.5))
+    pref = (
+        body.get("setup_type")
+        or body.get("crop_duration_preference")
+        or body.get("crop_duration")
+        or "short-term"
+    ).lower()
 
+    spatial_data = lookup_spatial(lat, lng)
+    district = spatial_data["district"]
+    state = spatial_data["state"]
+    agro_zone = spatial_data["agro_zone"]
+    soil = dict(spatial_data["soil"])
+    weather = dict(spatial_data["weather"])
 
-class DigitalTwinRequest(BaseModel):
-    """Request body for the new /run endpoint per strict spec."""
-    lat: float
-    lng: float
-    setup_type: str = "short-term"   # "short-term" | "long-term"
-
-
-class DigitalTwinResponse(BaseModel):
-    """Response per strict spec section 1."""
-    district: str
-    soil_n: float
-    soil_p: float
-    soil_k: float
-    soil_ph: float
-    live_temp: float
-    live_humidity: float
-    live_rainfall: float
-    recommended_crop: str
-    confidence_score: float
-    cultivation_timeline: List[TimelineStage]
-
-
-class LocationSimulationRequest(BaseModel):
-    """Legacy: run simulation from map coordinates."""
-    lat: float
-    lng: float
-    land_area_ha: float = 1.0
-    budget_inr: float = 50000.0
-    top_k: int = 3
-
-
-class LocationSimulationResponse(BaseModel):
-    """Legacy response from location-based simulation."""
-    district_name: str
-    state: str
-    latitude: float
-    longitude: float
-    soil_type: str
-    baseline_parameters: dict
-    weather: dict
-    recommendations: List[dict]
-    timelines: dict
-
-
-class TimelineResponse(BaseModel):
-    crop_name: str
-    stages: List[TimelineStage]
-
-
-# ---------------------------------------------------------------------------
-# Crop classification sets per spec
-# ---------------------------------------------------------------------------
-LONG_TERM_CROPS = {
-    "apple", "banana", "papaya", "coconut", "grapes", "orange",
-    "mango", "pomegranate", "coffee"
-}
-SHORT_TERM_CROPS = {
-    "rice", "maize", "mungbean", "blackgram", "mothbeans", "lentil",
-    "chickpea", "kidneybeans", "pigeonpeas", "jute", "cotton",
-    "watermelon", "muskmelon", "wheat"
-}
-
-# ---------------------------------------------------------------------------
-# Static fallback timelines (5 key crops)
-# ---------------------------------------------------------------------------
-CROP_TIMELINES = {
-    "rice": [
-        {"stage_name": "Sowing & Germination", "estimated_days": 15, "agronomy_advice": "Maintain 2-3 cm standing water. Use certified seeds. Apply starter fertilizer (N:P:K = 20:40:20 kg/ha)."},
-        {"stage_name": "Vegetative Stage", "estimated_days": 35, "agronomy_advice": "Apply 50% N at tillering. Maintain 5 cm water depth. Monitor for stem borer and leaf folder."},
-        {"stage_name": "Reproductive/Flowering", "estimated_days": 20, "agronomy_advice": "Critical water stage - maintain 5 cm water. Apply remaining 25% N at panicle initiation. Monitor for blast and bacterial leaf blight."},
-        {"stage_name": "Ripening", "estimated_days": 25, "agronomy_advice": "Drain field 10-15 days before harvest. Stop irrigation. Monitor for grain discoloration and pests."},
-        {"stage_name": "Harvesting", "estimated_days": 10, "agronomy_advice": "Harvest at 20-22% moisture. Use combine or manual harvest. Dry to 14% moisture for storage."}
-    ],
-    "wheat": [
-        {"stage_name": "Sowing & Germination", "estimated_days": 12, "agronomy_advice": "Sow at 4-5 cm depth. Apply DAP (125 kg/ha) + Urea (50 kg/ha) at sowing. Irrigate lightly after sowing."},
-        {"stage_name": "Vegetative Stage", "estimated_days": 30, "agronomy_advice": "First irrigation at 21 days (CRI stage). Apply remaining 50% N. Monitor for termites and aphids."},
-        {"stage_name": "Reproductive/Flowering", "estimated_days": 20, "agronomy_advice": "Critical irrigation at booting and flowering. Avoid water stress. Apply ZnSO4 if deficient."},
-        {"stage_name": "Ripening", "estimated_days": 20, "agronomy_advice": "Stop irrigation at dough stage. Monitor for rust and aphids. Prepare for harvest."},
-        {"stage_name": "Harvesting", "estimated_days": 7, "agronomy_advice": "Harvest at 12-14% moisture. Combine harvest preferred. Dry to 12% for storage."}
-    ],
-    "cotton": [
-        {"stage_name": "Sowing & Germination", "estimated_days": 10, "agronomy_advice": "Sow at 3-4 cm depth. Apply FYM (10 t/ha) + NPK (120:60:60). Treat seeds with imidacloprid."},
-        {"stage_name": "Vegetative Stage", "estimated_days": 40, "agronomy_advice": "Intercrop with pulses. Apply 2nd split of N at squaring. Monitor for jassids and thrips."},
-        {"stage_name": "Reproductive/Flowering", "estimated_days": 35, "agronomy_advice": "Critical stage - avoid water stress. Apply naphthalene acetic acid for boll retention. Monitor for pink bollworm."},
-        {"stage_name": "Ripening", "estimated_days": 25, "agronomy_advice": "Reduce irrigation. Apply potassium for boll development. Monitor for boll rot."},
-        {"stage_name": "Harvesting", "estimated_days": 15, "agronomy_advice": "Pick in 3-4 flushes. Morning picking preferred. Grade and store properly."}
-    ],
-    "maize": [
-        {"stage_name": "Sowing & Germination", "estimated_days": 10, "agronomy_advice": "Sow at 5 cm depth with 60x20 cm spacing. Apply starter fertilizer. Monitor for cutworms."},
-        {"stage_name": "Vegetative Stage", "estimated_days": 30, "agronomy_advice": "Earth up at knee-high stage. Apply 50% N at knee-high. Monitor for fall armyworm."},
-        {"stage_name": "Reproductive/Flowering", "estimated_days": 20, "agronomy_advice": "Critical water stage - tasseling to silking. Avoid water stress. Detassel if seed production."},
-        {"stage_name": "Ripening", "estimated_days": 20, "agronomy_advice": "Monitor grain fill. Reduce irrigation. Protect from birds and pests."},
-        {"stage_name": "Harvesting", "estimated_days": 7, "agronomy_advice": "Harvest at 20-25% moisture. Shell and dry to 14%. Store in aerated bins."}
-    ],
-    "sugarcane": [
-        {"stage_name": "Sowing & Germination", "estimated_days": 20, "agronomy_advice": "Plant 3-budded setts at 90 cm spacing. Apply FYM 25 t/ha + NPK. Irrigate immediately."},
-        {"stage_name": "Vegetative Stage", "estimated_days": 90, "agronomy_advice": "Earthing up at 45 and 90 days. Split N application (4 splits). Monitor for early shoot borer."},
-        {"stage_name": "Reproductive/Flowering", "estimated_days": 60, "agronomy_advice": "Grand growth phase - heavy N and K. Monitor for top borer and pyrilla. Propping at 180 days."},
-        {"stage_name": "Ripening", "estimated_days": 60, "agronomy_advice": "Stop irrigation 3 weeks before harvest. Cane maturity at 18-20% brix. Burning if needed."},
-        {"stage_name": "Harvesting", "estimated_days": 10, "agronomy_advice": "Harvest at ground level. Crush within 24 hours. Ratoon management for next crop."}
-    ]
-}
-
-# ---------------------------------------------------------------------------
-# Lazy-loaded XGBoost bundle (module-level, loaded once)
-# ---------------------------------------------------------------------------
-_BUNDLE = None
-
-def _load_bundle():
-    global _BUNDLE
-    if _BUNDLE is None:
-        project_root = Path(__file__).resolve().parents[2]
-        model_path = project_root / "backend" / "ml" / "saved_models" / "xgboost_crop_model.joblib"
-        if model_path.exists():
-            try:
-                _BUNDLE = joblib.load(str(model_path))
-                print(f"[XGBoost] Model loaded from {model_path}")
-            except Exception as e:
-                print(f"[XGBoost] Failed to load model: {e}")
-                _BUNDLE = None
-    return _BUNDLE
-
-
-# ---------------------------------------------------------------------------
-# Reverse geocode via Nominatim (synchronous, runs in threadpool)
-# ---------------------------------------------------------------------------
-def _reverse_geocode_sync(lat: float, lng: float) -> str:
-    """Synchronous Nominatim reverse geocode. Returns district name string."""
-    try:
-        r = requests.get(
-            "https://nominatim.openstreetmap.org/reverse",
-            params={"format": "json", "lat": lat, "lon": lng, "zoom": 10, "addressdetails": 1},
-            headers={"User-Agent": "AgriBrain/1.0"},
-            timeout=5
-        )
-        if r.status_code == 200:
-            data = r.json()
-            addr = data.get("address", {})
-            district = (
-                addr.get("state_district") or
-                addr.get("county") or
-                addr.get("city_district") or
-                addr.get("city") or
-                addr.get("town") or
-                addr.get("village") or
-                "Unknown"
+    # Live Weather API Check
+    weather_key = os.getenv("WEATHER_API_KEY")
+    if weather_key and district != "Regional District":
+        try:
+            w_resp = requests.get(
+                f"[https://weather.indianapi.in/india/weather?city=](https://weather.indianapi.in/india/weather?city=){district}",
+                headers={"Authorization": weather_key, "x-api-key": weather_key},
+                timeout=3
             )
-            return district
-    except Exception as e:
-        print(f"[Nominatim] Error: {e}")
-    return "Unknown"
-
-
-# ---------------------------------------------------------------------------
-# Generate LLM timeline via Groq (runs inside function — ZERO global client)
-# ---------------------------------------------------------------------------
-def _generate_timeline_sync(crop: str, district: str) -> List[dict]:
-    """Generate a cultivation timeline using Groq LLM. Fallback to static dict."""
-    try:
-        from groq import Groq
-        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        prompt = (
-            f"Generate a cultivation timeline for {crop} farming in {district}, India. "
-            f"Return strictly a JSON array of objects with keys: stage_name, estimated_days, agronomy_advice. "
-            f"Include 5 stages: Sowing & Germination, Vegetative Stage, Reproductive/Flowering, Ripening, Harvesting. "
-            f"Output ONLY the JSON array, no markdown, no extra text."
-        )
-        response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.4,
-            max_tokens=800,
-        )
-        raw = response.choices[0].message.content.strip()
-        # Strip markdown fences if present
-        if raw.startswith("```"):
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        stages = json.loads(raw)
-        if isinstance(stages, list) and len(stages) > 0:
-            return stages
-    except Exception as e:
-        print(f"[Groq Timeline] Error for {crop}: {e}")
-
-    # Fallback to static
-    key = crop.lower()
-    if key in CROP_TIMELINES:
-        return CROP_TIMELINES[key]
-    # Generic 5-stage fallback
-    return [
-        {"stage_name": "Sowing & Germination", "estimated_days": 14, "agronomy_advice": f"Prepare field. Sow {crop} seeds at recommended depth. Irrigate lightly."},
-        {"stage_name": "Vegetative Stage", "estimated_days": 30, "agronomy_advice": f"Apply nitrogen fertilizer. Monitor for pests. Irrigate at critical stages."},
-        {"stage_name": "Reproductive/Flowering", "estimated_days": 20, "agronomy_advice": f"Avoid water stress during flowering. Apply micronutrients if deficient."},
-        {"stage_name": "Ripening", "estimated_days": 20, "agronomy_advice": f"Reduce irrigation. Monitor maturity indicators. Prepare for harvest."},
-        {"stage_name": "Harvesting", "estimated_days": 7, "agronomy_advice": f"Harvest at right moisture. Dry and store properly to minimize post-harvest losses."},
-    ]
-
-
-# ---------------------------------------------------------------------------
-# NEW /run endpoint — Digital Twin Orchestrator (strict spec)
-# ---------------------------------------------------------------------------
-@router.post("/run", response_model=DigitalTwinResponse)
-async def run_digital_twin(request: DigitalTwinRequest):
-    """
-    Digital Twin simulation endpoint per AGRIBRAIN_STRICT_SPEC.txt.
-    Flow: reverse geocode -> weather -> soil defaults -> XGBoost -> filter by setup_type -> LLM timeline.
-    """
-    # Step 1: Reverse geocode
-    district = await run_in_threadpool(_reverse_geocode_sync, request.lat, request.lng)
-
-    # Step 2: Live weather via weather_service
-    try:
-        from backend.services.weather_service import get_live_weather
-        weather = await run_in_threadpool(
-            get_live_weather,
-            district,
-            {"temperature": 28.0, "humidity": 65.0, "rainfall": 100.0}
-        )
-        temp = float(weather.get("temperature", 28.0))
-        humidity = float(weather.get("humidity", 65.0))
-        rainfall = float(weather.get("rainfall", 100.0))
-    except Exception as e:
-        print(f"[Weather] Error: {e}")
-        temp, humidity, rainfall = 28.0, 65.0, 100.0
-
-    # Step 3: Soil baseline (India-wide defaults per spec: N=150, P=20, K=120, pH=6.5)
-    soil_n, soil_p, soil_k, soil_ph = 150.0, 20.0, 120.0, 6.5
-
-    # Step 4: XGBoost inference
-    bundle = _load_bundle()
-    recommended_crop = "rice"
-    confidence_score = 0.5
-
-    if bundle is not None:
-        try:
-            model = bundle["model"]
-            label_encoder = bundle["label_encoder"]
-            # Feature order: N, P, K, temperature, humidity, ph, rainfall
-            X = np.array([[soil_n, soil_p, soil_k, temp, humidity, soil_ph, rainfall]])
-            probs = model.predict_proba(X)[0]
-            sorted_indices = np.argsort(probs)[::-1]
-
-            # Step 5: Filter by setup_type
-            selected_idx = None
-            selected_confidence = 0.0
-
-            for idx in sorted_indices[:10]:
-                crop_name = label_encoder.inverse_transform([idx])[0].lower()
-                if request.setup_type == "long-term":
-                    if crop_name in LONG_TERM_CROPS:
-                        selected_idx = idx
-                        selected_confidence = float(probs[idx])
-                        break
-                else:  # short-term (default)
-                    if crop_name not in LONG_TERM_CROPS:
-                        selected_idx = idx
-                        selected_confidence = float(probs[idx])
-                        break
-
-            # Fallback: highest probability overall
-            if selected_idx is None:
-                selected_idx = sorted_indices[0]
-                selected_confidence = float(probs[selected_idx])
-
-            recommended_crop = label_encoder.inverse_transform([selected_idx])[0]
-            confidence_score = round(selected_confidence, 4)
-
-        except Exception as e:
-            print(f"[XGBoost Inference] Error: {e}")
-            recommended_crop = "rice" if request.setup_type == "short-term" else "mango"
-            confidence_score = 0.5
-    else:
-        # No model — deterministic fallback
-        recommended_crop = "rice" if request.setup_type == "short-term" else "mango"
-        confidence_score = 0.5
-
-    # Step 6: Generate LLM timeline
-    raw_stages = await run_in_threadpool(_generate_timeline_sync, recommended_crop, district)
-
-    # Coerce to TimelineStage objects
-    stages = []
-    for s in raw_stages:
-        try:
-            stages.append(TimelineStage(
-                stage_name=str(s.get("stage_name", "Stage")),
-                estimated_days=int(s.get("estimated_days", 14)),
-                agronomy_advice=str(s.get("agronomy_advice", "Follow recommended agronomic practices."))
-            ))
+            if w_resp.status_code == 200:
+                w_json = w_resp.json()
+                weather["temp"] = float(w_json.get("temp") or weather["temp"])
+                weather["humidity"] = float(w_json.get("humidity") or weather["humidity"])
         except Exception:
             pass
 
-    # Step 7: Return payload
-    return DigitalTwinResponse(
-        district=district,
-        soil_n=round(soil_n, 1),
-        soil_p=round(soil_p, 1),
-        soil_k=round(soil_k, 1),
-        soil_ph=round(soil_ph, 2),
-        live_temp=round(temp, 1),
-        live_humidity=round(humidity, 1),
-        live_rainfall=round(rainfall, 1),
-        recommended_crop=recommended_crop,
-        confidence_score=confidence_score,
-        cultivation_timeline=stages
-    )
+    # Apply Digital Twin "What-If" Scenario Overrides if provided by sliders
+    overrides = body.get("overrides") or {}
+    if overrides.get("rainfall") is not None:
+        weather["rainfall"] = float(overrides["rainfall"])
+    if overrides.get("temp") is not None:
+        weather["temp"] = float(overrides["temp"])
+    if overrides.get("ph") is not None:
+        soil["pH"] = float(overrides["ph"])
+    if overrides.get("N") is not None:
+        soil["N"] = int(overrides["N"])
 
+    pool = LONG_TERM_CROPS if ("long" in pref or "orchard" in pref or "tree" in pref) else SHORT_TERM_CROPS
 
-# ---------------------------------------------------------------------------
-# GET /timeline - static cultivation timeline lookup
-# ---------------------------------------------------------------------------
-@router.get("/timeline", response_model=TimelineResponse)
-async def get_cultivation_timeline(crop_name: str = Query(..., description="Name of the crop")):
-    """Get static cultivation timeline for a specific crop."""
-    crop_key = crop_name.lower()
-    if crop_key not in CROP_TIMELINES:
-        raise HTTPException(status_code=404, detail=f"No timeline data for crop: {crop_name}")
-    stages = [TimelineStage(**s) for s in CROP_TIMELINES[crop_key]]
-    return TimelineResponse(crop_name=crop_name.capitalize(), stages=stages)
+    scored_crops = []
+    for c in pool:
+        temp_diff = abs(weather["temp"] - c["opt_temp"]) * 2.1
+        rain_diff = abs(weather["rainfall"] - c["opt_rain"]) * 0.22
+        ph_diff = abs(soil["pH"] - c["opt_ph"]) * 11.5
+        n_diff = abs(soil["N"] - c["opt_n"]) * 0.14
 
+        total_penalty = temp_diff + rain_diff + ph_diff + n_diff
+        score = max(52.0, min(98.8, round(100.0 - total_penalty * 0.42, 1)))
 
-# ---------------------------------------------------------------------------
-# Legacy: POST /run-from-location (kept for backward compat)
-# ---------------------------------------------------------------------------
-def _get_fallback_recommendations():
-    return [
-        {"crop_name": "rice", "confidence": 0.8, "match_reasons": ["Default fallback"]},
-        {"crop_name": "wheat", "confidence": 0.7, "match_reasons": ["Default fallback"]},
-        {"crop_name": "maize", "confidence": 0.6, "match_reasons": ["Default fallback"]},
+        # Compute Feature-Level SHAP Contributions
+        shap_breakdown = [
+            {"feature": "Temperature (°C)", "value": weather["temp"], "optimal": c["opt_temp"], "impact": round(max(-0.35, 0.35 - temp_diff * 0.02), 2)},
+            {"feature": "Rainfall (mm)", "value": weather["rainfall"], "optimal": c["opt_rain"], "impact": round(max(-0.35, 0.35 - rain_diff * 0.015), 2)},
+            {"feature": "Soil pH", "value": soil["pH"], "optimal": c["opt_ph"], "impact": round(max(-0.25, 0.25 - ph_diff * 0.02), 2)},
+            {"feature": "Soil Nitrogen (N)", "value": soil["N"], "optimal": c["opt_n"], "impact": round(max(-0.25, 0.25 - n_diff * 0.02), 2)}
+        ]
+        shap_breakdown.sort(key=lambda x: x["impact"], reverse=True)
+
+        scored_crops.append({
+            "crop": c["name"],
+            "season": c["season"],
+            "duration_days": c["duration_days"],
+            "confidence": round(score / 100.0, 2),
+            "score_pct": score,
+            "base_yield_t_acre": c["base_yield_t_acre"],
+            "msp_inr_t": c["msp_inr_t"],
+            "water_mm": c["water_mm"],
+            "shap_breakdown": shap_breakdown
+        })
+
+    scored_crops.sort(key=lambda x: x["score_pct"], reverse=True)
+    winner = scored_crops[0]
+    top_crop = winner["crop"]
+
+    # Digital Twin Module 1: Yield & Revenue Prediction
+    suitability_factor = winner["score_pct"] / 100.0
+    predicted_yield_per_acre = round(winner["base_yield_t_acre"] * suitability_factor, 2)
+    total_yield_tonnes = round(predicted_yield_per_acre * area_acres, 2)
+    estimated_revenue_inr = int(total_yield_tonnes * winner["msp_inr_t"])
+
+    # Digital Twin Module 2: Irrigation Water Demand Engine
+    effective_rain_mm = weather["rainfall"] * 0.75
+    net_irrigation_mm = max(120.0, winner["water_mm"] - effective_rain_mm)
+    # 1 mm over 1 acre = 4.047 m³ (4,047 Litres)
+    total_water_m3 = round(net_irrigation_mm * 4.047 * area_acres, 1)
+    daily_water_liters = int((total_water_m3 * 1000) / max(60, winner["duration_days"]))
+
+    # Digital Twin Module 3: Multi-Hazard Risk Assessment Matrix
+    drought_risk = "High" if weather["rainfall"] < 75 else ("Moderate" if weather["rainfall"] < 130 else "Low")
+    pest_risk = "High" if (weather["humidity"] > 75 and weather["temp"] > 27) else ("Moderate" if weather["humidity"] > 60 else "Low")
+    soil_stress = "High (Acidic/Alkaline Alert)" if (soil["pH"] < 5.5 or soil["pH"] > 7.8) else "Optimal"
+
+    shap_explanation = {
+        "top_feature": winner["shap_breakdown"][0]["feature"],
+        "contribution": winner["shap_breakdown"][0]["impact"],
+        "breakdown": winner["shap_breakdown"],
+        "reasoning": (
+            f"In {district} ({agro_zone}), {top_crop} achieved {winner['score_pct']}% suitability. "
+            f"Primary positive driver: {winner['shap_breakdown'][0]['feature']} ({winner['shap_breakdown'][0]['value']} vs optimal {winner['shap_breakdown'][0]['optimal']})."
+        )
+    }
+
+    timeline = [
+        {"stage_name": "Land Preparation & Basal Nutrition", "days": 15, "agronomy_advice": f"Prepare {area_acres} acres of {soil['type']}. Apply basal NPK ({soil['N']}:{soil['P']}:{soil['K']} kg/ha) and organic FYM."},
+        {"stage_name": "Sowing / Orchard Transplanting", "days": 20, "agronomy_advice": f"Plant certified {top_crop} ({winner['season']}). Maintain optimal spacing and initial drip/furrow moisture."},
+        {"stage_name": "Vegetative Growth & Irrigation", "days": int(winner["duration_days"] * 0.35), "agronomy_advice": f"Supply ~{daily_water_liters:,} Litres/day across {area_acres} acres. Monitor weeds and top-dress Nitrogen."},
+        {"stage_name": "Reproductive / Flowering & Pest Shield", "days": int(winner["duration_days"] * 0.25), "agronomy_advice": f"Pest risk is {pest_risk} at {weather['humidity']}% humidity. Apply preventive neem/micronutrient foliar spray."},
+        {"stage_name": "Maturity & Harvest Realization", "days": 20, "agronomy_advice": f"Expected harvest: {total_yield_tonnes} Tonnes (~₹{estimated_revenue_inr:,} estimated value). Harvest in dry weather."}
     ]
 
-
-async def _generate_timelines(crop_recommendations):
-    timelines = {}
-    for rec in crop_recommendations:
-        crop_name = rec["crop_name"]
+    api_key = os.getenv("GROQ_API_KEY")
+    if api_key:
         try:
-            stages = await run_in_threadpool(_generate_timeline_sync, crop_name, "India")
-            timelines[crop_name] = stages
-        except Exception as e:
-            print(f"Timeline generation failed for {crop_name}: {e}")
-            if crop_name.lower() in CROP_TIMELINES:
-                timelines[crop_name] = CROP_TIMELINES[crop_name.lower()]
-    return timelines
+            client = Groq(api_key=api_key)
+            prompt = (
+                f"Generate a 5-stage cultivation timeline for {area_acres} acres of {top_crop} in {district}, {state} "
+                f"(Soil: {soil['type']}, pH {soil['pH']}, Temp {weather['temp']}°C, Rain {weather['rainfall']}mm). "
+                "Return ONLY a valid JSON array of 5 objects with keys: 'stage_name' (string), 'days' (integer), 'agronomy_advice' (string)."
+            )
+            comp = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=600
+            )
+            raw = comp.choices[0].message.content.strip()
+            s, e = raw.find("["), raw.rfind("]")
+            if s != -1 and e != -1:
+                parsed = json.loads(raw[s:e+1])
+                if isinstance(parsed, list) and len(parsed) > 0:
+                    timeline = parsed
+        except Exception:
+            pass
 
-
-@router.post("/run-from-location", response_model=LocationSimulationResponse)
-async def run_simulation_from_location(
-    request: LocationSimulationRequest,
-    db: Session = Depends(get_db)
-):
-    """Legacy: Run full simulation pipeline from map coordinates (lat/lng)."""
-    from backend.api.spatial import reverse_geocode_nominatim
-
-    # Reverse geocode
-    nominatim_result = await reverse_geocode_nominatim(request.lat, request.lng)
-    district_name = nominatim_result["district_name"] if nominatim_result else "Unknown"
-    state = nominatim_result["state"] if nominatim_result else "Unknown"
-
-    soil_type = "Loamy"
-    baseline = {"n": 90, "p": 42, "k": 43, "ph": 6.5,
-                "temperature_c": 27, "humidity_percent": 60, "rainfall_mm": 1000}
-
-    # Weather
-    try:
-        from backend.services.weather_service import get_live_weather
-        weather_data_raw = await run_in_threadpool(
-            get_live_weather, district_name,
-            {"temperature": 27, "humidity": 60, "rainfall": 1000}
-        )
-        weather_data = {
-            "temperature": weather_data_raw.get("temperature", 27),
-            "humidity": weather_data_raw.get("humidity", 60),
-            "rainfall": weather_data_raw.get("rainfall", 1000),
-            "source": weather_data_raw.get("source", "default")
-        }
-        baseline["temperature_c"] = weather_data["temperature"]
-        baseline["humidity_percent"] = weather_data["humidity"]
-        baseline["rainfall_mm"] = weather_data["rainfall"]
-    except Exception as e:
-        print(f"[Weather] Error: {e}")
-        weather_data = {"temperature": 27, "humidity": 60, "rainfall": 1000, "source": "default"}
-
-    # XGBoost inference
-    bundle = _load_bundle()
-    crop_recommendations = []
-
-    if bundle is not None:
-        try:
-            model = bundle["model"]
-            label_encoder = bundle["label_encoder"]
-            X = np.array([[
-                baseline["n"], baseline["p"], baseline["k"],
-                baseline["temperature_c"], baseline["humidity_percent"],
-                baseline["ph"], baseline["rainfall_mm"]
-            ]])
-            probs = model.predict_proba(X)[0]
-            top_indices = np.argsort(probs)[::-1][:request.top_k]
-            for idx in top_indices:
-                crop_name = label_encoder.inverse_transform([idx])[0]
-                confidence = float(probs[idx])
-                crop_recommendations.append({
-                    "crop_name": crop_name,
-                    "confidence": confidence,
-                    "match_reasons": [f"Model confidence: {confidence:.1%}"]
-                })
-        except Exception as e:
-            print(f"[XGBoost] Legacy inference error: {e}")
-            crop_recommendations = _get_fallback_recommendations()
-    else:
-        crop_recommendations = _get_fallback_recommendations()
-
-    timelines = await _generate_timelines(crop_recommendations)
-
-    return LocationSimulationResponse(
-        district_name=district_name,
-        state=state,
-        latitude=request.lat,
-        longitude=request.lng,
-        soil_type=soil_type,
-        baseline_parameters=baseline,
-        weather=weather_data,
-        recommendations=crop_recommendations,
-        timelines=timelines
-    )
-
-
-# ---------------------------------------------------------------------------
-# Legacy DB-backed simulation routes (unchanged)
-# ---------------------------------------------------------------------------
-
-@router.post("/simulate", response_model=SimulationResponse)
-async def run_simulation(
-    request: SimulationRequest,
-    db: Session = Depends(get_db)
-):
-    """Run a crop simulation with the given parameters (legacy DB route)."""
-    crop = db.query(CropProfile).filter(CropProfile.name.ilike(request.selected_crop)).first()
-    if not crop:
-        raise HTTPException(status_code=404, detail=f"Crop '{request.selected_crop}' not found")
-
-    district = db.query(District).filter(District.id == request.district_id).first()
-
-    engine = SimulationEngine(db)
-    result = engine.run_simulation(request, district, crop)
-
-    if not district:
-        result.district_name = f"District_{request.district_id}"
-
-    return result
-
-
-@router.post("/save", response_model=SimulationResultResponse)
-async def save_simulation(
-    request: SimulationRequest,
-    user_id: str = Query(..., description="User ID"),
-    db: Session = Depends(get_db)
-):
-    """Run and save a simulation result."""
-    crop = db.query(CropProfile).filter(CropProfile.name.ilike(request.selected_crop)).first()
-    if not crop:
-        raise HTTPException(status_code=404, detail=f"Crop '{request.selected_crop}' not found")
-
-    district = db.query(District).filter(District.id == request.district_id).first()
-
-    engine = SimulationEngine(db)
-    sim_result = engine.run_simulation(request, district, crop)
-    roadmap = engine.generate_roadmap(request, crop)
-
-    def activity_to_dict(activity):
-        d = activity.model_dump()
-        d['start_date'] = activity.start_date.isoformat()
-        d['end_date'] = activity.end_date.isoformat()
-        d['activity_type'] = activity.activity_type.value
-        return d
-
-    saved_result = SimulationResult(
-        user_id=user_id,
-        district_id=request.district_id,
-        selected_crop=request.selected_crop,
-        land_area_ha=request.land_area_ha,
-        budget_inr=request.budget_inr,
-        confirmed_soil_type=request.confirmed_soil_type,
-        rainfall_override_mm=request.rainfall_override_mm,
-        plant_capacity=sim_result.plant_capacity,
-        total_cost_inr=sim_result.total_cost_inr,
-        cost_breakdown=[item.model_dump() for item in sim_result.cost_breakdown],
-        estimated_yield_tons=sim_result.estimated_yield_tons,
-        estimated_yield_tons_per_ha=sim_result.estimated_yield_tons_per_ha,
-        market_value_inr=sim_result.market_value_inr,
-        net_profit_inr=sim_result.net_profit_inr,
-        roi_percentage=sim_result.roi_percentage,
-        risk_level=sim_result.risk_level.value,
-        risk_factors=sim_result.risk_factors,
-        farming_roadmap=[activity_to_dict(activity) for activity in roadmap],
-        status="completed"
-    )
-
-    db.add(saved_result)
-    db.commit()
-    db.refresh(saved_result)
-
-    return SimulationResultResponse.model_validate(saved_result)
-
-
-@router.get("/history/{user_id}", response_model=SimulationListResponse)
-async def get_simulation_history(
-    user_id: str,
-    page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=50),
-    db: Session = Depends(get_db)
-):
-    """Get user's simulation history with pagination."""
-    query = db.query(SimulationResult).filter(SimulationResult.user_id == user_id)
-    total = query.count()
-    results = query.order_by(SimulationResult.created_at.desc()).offset(
-        (page - 1) * page_size
-    ).limit(page_size).all()
-
-    return SimulationListResponse(
-        results=[SimulationResultResponse.model_validate(r) for r in results],
-        total=total,
-        page=page,
-        page_size=page_size
-    )
-
-
-@router.get("/result/{result_id}", response_model=SimulationResultResponse)
-async def get_simulation_result(result_id: int, db: Session = Depends(get_db)):
-    """Get a specific simulation result by ID."""
-    result = db.query(SimulationResult).filter(SimulationResult.id == result_id).first()
-    if not result:
-        raise HTTPException(status_code=404, detail="Simulation result not found")
-    return SimulationResultResponse.model_validate(result)
-
-
-@router.delete("/result/{result_id}")
-async def delete_simulation_result(result_id: int, db: Session = Depends(get_db)):
-    """Delete a simulation result."""
-    result = db.query(SimulationResult).filter(SimulationResult.id == result_id).first()
-    if not result:
-        raise HTTPException(status_code=404, detail="Simulation result not found")
-    db.delete(result)
-    db.commit()
-    return {"message": "Simulation result deleted successfully"}
+    return {
+        "district": district,
+        "state": state,
+        "agro_zone": agro_zone,
+        "area_acres": area_acres,
+        "setup_type": pref,
+        "weather": weather,
+        "soil": soil,
+        "recommended_crop": top_crop,
+        "season": winner["season"],
+        "duration_days": winner["duration_days"],
+        "confidence": winner["confidence"],
+        "score_pct": winner["score_pct"],
+        "alternatives": scored_crops[1:6],
+        "digital_twin": {
+            "yield_per_acre_tonnes": predicted_yield_per_acre,
+            "total_yield_tonnes": total_yield_tonnes,
+            "estimated_revenue_inr": estimated_revenue_inr,
+            "net_irrigation_mm": round(net_irrigation_mm, 1),
+            "total_water_m3": total_water_m3,
+            "daily_water_liters": daily_water_liters,
+            "risks": {
+                "drought": drought_risk,
+                "pest_disease": pest_risk,
+                "soil_reaction": soil_stress
+            }
+        },
+        "shap_data": shap_explanation,
+        "timeline": timeline
+    }

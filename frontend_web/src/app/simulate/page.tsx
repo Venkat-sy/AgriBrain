@@ -1,394 +1,479 @@
 "use client";
-
-import { useState } from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
 
-// ─── Types (strict spec §1 + §3) ──────────────────────────────────────────
-
-interface TimelineStage {
-  stage_name: string;
-  estimated_days: number;
-  agronomy_advice: string;
-}
-
-interface SimulationResult {
-  district: string;
-  soil_n: number;
-  soil_p: number;
-  soil_k: number;
-  soil_ph: number;
-  live_temp: number;
-  live_humidity: number;
-  live_rainfall: number;
-  recommended_crop: string;
-  confidence_score: number;
-  cultivation_timeline: TimelineStage[];
-}
-
-// ─── Map UI (SSR-disabled Leaflet) ────────────────────────────────────────
-
-const MapUI = dynamic(
-  () => import("@/components/MapUI").then((mod) => mod.MapUI),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-[50vh] md:h-[600px] w-full bg-slate-800 animate-pulse rounded-xl flex items-center justify-center text-slate-400">
-        Initializing Map Engine...
-      </div>
-    ),
-  }
-);
-
-// ─── Skeleton loader ───────────────────────────────────────────────────────
-
-function SkeletonCard() {
-  return (
-    <div className="animate-pulse space-y-4 p-6 rounded-2xl bg-white/5 border border-white/10">
-      <div className="h-6 bg-white/10 rounded w-1/2" />
-      <div className="h-4 bg-white/10 rounded w-3/4" />
-      <div className="h-4 bg-white/10 rounded w-2/3" />
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-10 bg-white/10 rounded" />
-        ))}
-      </div>
+const MapUI = dynamic(() => import("@/components/MapUI"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[320px] sm:h-[400px] lg:h-[460px] rounded-2xl bg-slate-900 animate-pulse flex items-center justify-center text-slate-400 border border-slate-800">
+      Loading Interactive India Map...
     </div>
-  );
-}
-
-// ─── Empty state widget ────────────────────────────────────────────────────
-
-function EmptyStateWidget() {
-  return (
-    <div className="flex flex-col items-center justify-center h-full py-16 text-center space-y-4">
-      <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center">
-        <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-        </svg>
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold text-white">No simulation yet</h3>
-        <p className="text-sm text-slate-400 mt-1">Pin a location on the map, choose your farm type, and click <strong className="text-green-400">Run Simulation</strong>.</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Results widget ────────────────────────────────────────────────────────
-
-function ResultsWidget({ data }: { data: SimulationResult }) {
-  const [expanded, setExpanded] = useState<number | null>(null);
-
-  return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Crop recommendation card */}
-      <div className="glass-card p-6 border border-green-500/30">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">Recommended Crop</p>
-            <h2 className="text-3xl font-bold text-green-400 capitalize">{data.recommended_crop}</h2>
-            <p className="text-sm text-slate-300 mt-1">📍 {data.district}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">Confidence</p>
-            <p className="text-2xl font-bold text-white">{(data.confidence_score * 100).toFixed(1)}%</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Live conditions */}
-      <div className="glass-card p-5">
-        <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-widest">Live Conditions</h3>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-blue-500/10 rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-400">Temperature</p>
-            <p className="text-xl font-bold text-blue-300">{data.live_temp}°C</p>
-          </div>
-          <div className="bg-cyan-500/10 rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-400">Humidity</p>
-            <p className="text-xl font-bold text-cyan-300">{data.live_humidity}%</p>
-          </div>
-          <div className="bg-indigo-500/10 rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-400">Rainfall</p>
-            <p className="text-xl font-bold text-indigo-300">{data.live_rainfall}mm</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Soil parameters */}
-      <div className="glass-card p-5">
-        <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-widest">Soil Baseline</h3>
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
-            <span className="text-slate-400">N</span>
-            <span className="text-white font-medium">{data.soil_n} kg/ha</span>
-          </div>
-          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
-            <span className="text-slate-400">P</span>
-            <span className="text-white font-medium">{data.soil_p} kg/ha</span>
-          </div>
-          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
-            <span className="text-slate-400">K</span>
-            <span className="text-white font-medium">{data.soil_k} kg/ha</span>
-          </div>
-          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
-            <span className="text-slate-400">pH</span>
-            <span className="text-white font-medium">{data.soil_ph}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Cultivation timeline */}
-      {data.cultivation_timeline.length > 0 && (
-        <div className="glass-card p-5">
-          <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-widest">Cultivation Timeline</h3>
-          <div className="space-y-2">
-            {data.cultivation_timeline.map((stage, idx) => (
-              <div key={idx} className="rounded-xl overflow-hidden border border-white/10">
-                <button
-                  onClick={() => setExpanded(expanded === idx ? null : idx)}
-                  className="w-full flex items-center justify-between p-3 text-left hover:bg-white/5 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center text-xs font-bold text-green-400">
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-white">{stage.stage_name}</p>
-                      <p className="text-xs text-slate-400">{stage.estimated_days} days</p>
-                    </div>
-                  </div>
-                  <svg
-                    className={`w-4 h-4 text-slate-400 transition-transform ${expanded === idx ? "rotate-180" : ""}`}
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {expanded === idx && (
-                  <div className="px-4 pb-3 text-xs text-slate-300 bg-white/5 leading-relaxed">
-                    {stage.agronomy_advice}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Navigate to Calendar */}
-      <Link
-        href="/calendar"
-        className="block w-full text-center py-3 px-4 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-xl transition-colors"
-      >
-        View Cultivation Calendar →
-      </Link>
-    </div>
-  );
-}
-
-// ─── Main Page ─────────────────────────────────────────────────────────────
+  ),
+});
 
 export default function SimulatePage() {
-  // Strict state per spec §3
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
+  const [areaAcres, setAreaAcres] = useState<number>(3.0);
   const [setupType, setSetupType] = useState<"short-term" | "long-term">("short-term");
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<SimulationResult | null>(null);
+  const [useOverrides, setUseOverrides] = useState<boolean>(false);
+  const [overrides, setOverrides] = useState({ rainfall: 140, temp: 28, ph: 6.5, N: 160 });
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<any | null>(null);
 
-  // Map pin drop (immediate — no API await per spec §2)
-  const handlePinDrop = (lat: number, lng: number) => {
+  const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+
+  const handlePinDrop = async (lat: number, lng: number) => {
     setPin({ lat, lng });
     setError(null);
-    // Clear old results when new pin dropped
-    setResults(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/spatial/reverse-geocode?lat=${lat}&lon=${lng}`);
+      if (res.ok) {
+        const preview = await res.json();
+        setData((prev: any) => ({
+          ...prev,
+          district: preview.district,
+          state: preview.state,
+          agro_zone: preview.agro_zone,
+          weather: preview.weather,
+          soil: preview.soil,
+        }));
+        setOverrides({
+          rainfall: Math.round(preview.weather?.rainfall || 140),
+          temp: Math.round(preview.weather?.temp || 28),
+          ph: preview.soil?.pH || 6.5,
+          N: preview.soil?.N || 160,
+        });
+      }
+    } catch {
+      // Non-blocking spatial preview
+    }
   };
 
-  // Run simulation via /api/v1/simulation/run
   const runSimulation = async () => {
     if (!pin) {
-      setError("Please pin a location on the map first.");
+      setError("Click anywhere on the map to drop a farm location pin first.");
       return;
     }
     setLoading(true);
     setError(null);
-    setResults(null);
-
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-backend.onrender.com";
-      const res = await fetch(`${apiUrl}/api/v1/simulation/run`, {
+      const res = await fetch(`${API_BASE}/api/v1/simulation/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lat: pin.lat,
           lng: pin.lng,
+          area_acres: areaAcres,
           setup_type: setupType,
+          crop_duration_preference: setupType,
+          overrides: useOverrides ? overrides : null,
         }),
       });
-
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.detail || `API error: ${res.status} ${res.statusText}`);
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || `Server responded with ${res.status}`);
       }
-
-      const data: SimulationResult = await res.json();
-      setResults(data);
+      const result = await res.json();
+      setData(result);
+      localStorage.setItem("agribrain_last_simulation", JSON.stringify(result));
     } catch (err: any) {
-      setError(err.message || "Simulation failed. Please try again.");
+      setError(err.message || "Failed to connect to backend simulation engine.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-digital-twin transition-colors">
-      {/* Header */}
-      <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
-                </svg>
-              </div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">AgriBrain</h1>
-            </Link>
-            <nav className="flex items-center gap-1">
-              <Link href="/simulate" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-400 bg-green-500/20 rounded-lg">
-                <span className="w-4 h-4 rounded-full bg-green-500" />
-                Simulation
-              </Link>
-              <Link href="/calendar" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                Calendar
-              </Link>
-              <Link href="/expert-chat" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                Expert Chat
-              </Link>
-            </nav>
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-3 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Top Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+              AgriBrain AI Digital Twin Platform
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+              40+ Indian Crop Ensemble • Yield & Irrigation Forecasting • SHAP Explainability • What-If Climate Simulator
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {pin && (
+              <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                📍 {pin.lat.toFixed(4)}°N, {pin.lng.toFixed(4)}°E
+              </span>
+            )}
+            <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+              🌾 40 Crops Indexed
+            </span>
           </div>
         </div>
-      </header>
 
-      {/* Main — strict responsive breakpoints per spec §6 */}
-      <main className="min-h-screen w-full flex flex-col md:flex-row p-2 md:p-4 gap-4 max-w-7xl mx-auto">
+        {error && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/40 text-red-400 text-sm font-medium">
+            ⚠️ {error}
+          </div>
+        )}
 
-        {/* Left: Map + controls */}
-        <div className="w-full md:w-2/3 flex flex-col gap-4">
-          <div className="glass-card overflow-hidden">
-            <div className="p-4 border-b border-white/10">
-              <h2 className="text-xl font-bold text-white">Interactive Farm Map</h2>
-              <p className="text-sm text-slate-400 mt-1">
-                Click anywhere on the map to drop a pin, then run the AI simulation.
-              </p>
-            </div>
+        {/* Main Responsive Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Map, Farm Inputs & What-If Sliders (6 cols) */}
+          <div className="lg:col-span-6 space-y-4">
+            <MapUI onPinDrop={handlePinDrop} pin={pin} />
 
-            {/* Map container — strict spec §6 */}
-            <div className="w-full h-[50vh] md:h-[600px] rounded-lg overflow-hidden relative z-0 p-2">
-              <MapUI
-                onDistrictSelect={() => {}}
-                isLoading={loading}
-                initialCenter={[20.5937, 78.9629]}
-                initialZoom={5}
-                onMapClick={handlePinDrop}
-                onPinDrop={handlePinDrop}
-              />
+            {/* Farm Setup & Input Card */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                <div>
+                  <span className="text-[11px] uppercase tracking-wider text-emerald-400 font-semibold">
+                    Selected Agro-Climatic Region
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-white">
+                    {data?.district ? `${data.district}, ${data.state}` : pin ? "Coordinates Locked" : "Tap anywhere on the map"}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {data?.agro_zone || "Drop a pin on the map to auto-detect zone & soil"}
+                  </p>
+                </div>
+                <span className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-amber-300 border border-slate-700 self-start sm:self-center">
+                  {data?.soil?.type || "Soil: Awaiting Pin"}
+                </span>
+              </div>
+
+              {/* Farm Land Area & Crop Horizon Controls */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                <div className="sm:col-span-4">
+                  <label className="text-xs uppercase tracking-wider text-slate-400 font-semibold block mb-1.5">
+                    Farm Area (Acres)
+                  </label>
+                  <input
+                    type="number"
+                    min="0.2"
+                    max="1000"
+                    step="0.5"
+                    value={areaAcres}
+                    onChange={(e) => setAreaAcres(Math.max(0.1, parseFloat(e.target.value) || 1))}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-semibold text-sm focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-8">
+                  <label className="text-xs uppercase tracking-wider text-slate-400 font-semibold block mb-1.5">
+                    Crop Duration / Cultivation Type
+                  </label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setSetupType("short-term")}
+                      className={`py-2.5 px-3 rounded-xl font-medium text-xs sm:text-sm transition-all border ${
+                        setupType === "short-term"
+                          ? "bg-emerald-600 text-white border-emerald-400 shadow-lg shadow-emerald-600/20"
+                          : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
+                      }`}
+                    >
+                      🌾 Short-Term (22)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSetupType("long-term")}
+                      className={`py-2.5 px-3 rounded-xl font-medium text-xs sm:text-sm transition-all border ${
+                        setupType === "long-term"
+                          ? "bg-emerald-600 text-white border-emerald-400 shadow-lg shadow-emerald-600/20"
+                          : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
+                      }`}
+                    >
+                      🌴 Long-Term (18)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Digital Twin What-If Scenario Simulator */}
+              <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">
+                    🎛️ Digital Twin "What-If" Scenario Sliders
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setUseOverrides(!useOverrides)}
+                    className={`text-xs px-2.5 py-1 rounded-md font-medium border ${
+                      useOverrides
+                        ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+                        : "bg-slate-800 text-slate-400 border-slate-700"
+                    }`}
+                  >
+                    {useOverrides ? "Custom Overrides ON" : "Using Live Auto-Telemetry"}
+                  </button>
+                </div>
+
+                {useOverrides && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-slate-400">Simulated Rainfall:</span>
+                        <span className="font-semibold text-white">{overrides.rainfall} mm</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="30"
+                        max="350"
+                        value={overrides.rainfall}
+                        onChange={(e) => setOverrides({ ...overrides, rainfall: Number(e.target.value) })}
+                        className="w-full accent-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-slate-400">Simulated Temp:</span>
+                        <span className="font-semibold text-white">{overrides.temp} °C</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="12"
+                        max="42"
+                        value={overrides.temp}
+                        onChange={(e) => setOverrides({ ...overrides, temp: Number(e.target.value) })}
+                        className="w-full accent-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-slate-400">Soil pH Override:</span>
+                        <span className="font-semibold text-white">{overrides.ph}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="4.5"
+                        max="8.5"
+                        step="0.1"
+                        value={overrides.ph}
+                        onChange={(e) => setOverrides({ ...overrides, ph: Number(e.target.value) })}
+                        className="w-full accent-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-slate-400">Soil Nitrogen (N):</span>
+                        <span className="font-semibold text-white">{overrides.N} kg/ha</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="60"
+                        max="280"
+                        value={overrides.N}
+                        onChange={(e) => setOverrides({ ...overrides, N: Number(e.target.value) })}
+                        className="w-full accent-emerald-500"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={runSimulation}
+                disabled={loading}
+                className="w-full py-3.5 px-6 rounded-xl font-bold text-sm sm:text-base text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-50 shadow-lg shadow-emerald-600/25 transition-all"
+              >
+                {loading ? "⚡ Simulating Digital Twin Pipeline..." : "⚡ Run Full Digital Twin Simulation"}
+              </button>
             </div>
           </div>
 
-          {/* Pin info + controls */}
-          <div className="glass-card p-5 space-y-4">
-            {/* Pin status */}
-            {pin ? (
-              <div className="flex items-center gap-2 text-sm text-green-400">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                Pin set: {pin.lat.toFixed(4)}°N, {pin.lng.toFixed(4)}°E
+          {/* Right Column: Always-Visible Telemetry, Digital Twin & SHAP (6 cols) */}
+          <div className="lg:col-span-6 space-y-4">
+            {/* Weather & Soil Baseline Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className={`bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl ${loading ? "animate-pulse" : ""}`}>
+                <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">
+                  ☀️ Weather Telemetry
+                </span>
+                <div className="mt-3 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Temperature:</span>
+                    <span className="font-semibold text-white">{data?.weather?.temp ?? "--"} °C</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Humidity:</span>
+                    <span className="font-semibold text-white">{data?.weather?.humidity ?? "--"} %</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Seasonal Rain:</span>
+                    <span className="font-semibold text-sky-300">{data?.weather?.rainfall ?? "--"} mm</span>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <span className="w-2 h-2 rounded-full bg-slate-500" />
-                No pin yet — click on the map
-              </div>
-            )}
 
-            {/* Setup type toggle per spec §3 */}
-            <div>
-              <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">Farm Type</p>
-              <div className="flex rounded-xl overflow-hidden border border-white/10">
-                <button
-                  onClick={() => setSetupType("short-term")}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                    setupType === "short-term"
-                      ? "bg-green-500 text-white"
-                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Short-term / Seasonal
-                </button>
-                <button
-                  onClick={() => setSetupType("long-term")}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                    setupType === "long-term"
-                      ? "bg-green-500 text-white"
-                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Long-term / Orchard
-                </button>
+              <div className={`bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl ${loading ? "animate-pulse" : ""}`}>
+                <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                  🌱 Soil NPK & pH Profile
+                </span>
+                <div className="mt-3 space-y-1.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">N / P / K:</span>
+                    <span className="font-semibold text-white">
+                      {data?.soil ? `${data.soil.N} / ${data.soil.P} / ${data.soil.K} kg/ha` : "-- / -- / --"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Soil pH:</span>
+                    <span className="font-semibold text-emerald-400">{data?.soil?.pH ?? "--"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Land Area:</span>
+                    <span className="font-semibold text-amber-300">{areaAcres} Acres</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Run button */}
-            <button
-              onClick={runSimulation}
-              disabled={loading || !pin}
-              className="w-full py-3 px-4 bg-green-500 hover:bg-green-400 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                  Running AI Simulation...
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Run Simulation
-                </>
+            {/* Primary Crop Recommendation & Multi-Feature SHAP Explainability */}
+            <div className={`bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4 ${loading ? "animate-pulse" : ""}`}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400 block">
+                    🤖 Top ML Crop Recommendation ({setupType === "long-term" ? "Long-Term / Orchard" : "Short-Term / Seasonal"})
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">
+                    {data?.recommended_crop || "Awaiting Simulation Run"}
+                  </h2>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30">
+                    Suitability: {data?.score_pct ? `${data.score_pct}%` : "--%"}
+                  </span>
+                  {data?.season && (
+                    <span className="block text-[11px] text-slate-400 mt-1">
+                      Season: {data.season} (~{data.duration_days} days)
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* SHAP Feature Attribution Bars */}
+              <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2.5">
+                <span className="text-xs font-semibold text-emerald-400 block">
+                  📊 SHAP Feature Attribution Breakdown
+                </span>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {data?.shap_data?.reasoning || "Drop a pin and run simulation to inspect feature-level SHAP weights."}
+                </p>
+                {data?.shap_data?.breakdown && (
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    {data.shap_data.breakdown.map((item: any, idx: number) => (
+                      <div key={idx} className="p-2 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center text-xs">
+                        <span className="text-slate-300">{item.feature}</span>
+                        <span className={`font-bold ${item.impact >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
+                          {item.impact >= 0 ? `+${item.impact}` : item.impact}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Top 5 Ranked Alternatives */}
+              {data?.alternatives && data.alternatives.length > 0 && (
+                <div>
+                  <span className="text-xs text-slate-400 font-medium block mb-2">
+                    Other High-Suitability {setupType === "long-term" ? "Orchard/Plantation" : "Seasonal"} Alternatives:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {data.alternatives.map((alt: any, idx: number) => (
+                      <span
+                        key={idx}
+                        className="text-xs px-3 py-1.5 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 font-medium"
+                      >
+                        {alt.crop} <strong className="text-emerald-400">({alt.score_pct}%)</strong>
+                      </span>
+                    ))}
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
 
-            {/* Error toast */}
-            {error && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-400 flex items-start gap-2">
-                <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                {error}
+            {/* Digital Twin Forecasting Card: Yield, Revenue, Irrigation & Risk Matrix */}
+            <div className={`bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4 ${loading ? "animate-pulse" : ""}`}>
+              <span className="text-xs font-semibold uppercase tracking-wider text-cyan-400 block">
+                🌐 Digital Twin Telemetry (For {data?.area_acres || areaAcres} Acres)
+              </span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+                  <span className="text-[11px] text-slate-400 uppercase">Predicted Yield</span>
+                  <div className="text-lg font-bold text-white mt-0.5">
+                    {data?.digital_twin ? `${data.digital_twin.total_yield_tonnes} Tonnes` : "-- Tonnes"}
+                  </div>
+                  <span className="text-[11px] text-emerald-400">
+                    {data?.digital_twin ? `${data.digital_twin.yield_per_acre_tonnes} T / Acre` : "Awaiting run"}
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+                  <span className="text-[11px] text-slate-400 uppercase">Est. Gross Value</span>
+                  <div className="text-lg font-bold text-emerald-400 mt-0.5">
+                    {data?.digital_twin ? `₹${data.digital_twin.estimated_revenue_inr.toLocaleString("en-IN")}` : "₹ --"}
+                  </div>
+                  <span className="text-[11px] text-slate-400">MSP / Market Baseline</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+                  <span className="text-[11px] text-slate-400 uppercase">Irrigation Demand</span>
+                  <div className="text-lg font-bold text-sky-400 mt-0.5">
+                    {data?.digital_twin ? `${data.digital_twin.daily_water_liters.toLocaleString("en-IN")} L/day` : "-- L/day"}
+                  </div>
+                  <span className="text-[11px] text-slate-400">
+                    {data?.digital_twin ? `Total: ${data.digital_twin.total_water_m3} m³` : "Net crop water"}
+                  </span>
+                </div>
               </div>
-            )}
+
+              {/* Risk Classification Matrix */}
+              <div className="grid grid-cols-3 gap-2.5 pt-1 text-xs">
+                <div className="p-2.5 rounded-xl bg-slate-800/70 border border-slate-700/70">
+                  <span className="text-slate-400 block">Drought Risk</span>
+                  <strong className="text-white">{data?.digital_twin?.risks?.drought || "--"}</strong>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-800/70 border border-slate-700/70">
+                  <span className="text-slate-400 block">Pest & Blight Risk</span>
+                  <strong className="text-white">{data?.digital_twin?.risks?.pest_disease || "--"}</strong>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-800/70 border border-slate-700/70">
+                  <span className="text-slate-400 block">Soil pH Status</span>
+                  <strong className="text-white">{data?.digital_twin?.risks?.soil_reaction || "--"}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Stage-by-Stage Cultivation Timeline */}
+            <div className={`bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3 ${loading ? "animate-pulse" : ""}`}>
+              <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 block">
+                📅 AI Cultivation Stage Schedule
+              </span>
+              {data?.timeline && data.timeline.length > 0 ? (
+                <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1">
+                  {data.timeline.map((stage: any, i: number) => (
+                    <div key={i} className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1">
+                      <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-white">
+                        <span>{i + 1}. {stage.stage_name}</span>
+                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">
+                          {stage.days || stage.estimated_days} Days
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 leading-relaxed">{stage.agronomy_advice}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400 py-3 text-center">
+                  Run the simulation to generate a localized 5-stage cultivation calendar.
+                </p>
+              )}
+            </div>
           </div>
         </div>
-
-        {/* Right: Results panel — strict spec §6 sidebar */}
-        <div className="w-full md:w-1/3 flex-shrink-0">
-          <div className="glass-card p-5 min-h-[400px]">
-            <h3 className="text-lg font-bold text-white mb-4">Simulation Results</h3>
-
-            {/* Strict conditional rendering — ZERO fallback text when loading or data exists */}
-            {loading ? (
-              <SkeletonCard />
-            ) : results ? (
-              <ResultsWidget data={results} />
-            ) : (
-              <EmptyStateWidget />
-            )}
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
