@@ -1,0 +1,27 @@
+   <CardDescription>Seasonal distribution based on agro-zone climatology</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                      {data.rainfall_forecast.map((m, idx) => (
+                        <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-center">
+                          <p className="text-xs text-slate-500">{m.month}</p>
+                          <p className="text-2xl font-bold text-emerald-600 mt-1">{m.predicted_mm} mm</p>
+                          <p className={`text-xs mt-1 ${m.anomaly_pct >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {m.anomaly_pct >= 0 ? '+' : ''}{m.anomaly_pct}% vs normal
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+              </>)
+            ) : (
+              <>
+                {/* Empty State */}
+                <Card className="h-full min-h-[500px] flex flex-col items-center justify-center">
+                  <div className="text-center">
+                    <Cpu className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">Ready to Simulate</h3>
+                    <p className="text-slate-500 mb-6 max-w-sm">
+                      Pin your far

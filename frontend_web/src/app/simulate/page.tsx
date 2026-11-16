@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardHeader,
@@ -245,6 +246,7 @@ const CROP_DATABASE = [  // Short-Term (Seasonal)
 ];
 
 export default function SimulatePage() {
+  const router = useRouter();
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>({ lat: 12.9716, lng: 77.5946 });
   const [manualLat, setManualLat] = useState<string>('12.9716');
   const [manualLng, setManualLng] = useState<string>('77.5946');
@@ -490,7 +492,10 @@ export default function SimulatePage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <StatusBadge isLive={true} label="Engine Active" />
+            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Engine Active
+            </Badge>
             <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               Dashboard
@@ -535,8 +540,8 @@ export default function SimulatePage() {
               </CardHeader>
               <CardContent className="p-0">
                 <MapUI
-                  center={mapCenter}
-                  zoom={mapZoom}
+                  center={[pin?.lat || 20.5937, pin?.lng || 78.9629]}
+                  zoom={pin ? 7 : 5}
                   pin={pin}
                   onPinDrop={handlePinDrop}
                   className="h-[380px] w-full"
@@ -563,7 +568,7 @@ export default function SimulatePage() {
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">Coordinates</p>
-                      <p className="font-mono text-xs text-slate-700">{pin[0].toFixed(4)}, {pin[1].toFixed(4)}</p>
+                      <p className="font-mono text-xs text-slate-700">{pin.lat.toFixed(4)}, {pin.lng.toFixed(4)}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -574,7 +579,7 @@ export default function SimulatePage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <SlidersHorizontal className="w-5 h-5" />
+                  <Settings className="w-5 h-5" />
                   Simulation Parameters
                 </CardTitle>
                 <CardDescription>Configure farm setup, area, and environmental overrides</CardDescription>
@@ -620,7 +625,12 @@ export default function SimulatePage() {
                 <div className="flex items-center justify-between border-t pt-4">
                   <div>
                     <Label className="font-medium flex items-center gap-2">
-                      <Switch checked={useOverrides} onCheckedChange={setUseOverrides} />
+                      <input
+                        type="checkbox"
+                        checked={useOverrides}
+                        onChange={(e) => setUseOverrides(e.target.checked)}
+                        className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                      />
                       Enable Environmental Overrides
                     </Label>
                     <p className="text-xs text-slate-500 mt-1">Manually adjust weather & soil nutrients for scenario testing</p>

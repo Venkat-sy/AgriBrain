@@ -1,6 +1,7 @@
  "use client";
 
- import { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
  import Link from "next/link";
  import { useFarm } from "@/context/FarmContext";
  import { WeatherWidget } from "@/components/WeatherWidget";

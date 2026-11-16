@@ -70,7 +70,7 @@ export default function MapUI({ pin, onPinDrop }: MapUIProps) {
           <Marker draggable={true} eventHandlers={eventHandlers} icon={svgPin} position={markerPos} ref={markerRef}>
             <Popup>
               <div className="text-xs font-semibold text-slate-900">
-                📍 Farm Pin: {pin?.lat.toFixed(4)}°N, {pin?.lng.toFixed(4)}°E
+                📍 Farm Pin: {pin?.lat?.toFixed(4)}°N, {pin?.lng?.toFixed(4)}°E
                 <br />
                 <span className="text-emerald-700">(Drag pin or click map to adjust)</span>
               </div>

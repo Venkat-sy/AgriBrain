@@ -1,0 +1,16 @@
+npm notice run frontend_web@0.1.0 npx
+npm notice run next build
+▲ Next.js 16.4.6 (Turbopack)
+- Environments: .env.local
+⚠ Warning: Next.js ignored package-lock.json in C:\Users\USER because it is outside the current Git repository (C:\Users\USER\Downloads\FinalYearProject).
+ To use this directory, set `turbopack.root` in your Next.js config.
+
+✓ Running next.config.ts took 272ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.5s
+  Running TypeScript ...
+src/components/MapUI.tsx(83,37): error TS2322: Type '(lat: number, lng: number) => void' is not assignable to type '(lat: number, lng: number) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
+Failed to type check.
+

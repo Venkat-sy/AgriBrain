@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { MessageSquare, Sprout, BarChart3, Calendar, Leaf, Sparkles, ArrowRight } from "lucide-react";
 import ChatAssistant from "@/components/ChatAssistant";

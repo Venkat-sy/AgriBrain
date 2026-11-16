@@ -1,0 +1,8 @@
+$raw = [IO.File]::ReadAllText('C:\Users\USER\Downloads\FinalYearProject\req1.txt')
+$s = $raw.IndexOf('### STEP 4: OVERWRITE')
+$e = $raw.IndexOf('### STEP 5:')
+$step4 = $raw.Substring($s, $e - $s)
+$cs = $step4.IndexOf('```tsx')
+$ce = $step4.LastIndexOf('```')
+$code = $step4.Substring($cs + 6, $ce - $cs - 6)
+[IO.File]::WriteAllText('C:\Users\USER\Downloads\FinalYearProject\frontend_web\src\app\simulate\page.tsx', $code.Trim())

@@ -1,0 +1,22 @@
+npm notice run frontend_web@0.1.0 npx
+npm notice run next build
+▲ Next.js 16.4.6 (Turbopack)
+- Environments: .env.local
+⚠ Warning: Next.js ignored package-lock.json in C:\Users\USER because it is outside the current Git repository (C:\Users\USER\Downloads\FinalYearProject).
+ To use this directory, set `turbopack.root` in your Next.js config.
+
+✓ Running next.config.ts took 394ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 8.5s
+  Running TypeScript ...
+src/app/simulate/page.tsx(83,58): error TS2339: Property 'MapUI' does not exist on type 'typeof import("C:/Users/USER/Downloads/FinalYearProject/frontend_web/src/components/MapUI")'.
+src/app/simulate/page.tsx(388,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: {}, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ onDistrictSelect: (district: SpatialLookupResponse) => void; isLoading: boolean; initialCenter: number[]; initialZoom: number; onMapClick: (lat: number, lng: number) => Promise<...>; onPinDrop: (lat: number, lng: number) => Promise<...>; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'onDistrictSelect' does not exist on type 'IntrinsicAttributes'.
+  Overload 2 of 2, '(props: {}): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ onDistrictSelect: (district: SpatialLookupResponse) => void; isLoading: boolean; initialCenter: number[]; initialZoom: number; onMapClick: (lat: number, lng: number) => Promise<...>; onPinDrop: (lat: number, lng: number) => Promise<...>; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'onDistrictSelect' does not exist on type 'IntrinsicAttributes'.
+Failed to type check.
+

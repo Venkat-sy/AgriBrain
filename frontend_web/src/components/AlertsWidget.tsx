@@ -1,6 +1,7 @@
  "use client";
 
- import { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
  import { useFarm } from "@/context/FarmContext";
  import { CheckCircle, AlertCircle, Info, X } from "lucide-react";
 

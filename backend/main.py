@@ -1,42 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from datetime import datetime
+from backend.api import spatial, simulation, chat
 
-from backend.core.config import settings
-from backend.api import (
-    map_router,
-    rainfall_router,
-    soil_router,
-    crop_router,
-    simulation_router,
-    roadmap_router,
-    chat,
-    baseline,
-    spatial
-)
-from backend.api import crop_recommendation
+app = FastAPI(title="AgriBrain AI Digital Twin API", version="3.0")
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    print("Starting AgriSim Backend...")
-    yield
-    # Shutdown
-    print("Shutting down AgriSim Backend...")
-
-
-app = FastAPI(
-    title="AgriSim API",
-    description="Agricultural Simulation and Recommendation System for Indian Farmers",
-    version="1.0.0",
-    lifespan=lifespan,
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
-
-# CORS configuration - allow all origins for production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -45,34 +12,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(map_router)
-app.include_router(rainfall_router)
-app.include_router(soil_router)
-app.include_router(crop_router)
-app.include_router(crop_recommendation.router)
-app.include_router(simulation_router)
-app.include_router(roadmap_router)
-app.include_router(chat.router)
-app.include_router(baseline.router)
-app.include_router(spatial.router)
+# Mount under both /api/v1 and /api to prevent 404 Not Found errors
+app.include_router(spatial.router, prefix="/api/v1/spatial", tags=["Spatial"])
+app.include_router(spatial.router, prefix="/api/spatial", tags=["Spatial-Fallback"])
 
+app.include_router(simulation.router, prefix="/api/v1/simulation", tags=["Simulation"])
+app.include_router(simulation.router, prefix="/api/simulation", tags=["Simulation-Fallback"])
+
+app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
+app.include_router(chat.router, prefix="/api/chat", tags=["Chat-Fallback"])
 
 @app.get("/")
-async def root():
-    return {
-        "message": "AgriSim API - Agricultural Simulation System",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
-
-
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    return {"status": "ok", "service": "AgriBrain Digital Twin Backend v3.0"}
 
 
 if __name__ == "__main__":
