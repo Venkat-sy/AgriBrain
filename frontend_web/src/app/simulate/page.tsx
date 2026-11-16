@@ -1,329 +1,270 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { InputPanel } from "@/components/InputPanel";
-import { SimulationPanel } from "@/components/SimulationPanel";
-import { CropCard } from "@/components/CropCard";
-import { useFarm } from "@/context/FarmContext";
-import { WeatherWidget } from "@/components/WeatherWidget";
-import { SimulationCalendar } from "@/components/SimulationCalendar";
-import { AlertsWidget } from "@/components/AlertsWidget";
-import { DigitalTwinWidget } from "@/components/DigitalTwinWidget";
 
-interface SpatialLookupResponse {
-  district_id: number;
-  district_name: string;
-  state: string;
-  state_code: string;
-  latitude?: number;
-  longitude?: number;
-  soil_type: string;
-  agro_climatic_zone?: string;
-  area_km2?: number;
-  centroid: { lat: number; lon: number };
-  lookup_method: string;
-  distance_km?: number;
-  baseline_parameters: {
-    n: number;
-    p: number;
-    k: number;
-    ph: number;
-    temperature_c: number;
-    humidity_percent: number;
-    rainfall_mm: number;
-    lookup_method: string;
-  };
-  note: string;
+// ─── Types (strict spec §1 + §3) ──────────────────────────────────────────
+
+interface TimelineStage {
+  stage_name: string;
+  estimated_days: number;
+  agronomy_advice: string;
 }
 
-interface Recommendation {
-  crop_name: string;
-  confidence: number;
-  match_reasons: string[];
-  expected_yield_tons_per_ha: number | null;
-  season: string | null;
+interface SimulationResult {
+  district: string;
+  soil_n: number;
+  soil_p: number;
+  soil_k: number;
+  soil_ph: number;
+  live_temp: number;
+  live_humidity: number;
+  live_rainfall: number;
+  recommended_crop: string;
+  confidence_score: number;
+  cultivation_timeline: TimelineStage[];
 }
 
-interface ApiResponse {
-  district_id: number;
-  soil_type: string;
-  rainfall_mm: number;
-  recommendations: Recommendation[];
-  model_version: string;
-  generated_at: string;
+// ─── Map UI (SSR-disabled Leaflet) ────────────────────────────────────────
+
+const MapUI = dynamic(
+  () => import("@/components/MapUI").then((mod) => mod.MapUI),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[50vh] md:h-[600px] w-full bg-slate-800 animate-pulse rounded-xl flex items-center justify-center text-slate-400">
+        Initializing Map Engine...
+      </div>
+    ),
+  }
+);
+
+// ─── Skeleton loader ───────────────────────────────────────────────────────
+
+function SkeletonCard() {
+  return (
+    <div className="animate-pulse space-y-4 p-6 rounded-2xl bg-white/5 border border-white/10">
+      <div className="h-6 bg-white/10 rounded w-1/2" />
+      <div className="h-4 bg-white/10 rounded w-3/4" />
+      <div className="h-4 bg-white/10 rounded w-2/3" />
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="h-10 bg-white/10 rounded" />
+        ))}
+      </div>
+    </div>
+  );
 }
+
+// ─── Empty state widget ────────────────────────────────────────────────────
+
+function EmptyStateWidget() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full py-16 text-center space-y-4">
+      <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center">
+        <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+        </svg>
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold text-white">No simulation yet</h3>
+        <p className="text-sm text-slate-400 mt-1">Pin a location on the map, choose your farm type, and click <strong className="text-green-400">Run Simulation</strong>.</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Results widget ────────────────────────────────────────────────────────
+
+function ResultsWidget({ data }: { data: SimulationResult }) {
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  return (
+    <div className="space-y-4 animate-fade-in">
+      {/* Crop recommendation card */}
+      <div className="glass-card p-6 border border-green-500/30">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">Recommended Crop</p>
+            <h2 className="text-3xl font-bold text-green-400 capitalize">{data.recommended_crop}</h2>
+            <p className="text-sm text-slate-300 mt-1">📍 {data.district}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">Confidence</p>
+            <p className="text-2xl font-bold text-white">{(data.confidence_score * 100).toFixed(1)}%</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Live conditions */}
+      <div className="glass-card p-5">
+        <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-widest">Live Conditions</h3>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-blue-500/10 rounded-xl p-3 text-center">
+            <p className="text-xs text-slate-400">Temperature</p>
+            <p className="text-xl font-bold text-blue-300">{data.live_temp}°C</p>
+          </div>
+          <div className="bg-cyan-500/10 rounded-xl p-3 text-center">
+            <p className="text-xs text-slate-400">Humidity</p>
+            <p className="text-xl font-bold text-cyan-300">{data.live_humidity}%</p>
+          </div>
+          <div className="bg-indigo-500/10 rounded-xl p-3 text-center">
+            <p className="text-xs text-slate-400">Rainfall</p>
+            <p className="text-xl font-bold text-indigo-300">{data.live_rainfall}mm</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Soil parameters */}
+      <div className="glass-card p-5">
+        <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-widest">Soil Baseline</h3>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
+            <span className="text-slate-400">N</span>
+            <span className="text-white font-medium">{data.soil_n} kg/ha</span>
+          </div>
+          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
+            <span className="text-slate-400">P</span>
+            <span className="text-white font-medium">{data.soil_p} kg/ha</span>
+          </div>
+          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
+            <span className="text-slate-400">K</span>
+            <span className="text-white font-medium">{data.soil_k} kg/ha</span>
+          </div>
+          <div className="flex justify-between bg-white/5 rounded-lg px-3 py-2">
+            <span className="text-slate-400">pH</span>
+            <span className="text-white font-medium">{data.soil_ph}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Cultivation timeline */}
+      {data.cultivation_timeline.length > 0 && (
+        <div className="glass-card p-5">
+          <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-widest">Cultivation Timeline</h3>
+          <div className="space-y-2">
+            {data.cultivation_timeline.map((stage, idx) => (
+              <div key={idx} className="rounded-xl overflow-hidden border border-white/10">
+                <button
+                  onClick={() => setExpanded(expanded === idx ? null : idx)}
+                  className="w-full flex items-center justify-between p-3 text-left hover:bg-white/5 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center text-xs font-bold text-green-400">
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">{stage.stage_name}</p>
+                      <p className="text-xs text-slate-400">{stage.estimated_days} days</p>
+                    </div>
+                  </div>
+                  <svg
+                    className={`w-4 h-4 text-slate-400 transition-transform ${expanded === idx ? "rotate-180" : ""}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {expanded === idx && (
+                  <div className="px-4 pb-3 text-xs text-slate-300 bg-white/5 leading-relaxed">
+                    {stage.agronomy_advice}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Navigate to Calendar */}
+      <Link
+        href="/calendar"
+        className="block w-full text-center py-3 px-4 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-xl transition-colors"
+      >
+        View Cultivation Calendar →
+      </Link>
+    </div>
+  );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────
 
 export default function SimulatePage() {
-  const {
-    setFarmParams,
-    simulationResults,
-    setSimulationResults,
-    selectedCrop,
-    setSelectedCrop,
-    currentStep,
-    setCurrentStep,
-    setCoordinates,
-    setSoilParams,
-    setAnnualRainfall,
-  } = useFarm();
+  // Strict state per spec §3
+  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
+  const [setupType, setSetupType] = useState<"short-term" | "long-term">("short-term");
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<SimulationResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<"input" | "simulate">("input");
-  const [isLoading, setIsLoading] = useState(false);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [mapDistrict, setMapDistrict] = useState<SpatialLookupResponse | null>(null);
-  const [digitalTwinLoading, setDigitalTwinLoading] = useState(false);
-  const [digitalTwinError, setDigitalTwinError] = useState<string | null>(null);
-
-  // Strict dynamic import with ssr: false - completely blocks SSR for Leaflet
-  const MapUI = dynamic(
-    () => import("@/components/MapUI").then((mod) => mod.MapUI),
-    {
-      ssr: false,
-      loading: () => (
-        <div className="h-[400px] w-full bg-slate-800 animate-pulse rounded-xl flex items-center justify-center text-slate-400">
-          Initializing Map Engine...
-        </div>
-      ),
-    }
-  );
-
-  // Handle map click / district selection -> auto-fetch soil + rainfall into global state
-  const handleMapDistrictSelect = (district: SpatialLookupResponse) => {
-    setMapDistrict(district);
-    // Persist auto-fetched location + soil data to global state
-    if (district.centroid) {
-      setCoordinates({ lat: district.centroid.lat, lon: district.centroid.lon });
-    }
-    if (district.baseline_parameters) {
-      const bp = district.baseline_parameters;
-      setSoilParams({
-        ph: bp.ph,
-        texture: district.soil_type,
-        organic_carbon: 0.6,
-        n: bp.n,
-        p: bp.p,
-        k: bp.k,
-      });
-      setAnnualRainfall(bp.rainfall_mm);
-    }
+  // Map pin drop (immediate — no API await per spec §2)
+  const handlePinDrop = (lat: number, lng: number) => {
+    setPin({ lat, lng });
+    setError(null);
+    // Clear old results when new pin dropped
+    setResults(null);
   };
 
-  // Handle map click anywhere -> auto-fetch soil + rainfall via spatial lookup API (with reverse geocoding fallback)
-  const handleMapClick = async (lat: number, lng: number) => {
-    try {
-      setIsLoading(true);
-
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-35zr.onrender.com";
-      console.log(`[MapClick] Looking up location: lat=${lat}, lng=${lng}`);
-      
-      // Try reverse-geocode endpoint first (includes Nominatim fallback)
-      const response = await fetch(`${backendUrl}/api/v1/spatial/reverse-geocode?lat=${lat}&lon=${lng}`);
-      if (!response.ok) {
-        console.error(`[MapClick] Reverse geocode failed: ${response.status} ${response.statusText}`);
-        // Fallback to old lookup endpoint
-        const fallbackResponse = await fetch(`${backendUrl}/api/v1/spatial/lookup?lat=${lat}&lng=${lng}`);
-        if (!fallbackResponse.ok) {
-          console.error(`[MapClick] Fallback lookup failed: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
-          throw new Error("Failed to lookup location - both endpoints failed");
-        }
-        const district = await fallbackResponse.json();
-        if (district) {
-          console.log(`[MapClick] Fallback lookup success:`, district.district_name);
-          handleMapDistrictSelect(district);
-        }
-      } else {
-        const district = await response.json();
-        if (district) {
-          console.log(`[MapClick] Reverse geocode success:`, district.district_name);
-          handleMapDistrictSelect(district);
-        }
-      }
-    } catch (err: any) {
-      console.error("[MapClick] Map click lookup failed:", err);
-      setApiError(`Location lookup failed: ${err.message}. Check console for details.`);
-    } finally {
-      setIsLoading(false);
+  // Run simulation via /api/v1/simulation/run
+  const runSimulation = async () => {
+    if (!pin) {
+      setError("Please pin a location on the map first.");
+      return;
     }
-  };
-
-  // Handle pin drop -> trigger digital twin simulation immediately
-  const handlePinDrop = async (lat: number, lng: number) => {
-    setDigitalTwinLoading(true);
-    setDigitalTwinError(null);
-    
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-35zr.onrender.com";
-      const endpoint = `${apiUrl}/api/v1/simulation/run-from-location`;
-      
-      console.log(`[PinDrop] Calling digital twin simulation: ${endpoint}`, { lat, lng });
-      
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat, lng }),
-      });
-      
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || `Simulation API failed: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log("[PinDrop] Digital twin simulation complete:", data);
-      
-      // Switch to simulate tab and update state
-      setActiveTab("simulate");
-      setCurrentStep(3);
-      
-      // If the response contains simulation results, store them
-      if (data.simulation_results) {
-        setSimulationResults(data.simulation_results);
-      }
-      
-    } catch (err: any) {
-      const errorMsg = err.message || "Digital twin simulation failed";
-      console.error("[PinDrop] Error:", errorMsg);
-      setDigitalTwinError(errorMsg);
-    } finally {
-      setDigitalTwinLoading(false);
-    }
-  };
-
-  // Form submit -> get crop recommendations
-  const handleRecommendationSubmit = async (formData: any) => {
-    setIsLoading(true);
-    setApiError(null);
-    setActiveTab("simulate");
-    setCurrentStep(2);
+    setLoading(true);
+    setError(null);
+    setResults(null);
 
     try {
-      const response = await fetch("/api/recommend", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://agribrain-backend.onrender.com";
+      const res = await fetch(`${apiUrl}/api/v1/simulation/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          district_id: formData.district_id || mapDistrict?.district_id,
-          soil_type: formData.soil_type,
-          rainfall_mm: formData.rainfall_mm,
-          temperature_c: formData.temperature_c,
-          humidity_percent: formData.humidity_percent,
-          ph: formData.ph,
-          n: formData.n,
-          p: formData.p,
-          k: formData.k,
-          top_k: 5,
+          lat: pin.lat,
+          lng: pin.lng,
+          setup_type: setupType,
         }),
       });
 
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || `API error: ${response.status}`);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || `API error: ${res.status} ${res.statusText}`);
       }
 
-      const data = await response.json();
-      if (data.recommendations?.length > 0) {
-        setRecommendations(data.recommendations);
-      }
+      const data: SimulationResult = await res.json();
+      setResults(data);
     } catch (err: any) {
-      setApiError(err.message || "Failed to get recommendations. Check backend connectivity.");
+      setError(err.message || "Simulation failed. Please try again.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  // Crop selection -> store in global state
-  const handleCropSelect = (rec: Recommendation) => {
-    setSelectedCrop(rec.crop_name);
-    setCurrentStep(3);
-    // Timeline is fetched automatically by SimulationCalendar component
-  };
-
-  // Run full simulation from map location
-  const handleRunSimulationFromLocation = async (lat: number, lng: number, landAreaHa: number = 1.0, budgetInr: number = 50000) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/simulation/location", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat, lng, land_area_ha: landAreaHa, budget_inr: budgetInr, top_k: 3 }),
-      });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || `API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      // Set recommendations from the full pipeline
-      if (data.recommendations?.length > 0) {
-        setRecommendations(data.recommendations.map((r: any) => ({
-          crop_name: r.crop_name,
-          confidence: r.confidence,
-          match_reasons: r.match_reasons,
-          expected_yield_tons_per_ha: null,
-          season: null,
-        })));
-        setActiveTab("simulate");
-        setCurrentStep(2);
-      }
-      
-      // Store timelines for use by SimulationCalendar
-      if (data.timelines) {
-        // The timelines will be picked up by the SimulationCalendar component
-        console.log("Timelines received:", data.timelines);
-      }
-      
-      return data;
-    } catch (err: any) {
-      setApiError(err.message || "Failed to run simulation from location.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Simulation complete -> store results + navigate
-  const handleSimulationComplete = (results: any) => {
-    setSimulationResults(results);
-    setCurrentStep(4);
   };
 
   return (
     <div className="min-h-screen bg-digital-twin transition-colors">
+      {/* Header */}
       <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
-                  </svg>
-                </div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">AgriBrain</h1>
-              </Link>
-            </div>
-
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">AgriBrain</h1>
+            </Link>
             <nav className="flex items-center gap-1">
-              <Link
-                href="/simulate"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-400 bg-green-500/20 rounded-lg"
-              >
-                <span className="w-4 h-4 rounded-full bg-green-500"></span>
+              <Link href="/simulate" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-400 bg-green-500/20 rounded-lg">
+                <span className="w-4 h-4 rounded-full bg-green-500" />
                 Simulation
               </Link>
-              <Link
-                href="/calendar"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
-              >
+              <Link href="/calendar" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                 Calendar
               </Link>
-              <Link
-                href="/expert-chat"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
-              >
+              <Link href="/expert-chat" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                 Expert Chat
               </Link>
             </nav>
@@ -331,207 +272,120 @@ export default function SimulatePage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Progress Tracker */}
-          <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
-            {[
-              { label: "Farm Input", step: 1 },
-              { label: "Crop Selection", step: 2 },
-              { label: "Simulation", step: 3 },
-              { label: "Calendar", step: 4 },
-              { label: "Expert Chat", step: 5 },
-            ].map((item, idx) => (
-              <div key={item.label} className="flex items-center gap-1 whitespace-nowrap">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                    currentStep >= item.step
-                      ? "bg-green-500 text-white"
-                      : "bg-white/10 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
-                  }`}
-                >
-                  {item.step}
-                </div>
-                <span
-                  className={`hidden sm:block text-sm font-medium ${
-                    currentStep >= item.step
-                      ? "text-green-400"
-                      : "text-slate-500 dark:text-slate-400"
-                  }`}
-                >
-                  {item.label}
-                </span>
-                {idx < 4 && (
-                  <div
-                    className={`hidden lg:block w-12 h-0.5 rounded ${
-                      currentStep > item.step
-                        ? "bg-green-500"
-                        : "bg-white/10 dark:bg-slate-700"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
+      {/* Main — strict responsive breakpoints per spec §6 */}
+      <main className="min-h-screen w-full flex flex-col md:flex-row p-2 md:p-4 gap-4 max-w-7xl mx-auto">
+
+        {/* Left: Map + controls */}
+        <div className="w-full md:w-2/3 flex flex-col gap-4">
+          <div className="glass-card overflow-hidden">
+            <div className="p-4 border-b border-white/10">
+              <h2 className="text-xl font-bold text-white">Interactive Farm Map</h2>
+              <p className="text-sm text-slate-400 mt-1">
+                Click anywhere on the map to drop a pin, then run the AI simulation.
+              </p>
+            </div>
+
+            {/* Map container — strict spec §6 */}
+            <div className="w-full h-[50vh] md:h-[600px] rounded-lg overflow-hidden relative z-0 p-2">
+              <MapUI
+                onDistrictSelect={() => {}}
+                isLoading={loading}
+                initialCenter={[20.5937, 78.9629]}
+                initialZoom={5}
+                onMapClick={handlePinDrop}
+                onPinDrop={handlePinDrop}
+              />
+            </div>
           </div>
 
-          <div className="grid lg:grid-cols-12 gap-6 md:gap-4">
-            {/* Map Panel - 7/12 width on lg, full width on mobile */}
-            <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
-              <div className="glass-card overflow-hidden">
-                <div className="p-4 border-b border-white/10 dark:border-slate-700/50">
-                  <h2 className="text-xl font-bold text-white">Interactive District Map</h2>
-                  <p className="text-sm text-slate-400 mt-1">Click anywhere on the map to auto-fill soil parameters and get crop recommendations</p>
-                </div>
-                <div className="p-4">
-                  <MapUI
-                    onDistrictSelect={handleMapDistrictSelect}
-                    isLoading={isLoading}
-                    initialCenter={[20.5937, 78.9629]}
-                    initialZoom={5}
-                    onMapClick={handleMapClick}
-                    onPinDrop={handlePinDrop}
-                  />
-
-                  {mapDistrict && (
-                    <div className="mt-4 p-4 glass-card border-green-500/30 animate-slide-in">
-                      <h4 className="text-lg font-semibold text-green-400 mb-2">
-                        {mapDistrict.district_name}, {mapDistrict.state}
-                      </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-slate-400">
-                        <div>Soil: {mapDistrict.soil_type}</div>
-                        <div>Zone: {mapDistrict.agro_climatic_zone || "N/A"}</div>
-                        <div>N: {mapDistrict.baseline_parameters?.n} kg/ha</div>
-                        <div>P: {mapDistrict.baseline_parameters?.p} kg/ha</div>
-                        <div>K: {mapDistrict.baseline_parameters?.k} kg/ha</div>
-                        <div>pH: {mapDistrict.baseline_parameters?.ph}</div>
-                        <div>Temp: {mapDistrict.baseline_parameters?.temperature_c}°C</div>
-                        <div>Humidity: {mapDistrict.baseline_parameters?.humidity_percent}%</div>
-                        <div>Rainfall: {mapDistrict.baseline_parameters?.rainfall_mm} mm</div>
-                      </div>
-                      <button
-                        onClick={() => handleRunSimulationFromLocation(
-                          mapDistrict.latitude || mapDistrict.centroid?.lat || 20.5937,
-                          mapDistrict.longitude || mapDistrict.centroid?.lon || 78.9629
-                        )}
-                        disabled={isLoading}
-                        className="mt-4 w-full py-2 px-4 bg-green-500/20 text-green-400 font-medium rounded-lg hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {isLoading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-500 border-t-transparent"></div>
-                            Running Full Pipeline...
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                            Run Full Simulation Pipeline
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
-
-                  {apiError && (
-                    <div className="mt-4 p-4 glass-card border-red-500/30 animate-slide-in">
-                      <p className="text-sm text-red-400">{apiError}</p>
-                    </div>
-                  )}
-
-                  {/* Digital Twin Loading/Error Display */}
-                  {digitalTwinLoading && (
-                    <div className="mt-4 p-4 glass-card border-blue-500/30 animate-slide-in">
-                      <div className="flex items-center justify-center gap-2 text-sm text-blue-300">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
-                        Running Digital Twin Simulation...
-                      </div>
-                    </div>
-                  )}
-
-                  {digitalTwinError && (
-                    <div className="mt-4 p-4 glass-card border-red-500/30 animate-slide-in">
-                      <div className="flex items-center gap-2 text-sm text-red-400">
-                        <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                        <span>Digital Twin Error: {digitalTwinError}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          {/* Pin info + controls */}
+          <div className="glass-card p-5 space-y-4">
+            {/* Pin status */}
+            {pin ? (
+              <div className="flex items-center gap-2 text-sm text-green-400">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Pin set: {pin.lat.toFixed(4)}°N, {pin.lng.toFixed(4)}°E
               </div>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <span className="w-2 h-2 rounded-full bg-slate-500" />
+                No pin yet — click on the map
+              </div>
+            )}
 
-              {activeTab === "simulate" && recommendations.length > 0 && (
-                <div className="glass-card p-6 animate-slide-in">
-                  <h2 className="text-xl font-bold text-white mb-6">Select Crop to Simulate</h2>
-                  <p className="text-slate-400 mb-6">Click on a crop card to select it, then run the digital twin simulation.</p>
-                  <div className="grid grid-cols-1 gap-4">
-                    {recommendations.map((rec, index) => (
-                      <CropCard
-                        key={`${rec.crop_name}-${index}`}
-                        recommendation={rec}
-                        rank={index + 1}
-                        onClick={() => handleCropSelect(rec)}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => setActiveTab("input")}
-                    className="mt-6 w-full py-2 px-4 bg-white/10 text-slate-300 font-medium rounded-lg hover:bg-white/20 transition-colors"
-                  >
-                    Back to Input
-                  </button>
-                </div>
-              )}
+            {/* Setup type toggle per spec §3 */}
+            <div>
+              <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">Farm Type</p>
+              <div className="flex rounded-xl overflow-hidden border border-white/10">
+                <button
+                  onClick={() => setSetupType("short-term")}
+                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                    setupType === "short-term"
+                      ? "bg-green-500 text-white"
+                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  Short-term / Seasonal
+                </button>
+                <button
+                  onClick={() => setSetupType("long-term")}
+                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                    setupType === "long-term"
+                      ? "bg-green-500 text-white"
+                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  Long-term / Orchard
+                </button>
+              </div>
             </div>
 
-            {/* Sidebar - 5/12 width on lg, full width on mobile */}
-            <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
-              {activeTab === "input" && (
-                <InputPanel
-                  onSubmit={handleRecommendationSubmit}
-                  isLoading={isLoading}
-                  hasRecommendations={recommendations.length > 0}
-                />
+            {/* Run button */}
+            <button
+              onClick={runSimulation}
+              disabled={loading || !pin}
+              className="w-full py-3 px-4 bg-green-500 hover:bg-green-400 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  Running AI Simulation...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Run Simulation
+                </>
               )}
+            </button>
 
-              {activeTab === "simulate" && (
-                <SimulationPanel
-                  recommendations={recommendations}
-                  onSimulationComplete={handleSimulationComplete}
-                  selectedCrop={selectedCrop}
-                />
-              )}
+            {/* Error toast */}
+            {error && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-400 flex items-start gap-2">
+                <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                {error}
+              </div>
+            )}
+          </div>
+        </div>
 
-              {/* Sidebar Widgets */}
-              <WeatherWidget />
-              <AlertsWidget />
-              <DigitalTwinWidget />
+        {/* Right: Results panel — strict spec §6 sidebar */}
+        <div className="w-full md:w-1/3 flex-shrink-0">
+          <div className="glass-card p-5 min-h-[400px]">
+            <h3 className="text-lg font-bold text-white mb-4">Simulation Results</h3>
 
-              {/* Cultivation Timeline */}
-              {selectedCrop && (
-                <SimulationCalendar cropName={selectedCrop} />
-              )}
-
-              {/* Continue to Calendar */}
-              {simulationResults && (
-                <div className="glass-card border-green-500/30 p-6 animate-slide-in">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-green-400">Simulation Complete!</h3>
-                      <p className="text-green-300">Your digital twin simulation for <strong>{selectedCrop}</strong> is ready with yield, revenue, and ROI predictions.</p>
-                    </div>
-                    <Link
-                      href="/calendar"
-                      className="btn-primary"
-                    >
-                      View Cultivation Calendar →
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Strict conditional rendering — ZERO fallback text when loading or data exists */}
+            {loading ? (
+              <SkeletonCard />
+            ) : results ? (
+              <ResultsWidget data={results} />
+            ) : (
+              <EmptyStateWidget />
+            )}
           </div>
         </div>
       </main>
