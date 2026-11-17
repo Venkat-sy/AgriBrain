@@ -155,9 +155,9 @@ import { useState, useEffect } from "react";
          </div>
 
          {/* Main Content Grid */}
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-[calc(100vh-350px)] lg:h-[calc(100vh-350px)]">
            {/* Chat Interface - 2/3 width */}
-           <div className="lg:col-span-2">
+           <div className="lg:col-span-2 min-h-[32rem] lg:min-h-0 min-w-0">
              <ChatAssistant is_context_aware={true} />
            </div>
            

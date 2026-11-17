@@ -5,7 +5,7 @@ export interface ApiError extends Error {
   retryable?: boolean;
 }
 
-// Session ID management - generate unique session per user
+// Adjusted API structure for sending correctly; payload includes prompt, coordinates.
 let sessionId: string | null = null;
 
 function getSessionId(): string {
@@ -76,8 +76,8 @@ export class ApiService {
         endpoint?: string; // override endpoint
       }
     ) {
-      const endpoint = context?.endpoint || "/api/v1/chat/troubleshoot";
       const hasImage = context?.image != null && context.image.startsWith("data:image/");
+      const endpoint = context?.endpoint || (hasImage ? "/api/v1/chat/troubleshoot-vision" : "/api/v1/chat/troubleshoot");
     
       const currentSessionId = getSessionId();
 
@@ -91,6 +91,15 @@ export class ApiService {
         body = new FormData();
         body.append("session_id", currentSessionId);
         body.append("user_question", message || "Analyze this image");
+        body.append("context", JSON.stringify({
+          coordinates: context?.coordinates,
+          soilParams: context?.soilParams,
+          annualRainfall: context?.annualRainfall,
+          selectedCrop: context?.selectedCrop,
+          farmParams: context?.farmParams,
+          simulationResults: context?.simulationResults,
+          calendarStages: context?.calendarStages,
+        }));
       
         // Convert base64 to blob
         const base64Data = context.image!.split(",")[1];
@@ -107,12 +116,20 @@ export class ApiService {
         // Don't set Content-Type for FormData - browser will set it with boundary
         delete headers["Content-Type"];
       } else {
-        body = JSON.stringify({
-          session_id: currentSessionId,
-          user_question: message,
-          context: context?.is_context_aware ? context : undefined,
-        });
-      }
+              body = JSON.stringify({
+                session_id: currentSessionId,
+                message: message,
+                context: context?.is_context_aware ? {
+                  coordinates: context.coordinates,
+                  soilParams: context.soilParams,
+                  annualRainfall: context.annualRainfall,
+                  selectedCrop: context.selectedCrop,
+                  farmParams: context.farmParams,
+                  simulationResults: context.simulationResults,
+                  calendarStages: context.calendarStages,
+                } : undefined,
+              });
+            }
 
       return this.request<{ response: string; session_id: string }>(endpoint, {
         method: "POST",

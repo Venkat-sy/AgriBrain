@@ -335,7 +335,6 @@ export default function SimulatePage() {
           plantingSeason = "Zaid";
         }
 
-        // Call backend simulation API
         const result = await ApiService.runSimulation({
           district_id: districtId,
           selected_crop: data?.ranked_crops?.[0]?.name || data?.recommended_crop || "Rice (Paddy)",
@@ -347,23 +346,35 @@ export default function SimulatePage() {
           planned_start_date: new Date().toISOString().split('T')[0],
         });
 
-        // Transform backend response to frontend format
+        // Validate response before changing the rendered results.
+        if (!result || typeof result !== 'object') {
+          throw new Error('Simulation returned an invalid response');
+        }
+        const rankedCrops = Array.isArray(result.ranked_crops)
+          ? result.ranked_crops
+          : Array.isArray(result.alternatives)
+            ? result.alternatives
+            : [];
         const payload = {
-          district: result.district,
-          agro_zone: result.agro_zone,
+          district: result.district ?? null,
+          agro_zone: result.agro_zone ?? null,
           area_acres: areaAcres,
           setup_type: setupType,
-          weather: result.weather,
-          soil: result.soil,
-          rainfall_forecast: result.rainfall_forecast || [],
-          ranked_crops: result.ranked_crops || result.alternatives || [],
-          recommended_crop: result.recommended_crop,
-          timeline: result.timeline || [],
+          weather: result.weather ?? null,
+          soil: result.soil ?? null,
+          rainfall_forecast: Array.isArray(result.rainfall_forecast) ? result.rainfall_forecast : [],
+          ranked_crops: rankedCrops,
+          recommended_crop: result.recommended_crop ?? null,
+          timeline: Array.isArray(result.timeline) ? result.timeline : [],
         };
 
         setSelectedCropIndex(0);
         setData(payload);
-        localStorage.setItem('agribrain_last_simulation', JSON.stringify(payload));
+        try {
+          localStorage.setItem('agribrain_last_simulation', JSON.stringify(payload));
+        } catch (storageError) {
+          console.warn('Unable to cache simulation results:', storageError);
+        }
         setLoading(false);
       } catch (error) {
         console.error('Simulation error:', error);
@@ -404,13 +415,13 @@ export default function SimulatePage() {
       {/* Status Banner */}
       {statusBanner && (
         <div className="max-w-7xl mx-auto px-4 py-2 animate-slide-down">
-          <Alert variant={statusBanner.type === 'error' ? 'destructive' : 'default'} className="mb-0 rounded-none border-x-0 border-t-0 border-b-0">
-            <AlertCircle className="w-4 h-4" />
-            <AlertTitle className="text-sm">{statusBanner.title}</AlertTitle>
-            <AlertDescription className="text-xs">{statusBanner.message}</AlertDescription>
-          </Alert>
-        </div>
-      )}
+                <Alert variant="destructive" className="mb-0 rounded-none border-x-0 border-t-0 border-b-0">
+                  <AlertCircle className="w-4 h-4" />
+                  <AlertTitle className="text-sm">Simulation notice</AlertTitle>
+                  <AlertDescription className="text-xs">{statusBanner}</AlertDescription>
+                </Alert>
+              </div>
+            )}
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Loading Overlay */}
@@ -584,7 +595,7 @@ export default function SimulatePage() {
 
           {/* Right Panel - Results */}
           <div className="space-y-6">
-            {data ? (
+            {data?.ranked_crops?.length > 0 && activeCrop ? (
               <>
                 {/* Top Crop Card */}
                 <Card className="border-emerald-300 bg-gradient-to-br from-emerald-50 to-white relative overflow-hidden">
@@ -594,13 +605,13 @@ export default function SimulatePage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <Badge variant="default" className="text-xs">Top Match</Badge>
-                          <Badge variant="secondary" className="text-xs">{data.setup_type === 'seasonal' ? 'Seasonal' : 'Perennial'}</Badge>
+                          <Badge variant="secondary" className="text-xs">{data?.setup_type === 'seasonal' ? 'Seasonal' : 'Perennial'}</Badge>
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-900">{activeCrop.name}</h2>
-                        <p className="text-sm text-slate-500">{activeCrop.variety} • {activeCrop.season} • {activeCrop.days} days</p>
+                        <h2 className="text-2xl font-bold text-slate-900">{activeCrop?.name}</h2>
+                                                <p className="text-sm text-slate-500">{activeCrop?.variety} • {activeCrop?.season} • {activeCrop?.days} days</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-4xl font-bold text-emerald-600">{activeCrop.score_pct}%</p>
+                        <p className="text-4xl font-bold text-emerald-600">{activeCrop?.score_pct}%</p>
                         <p className="text-xs text-slate-500">Suitability Score</p>
                       </div>
                     </div>
@@ -608,10 +619,10 @@ export default function SimulatePage() {
                   <CardContent className="relative space-y-4">
                     {/* Key Metrics Row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <MetricCard label="Yield / Acre" value={`${activeCrop.digital_twin.yield_per_acre_tonnes} t`} icon={<Tractor className="w-4 h-4" />} />
-                      <MetricCard label="Total Yield" value={`${activeCrop.digital_twin.total_yield_tonnes} t`} icon={<Package className="w-4 h-4" />} />
-                      <MetricCard label="Est. Revenue" value={`₹${activeCrop.digital_twin.estimated_revenue_inr.toLocaleString('en-IN')}`} icon={<Rupee className="w-4 h-4" />} />
-                      <MetricCard label="Water / Day" value={`${activeCrop.digital_twin.daily_water_liters.toLocaleString('en-IN')} L`} icon={<Droplets className="w-4 h-4" />} />
+                      <MetricCard label="Yield / Acre" value={`${activeCrop?.digital_twin?.yield_per_acre_tonnes || 0} t`} icon={<Tractor className="w-4 h-4" />} />
+                                            <MetricCard label="Total Yield" value={`${activeCrop?.digital_twin?.total_yield_tonnes || 0} t`} icon={<Package className="w-4 h-4" />} />
+                                            <MetricCard label="Est. Revenue" value={`₹${activeCrop?.digital_twin?.estimated_revenue_inr?.toLocaleString('en-IN') || 0}`} icon={<Rupee className="w-4 h-4" />} />
+                                            <MetricCard label="Water / Day" value={`${activeCrop?.digital_twin?.daily_water_liters?.toLocaleString('en-IN') || 0} L`} icon={<Droplets className="w-4 h-4" />} />
                     </div>
 
                     {/* SHAP Explainability */}
@@ -621,7 +632,7 @@ export default function SimulatePage() {
                         SHAP Feature Impact Breakdown
                       </h4>
                       <div className="space-y-2">
-                        {activeCrop.shap_breakdown.map((s, i) => (
+                        {activeCrop?.shap_breakdown?.map((s, i) => (
                           <div key={i} className="flex items-center gap-3">
                             <div className="w-36 text-xs text-slate-600 font-medium">{s.feature}</div>
                             <div className="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
@@ -645,7 +656,7 @@ export default function SimulatePage() {
                     <div className="border-t pt-4">
                       <h4 className="text-sm font-semibold text-slate-700 mb-3">Risk Assessment</h4>
                       <div className="grid grid-cols-3 gap-3">
-                        {Object.entries(activeCrop.digital_twin.risks).map(([key, val]) => (
+                        {Object.entries(activeCrop?.digital_twin?.risks || {}).map(([key, val]) => (
                           <div key={key} className="p-3 bg-slate-50 rounded-lg text-center">
                             <p className="text-xs text-slate-500 capitalize">{key.replace('_', ' ')}</p>
                             <p className="text-sm font-medium text-slate-900 mt-1">{val}</p>
@@ -680,9 +691,9 @@ export default function SimulatePage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {data.ranked_crops.map((crop, idx) => (
+                          {(data?.ranked_crops || []).map((crop, idx) => (
                             <TableRow
-                              key={crop.name}
+                                key={`${crop.name}-${idx}`}
                               className={`cursor-pointer transition-colors ${selectedCropIndex === idx ? 'bg-emerald-50' : 'hover:bg-slate-50'}`}
                               onClick={() => setSelectedCropIndex(idx)}
                             >
@@ -700,13 +711,13 @@ export default function SimulatePage() {
                                 </span>
                               </TableCell>
                               <TableCell className="text-right hidden sm:table-cell text-sm text-slate-700">
-                                {crop.digital_twin.yield_per_acre_tonnes} t
+                                {crop.digital_twin?.yield_per_acre_tonnes ?? 0} t
                               </TableCell>
                               <TableCell className="text-right hidden md:table-cell text-sm text-slate-700 font-medium">
-                                ₹{crop.digital_twin.estimated_revenue_inr.toLocaleString('en-IN')}
+                                ₹{(crop.digital_twin?.estimated_revenue_inr ?? 0).toLocaleString('en-IN')}
                               </TableCell>
                               <TableCell className="text-right text-sm text-slate-700">
-                                {crop.digital_twin.daily_water_liters.toLocaleString('en-IN')} L
+                                {(crop.digital_twin?.daily_water_liters ?? 0).toLocaleString('en-IN')} L
                               </TableCell>
                             </TableRow>
                           ))}
@@ -721,13 +732,13 @@ export default function SimulatePage() {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Calendar className="w-5 h-5" />
-                      Agronomy Timeline — {activeCrop.name}
+                      Agronomy Timeline — {activeCrop?.name || 'Crop'}
                     </CardTitle>
                     <CardDescription>Stage-wise schedule with weather-aligned advisories</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {activeCrop.timeline.map((stage, idx) => (
+                      {(activeCrop?.timeline || []).map((stage, idx) => (
                         <div key={idx} className="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
                           <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
                             <span className="text-2xl font-bold text-emerald-600">{idx + 1}</span>
@@ -742,11 +753,11 @@ export default function SimulatePage() {
                     </div>
                     <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                       <p className="text-sm text-emerald-800">
-                        <strong>Total Cycle:</strong> {activeCrop.timeline.reduce((a, b) => a + b.days, 0)} days (~{Math.round(activeCrop.timeline.reduce((a, b) => a + b.days, 0) / 30)} months)
+                        <strong>Total Cycle:</strong> {(activeCrop?.timeline || []).reduce((a, b) => a + (Number(b.days) || 0), 0)} days (~{Math.round((activeCrop?.timeline || []).reduce((a, b) => a + (Number(b.days) || 0), 0) / 30)} months)
                         {' | '}
-                        <strong>Total Water:</strong> {activeCrop.digital_twin.total_water_m3.toLocaleString('en-IN')} m³
+                        <strong>Total Water:</strong> {(activeCrop?.digital_twin?.total_water_m3 || 0).toLocaleString('en-IN')} m³
                         {' | '}
-                        <strong>Projected Gross:</strong> ₹{activeCrop.digital_twin.estimated_revenue_inr.toLocaleString('en-IN')}
+                        <strong>Projected Gross:</strong> ₹{(activeCrop?.digital_twin?.estimated_revenue_inr || 0).toLocaleString('en-IN')}
                       </p>
                     </div>
                   </CardContent>
@@ -763,7 +774,7 @@ export default function SimulatePage() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                      {data.rainfall_forecast.map((m, idx) => (
+                      {(data?.rainfall_forecast || []).map((m, idx) => (
                         <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-center">
                           <p className="text-xs text-slate-500">{m.month}</p>
                           <p className="text-2xl font-bold text-emerald-600 mt-1">{m.predicted_mm} mm</p>

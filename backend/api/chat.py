@@ -42,7 +42,7 @@ async def troubleshoot_chat(request: Request):
         body = await request.json()
         message = body.get('message') or body.get('query') or body.get('prompt') or ''
         base64_image = body.get('image')
-        farm_context = body.get('context') or ''
+        farm_context = body.get('context')
         session_id = body.get('session_id')
     else:
         form = await request.form()
@@ -61,6 +61,9 @@ async def troubleshoot_chat(request: Request):
     messages = [{'role': msg['role'], 'content': msg['content']} for msg in history]
     user_content = message
     if farm_context:
+        if not isinstance(farm_context, str):
+            import json
+            farm_context = json.dumps(farm_context, indent=2)
         user_content = 'Farm Context: ' + farm_context + chr(10) + chr(10) + 'User Query: ' + message
     if base64_image:
         if ',' in base64_image:
