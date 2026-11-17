@@ -3,7 +3,8 @@ import json
 import requests
 from fastapi import APIRouter, Request
 from groq import Groq
-from backend.api.spatial import lookup_spatial
+from backend.api.spatial import lookup_spatial, fetch_live_weather
+from backend.ml.inference.crop_recommendation import compute_shap_values, _get_xgboost_bundle, XGBOOST_FEATURE_COLUMNS
 
 router = APIRouter()
 
@@ -76,22 +77,6 @@ async def run_simulation(request: Request):
     soil = dict(spatial_data["soil"])
     weather = dict(spatial_data["weather"])
 
-    # Live Weather API Check
-    weather_key = os.getenv("WEATHER_API_KEY")
-    if weather_key and district != "Regional District":
-        try:
-            w_resp = requests.get(
-                f"[https://weather.indianapi.in/india/weather?city=](https://weather.indianapi.in/india/weather?city=){district}",
-                headers={"Authorization": weather_key, "x-api-key": weather_key},
-                timeout=3
-            )
-            if w_resp.status_code == 200:
-                w_json = w_resp.json()
-                weather["temp"] = float(w_json.get("temp") or weather["temp"])
-                weather["humidity"] = float(w_json.get("humidity") or weather["humidity"])
-        except Exception:
-            pass
-
     # Apply Digital Twin "What-If" Scenario Overrides if provided by sliders
     overrides = body.get("overrides") or {}
     if overrides.get("rainfall") is not None:
@@ -115,13 +100,44 @@ async def run_simulation(request: Request):
         total_penalty = temp_diff + rain_diff + ph_diff + n_diff
         score = max(52.0, min(98.8, round(100.0 - total_penalty * 0.42, 1)))
 
-        # Compute Feature-Level SHAP Contributions
-        shap_breakdown = [
-            {"feature": "Temperature (°C)", "value": weather["temp"], "optimal": c["opt_temp"], "impact": round(max(-0.35, 0.35 - temp_diff * 0.02), 2)},
-            {"feature": "Rainfall (mm)", "value": weather["rainfall"], "optimal": c["opt_rain"], "impact": round(max(-0.35, 0.35 - rain_diff * 0.015), 2)},
-            {"feature": "Soil pH", "value": soil["pH"], "optimal": c["opt_ph"], "impact": round(max(-0.25, 0.25 - ph_diff * 0.02), 2)},
-            {"feature": "Soil Nitrogen (N)", "value": soil["N"], "optimal": c["opt_n"], "impact": round(max(-0.25, 0.25 - n_diff * 0.02), 2)}
-        ]
+        # Compute Authentic SHAP Contributions using real ML model
+        # Prepare input features for the ML model (7 features: N, P, K, temperature, humidity, ph, rainfall)
+        ml_input_features = {
+            "N": soil["N"],
+            "P": soil.get("P", 40),  # P not in soil dict, use default
+            "K": soil.get("K", 150),  # K not in soil dict, use default
+            "temperature": weather["temp"],
+            "humidity": weather["humidity"],
+            "ph": soil["pH"],
+            "rainfall": weather["rainfall"],
+        }
+
+        # Get real SHAP values from XGBoost model
+        xgb_bundle = _get_xgboost_bundle()
+        if xgb_bundle:
+            shap_features = compute_shap_values(xgb_bundle, ml_input_features, XGBOOST_FEATURE_COLUMNS)
+        else:
+            shap_features = None
+
+        # Format SHAP breakdown for frontend compatibility
+        if shap_features:
+            shap_breakdown = [
+                {
+                    "feature": sf["feature"],
+                    "value": sf["value"],
+                    "optimal": None,  # ML model doesn't have per-crop optimal values
+                    "impact": round(sf["shap_value"], 4),
+                }
+                for sf in shap_features
+            ]
+        else:
+            # Fallback to heuristic if SHAP unavailable
+            shap_breakdown = [
+                {"feature": "Temperature (°C)", "value": weather["temp"], "optimal": c["opt_temp"], "impact": round(max(-0.35, 0.35 - temp_diff * 0.02), 2)},
+                {"feature": "Rainfall (mm)", "value": weather["rainfall"], "optimal": c["opt_rain"], "impact": round(max(-0.35, 0.35 - rain_diff * 0.015), 2)},
+                {"feature": "Soil pH", "value": soil["pH"], "optimal": c["opt_ph"], "impact": round(max(-0.25, 0.25 - ph_diff * 0.02), 2)},
+                {"feature": "Soil Nitrogen (N)", "value": soil["N"], "optimal": c["opt_n"], "impact": round(max(-0.25, 0.25 - n_diff * 0.02), 2)},
+            ]
         shap_breakdown.sort(key=lambda x: x["impact"], reverse=True)
 
         scored_crops.append({
@@ -136,7 +152,7 @@ async def run_simulation(request: Request):
             "shap_breakdown": shap_breakdown
         })
 
-    scored_crops.sort(key=lambda x: x["score_pct"], reverse=True)
+        scored_crops.sort(key=lambda x: x["score_pct"], reverse=True)
     winner = scored_crops[0]
     top_crop = winner["crop"]
 
@@ -164,7 +180,7 @@ async def run_simulation(request: Request):
         "breakdown": winner["shap_breakdown"],
         "reasoning": (
             f"In {district} ({agro_zone}), {top_crop} achieved {winner['score_pct']}% suitability. "
-            f"Primary positive driver: {winner['shap_breakdown'][0]['feature']} ({winner['shap_breakdown'][0]['value']} vs optimal {winner['shap_breakdown'][0]['optimal']})."
+            f"Primary positive driver: {winner['shap_breakdown'][0]['feature']} (SHAP impact: {winner['shap_breakdown'][0]['impact']})."
         )
     }
 

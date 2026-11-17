@@ -14,13 +14,7 @@ from backend.schemas import (
     CropPriceResponse
 )
 from backend.services.weather_service import get_live_weather
-import importlib
-import backend.services.crop_recommendation_service as svc
-importlib.reload(svc)
-# Import inside function to avoid caching issues
-def get_recommend_crops():
-    from backend.services.crop_recommendation_service import recommend_crops
-    return recommend_crops
+from backend.services.unified_crop_service import get_crop_service, recommend_crops_unified
 
 router = APIRouter(prefix="/api/v1/crop", tags=["crop"])
 
@@ -31,12 +25,10 @@ async def recommend_crops(
     db: Session = Depends(get_db)
 ):
     """
-    Recommend crops using the trained ML model (RandomForest).
-    Takes soil and climate parameters, returns top-K crop predictions with confidence scores.
+    Recommend crops using the unified crop service.
+    Combines ML (XGBoost) with heuristic fallback for robust recommendations.
     """
-    # Fill missing climate features with live weather for the district so the
-    # XGBoost model always receives a complete payload. The weather service
-    # falls back to historical averages if the API is unavailable.
+    # Fill missing climate features with live weather for the district
     if request.temperature_c is None or request.humidity_percent is None:
         district = db.query(District).filter(District.id == request.district_id).first()
         if district:
@@ -46,9 +38,7 @@ async def recommend_crops(
             if request.humidity_percent is None:
                 request.humidity_percent = weather["humidity"]
 
-    # Map API request fields to ML model feature names
-    # API uses: n, p, k, temperature_c, humidity_percent, ph, rainfall_mm
-    # ML expects: n, p, k, temperature, humidity, ph, rainfall
+    # Map API request fields to unified service feature names
     input_features = {
         'N': request.n,
         'P': request.p,
@@ -58,30 +48,35 @@ async def recommend_crops(
         'ph': request.ph,
         'rainfall': request.rainfall_mm,
     }
-    
-    # Filter out None values - ML service will handle defaults
+
+    # Filter out None values
     input_features = {k: v for k, v in input_features.items() if v is not None}
-    
-    # Get ML-based recommendations
-    ml_recommendations = get_recommend_crops()(input_features, top_k=request.top_k)
-    
-    # Convert ML response to API response format
+
+    # Get unified recommendations (ML + heuristic)
+    unified_recommendations = recommend_crops_unified(
+        input_features,
+        top_k=request.top_k,
+        crop_type="all",
+        include_shap=True
+    )
+
+    # Convert to API response format
     recommendations = []
-    for rec in ml_recommendations:
+    for rec in unified_recommendations:
         recommendations.append(CropRecommendationItem(
             crop_name=rec['crop_name'],
             confidence=round(rec['confidence'], 4),
-            match_reasons=rec.get('match_reasons', []),
-            expected_yield_tons_per_ha=None,  # ML model doesn't provide yield estimates
-            season=None  # ML model doesn't provide season info
+            match_reasons=rec.get('heuristic_reasons', []),
+            expected_yield_tons_per_ha=rec.get('base_yield_t_ha'),
+            season=rec.get('season'),
         ))
-    
+
     return CropRecommendationResponse(
         district_id=request.district_id,
         soil_type=request.soil_type,
         rainfall_mm=request.rainfall_mm,
         recommendations=recommendations,
-        version="xgboost_v2.0",
+        version="unified_v1.0",
         generated_at=datetime.utcnow()
     )
 
@@ -96,11 +91,11 @@ async def get_crop_costs(
     crop = db.query(CropProfile).filter(CropProfile.id == crop_id).first()
     if not crop:
         raise HTTPException(status_code=404, detail="Crop not found")
-    
+
     query = db.query(CropCost).filter(CropCost.crop_id == crop_id)
     if region:
         query = query.filter(CropCost.region.ilike(f"%{region}%"))
-    
+
     costs = query.all()
     return costs
 
@@ -116,15 +111,33 @@ async def get_crop_prices(
     crop = db.query(CropProfile).filter(CropProfile.id == crop_id).first()
     if not crop:
         raise HTTPException(status_code=404, detail="Crop not found")
-    
+
     start_date = datetime.utcnow() - timedelta(days=days_back)
-    
+
     query = db.query(CropPrice).filter(
         CropPrice.crop_id == crop_id,
         CropPrice.price_date >= start_date
     )
     if market:
         query = query.filter(CropPrice.market.ilike(f"%{market}%"))
-    
+
     prices = query.order_by(CropPrice.price_date.desc()).all()
     return prices
+
+
+@router.get("/list")
+async def list_crops(crop_type: str = Query("all", regex="^(all|short_term|long_term)$")):
+    """List all available crops from unified database."""
+    service = get_crop_service()
+    crops = service.get_all_crops(crop_type)
+    return {"crops": crops, "count": len(crops)}
+
+
+@router.get("/{crop_name}")
+async def get_crop(crop_name: str):
+    """Get detailed crop information by name."""
+    service = get_crop_service()
+    crop = service.get_crop_by_name(crop_name)
+    if not crop:
+        raise HTTPException(status_code=404, detail="Crop not found")
+    return crop

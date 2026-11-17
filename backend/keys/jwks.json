@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "kid": "agribrain-key-1",
+      "use": "sig",
+      "alg": "RS256",
+      "n": "kYSdAzRtn5KjAXMMOojUt4Pn5Vsni-zyE-BoV2F_Atryno1dW0OlG8VORdNhjd-ikHHRC6nSDExDXNUHMIUpgB1JeEsRxmQdSck7u3wZlwet8PKuWL0w2L1jfpsT9NQBjNBhkwUGB0T2YwVt937Kcd-4BFwn7qaiQtdDMjCOHMEBtPaRxx0NszoHoDAoIGbVmZ-UE8hH5-bUjvcrvOLDuOoyzESRxJPSBvK-Mj5PBMgwCdyLcBLmokPFY8iQIz130W4nGvf6qlr_Ghhdel84wXZMBWYSbh_2n1k7D1B8Ddc81keaq1nIYhhSpo5A45E2DFk-yJ0CRxHLZMDjZbak1w",
+      "e": "AQAB"
+    }
+  ]
+}

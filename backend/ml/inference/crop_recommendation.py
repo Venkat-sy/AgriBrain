@@ -29,6 +29,14 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
+# SHAP for model explainability
+try:
+    import shap
+    SHAP_AVAILABLE = True
+except ImportError:
+    shap = None
+    SHAP_AVAILABLE = False
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -86,12 +94,214 @@ def _load_xgboost_bundle() -> Dict[str, Any]:
     }
 
 
+# ---------------------------------------------------------------------------
+# SHAP Explainer (authentic model explainability)
+# ---------------------------------------------------------------------------
+_SHAP_EXPLAINER = None
+
+
+def _get_shap_explainer() -> Any:
+    """Get or create SHAP TreeExplainer for the XGBoost model."""
+    global _SHAP_EXPLAINER
+    if _SHAP_EXPLAINER is not None:
+        return _SHAP_EXPLAINER
+    
+    if not SHAP_AVAILABLE:
+        print("[SHAP] shap library not available, returning None")
+        return None
+    
+    try:
+        bundle = _load_xgboost_bundle()
+        model = bundle["model"]
+        # XGBoost models work with TreeExplainer
+        _SHAP_EXPLAINER = shap.TreeExplainer(model)
+        print("[SHAP] TreeExplainer initialized for XGBoost model")
+        return _SHAP_EXPLAINER
+    except Exception as e:
+        print(f"[SHAP] Failed to initialize explainer: {e}")
+        return None
+
+
+def compute_shap_values(input_features: Dict[str, float]) -> Dict[str, Any]:
+    """
+    Compute authentic SHAP feature importance values for the given input.
+    
+    Args:
+        input_features: Dict with keys N, P, K, temperature, humidity, ph, rainfall
+        
+    Returns:
+        Dict with SHAP values, base values, and feature rankings
+    """
+    if not SHAP_AVAILABLE:
+        print("[SHAP] shap library not installed, returning empty explanation")
+        return {
+            "shap_values": {},
+            "base_values": {},
+            "feature_importance": [],
+            "status": "shap_unavailable"
+        }
+    
+    try:
+        # Get the model bundle
+        bundle = _load_xgboost_bundle()
+        model = bundle["model"]
+        feature_columns = bundle["feature_columns"]
+        
+        # Prepare input array in correct order
+        X = np.array([[input_features.get(col, 0) for col in feature_columns]])
+        X_df = pd.DataFrame(X, columns=feature_columns)
+        
+        # Load scaler and transform
+        scaler = joblib.load(XGBOOST_BUNDLE_PATH.parent / "xgboost_crop_scaler.joblib")
+        X_scaled = scaler.transform(X_df)
+        X_scaled_df = pd.DataFrame(X_scaled, columns=feature_columns)
+        
+        # Get SHAP explainer
+        explainer = _get_shap_explainer()
+        if explainer is None:
+            return {
+                "shap_values": {},
+                "base_values": {},
+                "feature_importance": [],
+                "status": "explainer_failed"
+            }
+        
+        # Compute SHAP values
+        shap_values = explainer.shap_values(X_scaled_df)
+        
+        # For multi-class, shap_values is list of arrays (one per class)
+        # We'll use the mean absolute SHAP across all classes for overall importance
+        if isinstance(shap_values, list):
+            # Mean absolute SHAP across classes
+            mean_shap = np.mean([np.abs(sv) for sv in shap_values], axis=0)
+            shap_vals = mean_shap[0]  # Single sample
+            base_values = np.mean([explainer.expected_value] if np.isscalar(explainer.expected_value) 
+                                  else explainer.expected_value)
+        else:
+            shap_vals = np.abs(shap_values[0])
+            base_values = explainer.expected_value if np.isscalar(explainer.expected_value) else explainer.expected_value[0]
+        
+        # Create feature importance ranking
+        feature_importance = []
+        for i, col in enumerate(feature_columns):
+            feature_importance.append({
+                "feature": col,
+                "value": float(shap_vals[i]),
+                "input_value": float(input_features.get(col, 0)),
+                "impact": "positive" if shap_vals[i] > 0 else "negative"
+            })
+        
+        # Sort by absolute SHAP value
+        feature_importance.sort(key=lambda x: abs(x["value"]), reverse=True)
+        
+        return {
+            "shap_values": {col: float(shap_vals[i]) for i, col in enumerate(feature_columns)},
+            "base_values": float(base_values) if np.isscalar(base_values) else float(base_values[0]),
+            "feature_importance": feature_importance,
+            "status": "success"
+        }
+        
+    except Exception as e:
+        print(f"[SHAP] Computation failed: {e}")
+        return {
+            "shap_values": {},
+            "base_values": 0.0,
+            "feature_importance": [],
+            "status": f"error: {str(e)}"
+        }
+
+
 def _get_xgboost_bundle() -> Optional[Dict[str, Any]]:
     """Lazy-load the XGBoost pipeline. Returns None if not on disk yet."""
     global _XGB_PIPELINE
     if _XGB_PIPELINE is None and XGBOOST_BUNDLE_PATH.is_file():
         _XGB_PIPELINE = _load_xgboost_bundle()
     return _XGB_PIPELINE
+
+
+# ---------------------------------------------------------------------------
+# SHAP Explainer (for XGBoost model explainability)
+# ---------------------------------------------------------------------------
+_XGB_EXPLAINER: Optional[Any] = None
+
+
+def _get_xgboost_explainer(bundle: Dict[str, Any]) -> Optional[Any]:
+    """Get or create SHAP TreeExplainer for the XGBoost model."""
+    global _XGB_EXPLAINER
+    if not SHAP_AVAILABLE:
+        return None
+    
+    if _XGB_EXPLAINER is None:
+        try:
+            xgb_model = bundle["model"].named_steps["xgb"]
+            _XGB_EXPLAINER = shap.TreeExplainer(xgb_model)
+            print("[ML] SHAP TreeExplainer initialized for XGBoost model")
+        except Exception as e:
+            print(f"[ML] Failed to initialize SHAP explainer: {e}")
+            return None
+    return _XGB_EXPLAINER
+
+
+def compute_shap_values(
+    bundle: Dict[str, Any],
+    input_features: Dict[str, Any],
+    feature_cols: List[str],
+) -> Optional[List[Dict[str, Any]]]:
+    """
+    Compute authentic SHAP feature importance values for a single prediction.
+    
+    Returns list of dicts with feature name, value, and SHAP impact value.
+    Returns None if SHAP is not available or fails.
+    """
+    if not SHAP_AVAILABLE:
+        return None
+    
+    explainer = _get_xgboost_explainer(bundle)
+    if explainer is None:
+        return None
+    
+    try:
+        # Build input DataFrame
+        row = []
+        for col in feature_cols:
+            val = (
+                input_features.get(col)
+                or input_features.get(col.lower())
+                or input_features.get(col.upper())
+                or 0
+            )
+            row.append(float(val))
+        
+        X = pd.DataFrame([row], columns=feature_cols)
+        
+        # Compute SHAP values
+        shap_values = explainer.shap_values(X)
+        
+        # For multi-class, shap_values is a list of arrays (one per class)
+        # We'll use the mean absolute SHAP value across all classes for each feature
+        if isinstance(shap_values, list):
+            # Average absolute SHAP values across classes
+            mean_shap = np.mean([np.abs(sv) for sv in shap_values], axis=0)
+            shap_vals = mean_shap[0]  # Single row
+        else:
+            shap_vals = np.abs(shap_values[0])
+        
+        # Create feature importance list
+        feature_importance = []
+        for i, col in enumerate(feature_cols):
+            feature_importance.append({
+                "feature": col,
+                "value": float(X.iloc[0, i]),
+                "shap_value": float(shap_vals[i]),
+            })
+        
+        # Sort by absolute SHAP value descending
+        feature_importance.sort(key=lambda x: abs(x["shap_value"]), reverse=True)
+        return feature_importance
+        
+    except Exception as e:
+        print(f"[ML] SHAP computation failed: {e}")
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -187,6 +397,7 @@ def _get_yield_encoders():
 def recommend(
     input_features: Dict[str, Any],
     top_k: int = 5,
+    include_shap: bool = False,
 ) -> List[Dict[str, Any]]:
     """Generate crop recommendations for a single input record.
 
@@ -197,24 +408,27 @@ def recommend(
         Accepts both upper (N, P, K) and lower (n, p, k) keys.
     top_k:
         Number of top recommendations to return.
+    include_shap:
+        If True, compute and include SHAP feature importance values.
 
     Returns
     -------
     List[Dict]
-        Each dict: ``crop_name``, ``confidence``, ``match_reasons``.
+        Each dict: ``crop_name``, ``confidence``, ``match_reasons``, and optionally ``shap_values``.
     """
     bundle = _get_xgboost_bundle()
 
     if bundle is not None:
-        return _recommend_xgboost(bundle, input_features, top_k)
+        return _recommend_xgboost(bundle, input_features, top_k, include_shap)
     else:
-        return _recommend_legacy(input_features, top_k)
+        return _recommend_legacy(input_features, top_k, include_shap)
 
 
 def _recommend_xgboost(
     bundle: Dict[str, Any],
     input_features: Dict[str, Any],
     top_k: int,
+    include_shap: bool = False,
 ) -> List[Dict[str, Any]]:
     """Inference using the XGBoost model bundle."""
     pipeline = bundle["model"]
@@ -248,6 +462,12 @@ def _recommend_xgboost(
             "match_reasons": [],
         })
 
+    # Compute SHAP values if requested
+    if include_shap:
+        shap_values = compute_shap_values(bundle, input_features, feature_cols)
+        if shap_values:
+            recommendations[0]["shap_values"] = shap_values
+
     # Pad if fewer classes than top_k
     while len(recommendations) < top_k:
         recommendations.append({
@@ -262,6 +482,7 @@ def _recommend_xgboost(
 def _recommend_legacy(
     input_features: Dict[str, Any],
     top_k: int,
+    include_shap: bool = False,
 ) -> List[Dict[str, Any]]:
     """Fallback: inference using the legacy RandomForest + scaler pipeline."""
     model, scaler, idx_to_crop = _get_legacy_artifacts()

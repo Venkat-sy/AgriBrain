@@ -54,18 +54,31 @@ def import_districts(session: Session, features):
     """
     # Lazy import of the District model
     from backend.models import District
+    import json
+    
+    # First, get all existing district_codes
+    existing_codes = set()
+    existing_codes_query = session.execute(select(District.district_code)).scalars().all()
+    existing_codes = set(existing_codes_query)
+    
     for feat in features:
         props = feat.get("properties", {})
+        district_code = props.get("district_code")
+        
+        # Skip if already exists
+        if district_code in existing_codes:
+            continue
+            
+        geometry = feat.get("geometry")
         district = District(
             name=props.get("name"),
             state=props.get("state"),
             state_code=props.get("state_code"),
-            district_code=props.get("district_code"),
-            geometry=feat.get("geometry"),
+            district_code=district_code,
+            geometry=json.dumps(feat.get("geometry")) if feat.get("geometry") else None,
         )
-        # Upsert – avoid duplicate primary‑key errors
-        stmt = insert(District).values(**district.__dict__).on_conflict_do_nothing()
-        session.execute(stmt)
+        session.add(district)
+        existing_codes.add(district_code)
     session.commit()
 
 
@@ -76,7 +89,7 @@ def import_soil_mappings(session: Session, csv_path: Path):
     The function resolves foreign keys via helper queries.
     """
     # Lazy import of related models
-    from backend.models import SoilType, DistrictSoilType
+    from backend.models import SoilType, DistrictSoilType, District
     with csv_path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -89,19 +102,29 @@ def import_soil_mappings(session: Session, csv_path: Path):
             ).scalar_one_or_none()
             if district is None or soil is None:
                 continue  # Skip incomplete rows – can be logged in real usage
-            mapping = DistrictSoilType(
-                district_id=district,
-                soil_type_id=soil,
-                percentage=float(row["percentage"]),
-                is_predominant=bool(int(row.get("is_predominant", 0))),
-            )
-            stmt = insert(DistrictSoilType).values(**mapping.__dict__).on_conflict_do_nothing()
-            session.execute(stmt)
+            # Check if mapping already exists
+            existing = session.execute(
+                select(DistrictSoilType).where(
+                    DistrictSoilType.district_id == district,
+                    DistrictSoilType.soil_type_id == soil
+                )
+            ).scalar_one_or_none()
+            if existing is None:
+                mapping = DistrictSoilType(
+                    district_id=district,
+                    soil_type_id=soil,
+                    percentage=float(row["percentage"]),
+                    is_predominant=bool(int(row.get("is_predominant", 0))),
+                )
+                session.add(mapping)
     session.commit()
 
 
 def main():
-    engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
+    database_url = settings.DATABASE_URL
+    is_sqlite = database_url.startswith("sqlite")
+    connect_args = {"check_same_thread": False} if is_sqlite else {}
+    engine = create_engine(database_url, connect_args=connect_args)
     with Session(engine) as session:
         features = load_geojson(GEOJSON_PATH)
         import_districts(session, features)

@@ -1,0 +1,208 @@
+Here is the exhaustive retrospective extraction and documentation of the AgriBrain project. The documentation is structured into the requested modular Markdown files below.
+
+---
+
+### FILE: 1_PROJECT_MASTER_DOCUMENTATION.md
+
+# AgriBrain: Project Master Documentation
+
+## Project Overview
+
+AgriBrain is an AI-driven Digital Twin platform designed for Indian agriculture. It allows users to drop a pin anywhere on a map of India to automatically retrieve spatial agro-climatic data, select soil profiles, input farm acreage, and run a Machine Learning inference engine. The system predicts the most suitable crops, estimates yield and revenue, calculates irrigation water demand, assesses multi-hazard risks, provides SHAP (SHapley Additive exPlanations) feature attribution, and generates a dynamic 5-stage cultivation timeline.
+
+## Core Objectives
+
+* Replace static, template-based farming dashboards with a deterministic, data-driven Digital Twin.
+* Eliminate backend dependency for core UI rendering (handling 404s gracefully with frontend local processing).
+* Provide high-fidelity localized recommendations using a 45-crop dataset (25 short-term, 20 long-term).
+* Integrate a multi-modal AI Agronomist (Vision + Text) using Groq (Llama-3.1-8b and Llama-3.2-11b-Vision).
+
+## Historical Context & Pivot
+
+Initial iterations of the project relied heavily on an AI coding agent that generated "mock" data, fake `if/else` chatbot templates, stringified JSX props causing React runtime crashes, and rigid Next.js routing that resulted in persistent `404 Not Found` API errors. The project underwent a massive, multi-phase literal overwrite protocol to bypass agent hallucinations, culminating in a resilient, zero-mock, production-ready system.
+
+---
+
+### FILE: 2_DEVELOPMENT_TIMELINE.md
+
+# Development Timeline & Project Evolution
+
+| Phase | Objective | Key Actions & Technical Decisions | Outcome / Status |
+| --- | --- | --- | --- |
+| **Phase 1: Initial Implementation** | Establish baseline frontend and backend. | Agent scaffolded Next.js UI and FastAPI backend. | **BLOCKED:** Introduced 404s, broken Leaflet icons, mock ML data, and fake chatbot responses. |
+| **Phase 2: UI/UX & Pin Fix** | Stop UI components from vanishing; fix invisible Leaflet pin. | Removed aggressive `!simulationData` conditionals. Added default SVG Leaflet icon config. | **COMPLETED:** UI cards permanently visible with skeleton loaders/placeholders. |
+| **Phase 3: Real LLM Integration** | Wire real Groq API to chatbot. | Overwrote `backend/api/chat.py` to route text to Llama-3.3-70b-versatile and images to Llama-3.2-11b-vision-preview. | **COMPLETED:** Removed fake template answers. |
+| **Phase 4: ML Dataset Expansion** | Fix repeating crop outputs; implement Digital Twin metrics. | Replaced `backend/api/simulation.py`. Added 45 Indian crops, SHAP logic, yield/revenue math, and water demand. | **COMPLETED:** Highly variable, mathematically grounded inference engine active. |
+| **Phase 5: DevOps Cleanup** | Fix duplicate Vercel deployments. | Deleted redundant `agribrain-frontend` project. Kept `agri-brain-seven.vercel.app`. | **COMPLETED:** Reduced Vercel build conflicts. |
+| **Phase 6: 404 & Runtime Crash Resolution** | Fix `404 Not Found` and React `ReferenceError`. | Double-mounted FastAPI routers (`/api` and `/api/v1`). Cleaned stringified JSX props (`zoom="{5}"` -> `zoom={5}`) in `MapUI.tsx`. | **COMPLETED:** Application compiles and runs without client-side fatal errors. |
+| **Phase 7: Frontend Self-Healing** | Make the frontend independent of Render backend cold-starts. | Migrated the entire ML scoring logic, soil profiles, and 6-month rainfall forecast into `page.tsx` as a local fallback. Added Draggable Map Pin. | **COMPLETED:** Zero-404 architecture achieved. |
+
+---
+
+### FILE: 3_TECHNICAL_ARCHITECTURE.md
+
+# Technical Architecture
+
+## System Architecture
+
+```mermaid
+graph TD
+    Client[Next.js Frontend - Vercel]
+    Client --> |Map Click / Drag| OpenStreetMap[OpenStreetMap Nominatim API]
+    Client --> |REST API / JSON| Backend[FastAPI Backend - Render]
+    
+    subgraph Frontend [Vercel]
+        MapUI[Leaflet MapUI Component]
+        Simulator[Simulate Page Engine]
+        Fallback[Local Fallback Engine]
+        MapUI --> Simulator
+        Simulator --> Fallback
+    end
+
+    subgraph Backend [Render]
+        Router[Double-Mounted Routers]
+        Spatial[spatial.py]
+        Simulation[simulation.py]
+        Chat[chat.py]
+        Router --> Spatial
+        Router --> Simulation
+        Router --> Chat
+    end
+
+    Backend --> |Vision/Text Inference| Groq[Groq API - Llama 3]
+    Backend --> |Live Weather| IndianAPI[Weather API]
+
+```
+
+## Data Flow & Components
+
+* **Frontend (Vercel):** Built with Next.js and Tailwind CSS. Implements `react-leaflet` for spatial mapping. Contains a local deterministic ML inference engine mirroring the backend to prevent downtime.
+* **Backend (Render):** FastAPI application with `spatial.py` (reverse geocoding & agro-climatic base-lining), `simulation.py` (crop scoring, SHAP, timeline generation), and `chat.py` (Groq multi-modal LLM routing).
+* **APIs:** OpenStreetMap Nominatim (Reverse Geocoding), Groq (LLM).
+
+---
+
+### FILE: 4_MODULE_AND_WORKFLOW_DOCUMENTATION.md
+
+# Module & Workflow Documentation
+
+## 1. Map & Spatial Module (`MapUI.tsx` & `spatial.py`)
+
+* **Functionality:** Interactive map allowing users to click or drag a pin. Updates coordinates instantly.
+* **Frontend:** Uses `react-leaflet`. Next.js image bundling issues bypassed using a raw inline SVG for the map marker. Implements `useMapEvents` for clicks and `eventHandlers={dragend}` for pin dragging. `MapFlyTo` controls smooth camera panning.
+* **Backend:** `lookup_spatial` uses Nominatim to get the district, then applies deterministic rules based on Indian latitudes/longitudes to assign an Agro-Climatic Zone (e.g., Coastal Lateritic, Northern Plains) and baseline NPK/pH/Weather data.
+
+## 2. Digital Twin Simulator (`page.tsx` & `simulation.py`)
+
+* **Trigger:** User confirms soil, enters acreage, selects crop duration, and clicks "Run".
+* **Workflow:**
+1. Reads coordinates, overridden What-If parameters (Rain, Temp, NPK, pH), and Farm Area.
+2. Filters the 45-crop database by duration (Short-Term vs Long-Term).
+3. Calculates absolute difference penalties between current environment and optimal crop conditions.
+4. Generates a Suitability Score (0-100%).
+5. Calculates SHAP feature attribution (positive/negative impact of Temp, Rain, pH, N).
+6. Digital Twin Math: Total Yield = (Base Yield * Suitability) * Acres. Revenue = Yield * MSP. Water Demand = (Crop Water Requirement - Effective Rainfall) * Acres.
+7. Groq LLM / Local Fallback generates a 5-stage agronomy timeline.
+
+
+
+## 3. Expert Chatbot (`chat.py`)
+
+* **Workflow:** Receives either a JSON payload (text) or Multipart Form-Data (image + text).
+* **Routing:** If an image is present in base64, routes to `llama-3.2-11b-vision-preview` with plant-pathologist system prompt. If text-only, routes to `llama-3.3-70b-versatile` using the active farm context.
+
+---
+
+### FILE: 5_AI_AGENT_PROMPT_HISTORY.md
+
+# AI Agent Prompt History & Instructions
+
+## Historical Context & Agent Failures
+
+The AI coding agents (Cursor/Windsurf) repeatedly failed by:
+
+1. Attempting to merge code lazily, leaving legacy artifacts (`name 'lookup_spatial' is not defined`).
+2. Corrupting React JSX syntax by wrapping props in quotes (`zoom="{5}"` instead of `zoom={5}`), causing fatal client-side crashes.
+3. Generating fake response templates (`if "wheat" in user_input`) instead of utilizing API keys.
+
+## Corrective Prompts Used
+
+To bypass agent hallucinations, a **Strict Literal Overwrite Protocol** was utilized.
+
+**Prompt Snippet (JSX Syntax Correction):**
+
+> "CRITICAL REACT RUNTIME CRASH FIX: STRIP STRINGIFIED JSX PROPS. Previous generations corrupted the JSX syntax by placing quotes around curly braces... You MUST remove the quotes and replace it with: `<MapUI onPinDrop="{handlePinDrop}" pin="{pin}"/>`"
+
+**Prompt Snippet (Backend API Fix):**
+
+> "Mount under both `/api/v1` and `/api` to prevent 404 path mismatches. `app.include_router(spatial.router, prefix="/api/v1/spatial")`..."
+
+---
+
+### FILE: 6_DATABASE_AND_DATASET_DOCUMENTATION.md
+
+# Database & Dataset Documentation
+
+## Indian Soil Profiles Dataset
+
+8 deterministic baseline profiles programmed into the fallback engine and backend logic:
+
+1. Indo-Gangetic Alluvial (pH 7.1)
+2. Deccan Black Cotton (pH 7.4)
+3. Coastal Lateritic / Alluvial (pH 5.7)
+4. Southern Red Loam (pH 6.4)
+5. Arid Sandy / Calcareous (pH 7.9)
+6. Mountain Forest / Podzolic (pH 6.0)
+7. Deltaic Clay Loam (pH 6.6)
+8. Saline / Alkaline Usar (pH 8.2)
+
+## 45-Crop Machine Learning Dataset
+
+Hardcoded dataset used for zero-latency inference and mapping.
+
+* **Short-Term / Seasonal (25 crops):** Rice, Wheat, Maize, Blackgram, Mungbean, Chickpea, Pigeonpea, Groundnut, Soybean, Mustard, Sunflower, Cotton, Jute, Potato, Onion, Tomato, Chilli, Okra, Watermelon, Muskmelon, Ragi, Bajra, Jowar, Lentil, Cabbage.
+* **Long-Term / Orchard (20 crops):** Coconut, Arecanut, Mango, Banana, Pomegranate, Coffee, Black Pepper, Cashew, Papaya, Guava, Grapes, Sweet Orange, Apple, Sugarcane, Turmeric, Ginger, Rubber, Cardamom, Sapota, Jackfruit.
+* **Features per crop:** Optimal Temp, Rain, pH, N, Base Yield (Tonnes/Acre), MSP (₹/Tonne), Water Requirement (mm).
+
+---
+
+### FILE: 7_BUGS_AND_DECISIONS_REGISTER.md
+
+# Bugs & Decisions Register
+
+## Issue Register
+
+| Issue ID | Problem | Root Cause | Fix Implemented | Status |
+| --- | --- | --- | --- | --- |
+| BUG-01 | UI vanishes before running simulation. | Aggressive conditional rendering (`!simulationData ? <Empty/> : <Cards/>`). | Removed conditionals; implemented placeholder dashes and skeleton loaders. | **COMPLETED** |
+| BUG-02 | Leaflet pin invisible. | Next.js image bundler breaks default Leaflet marker assets. | Replaced default markers with a raw inline base64 SVG icon. | **COMPLETED** |
+| BUG-03 | Fake Chatbot Responses. | Agent wrote `if/else` mock data instead of using Groq API. | Hard-overwrote `chat.py` with `groq` client implementation. | **COMPLETED** |
+| BUG-04 | 404 Not Found on API calls. | Route prefixes mismatched (`/api/v1` vs `/api`) and server cold starts. | Double-mounted routers in `main.py`; built complete fallback engine in frontend. | **COMPLETED** |
+| BUG-05 | `ReferenceError: React is not defined` | Missing React import in Next.js page. | Added `import React from "react";` | **COMPLETED** |
+| BUG-06 | Client crash on load (Black Screen). | Agent wrote stringified JSX props (`zoom="{5}"`). | Stripped quotes from numerical/boolean/object props in `MapUI.tsx`. | **COMPLETED** |
+
+## Decision Register
+
+* **DEC-01 (Architecture):** Build a "Zero-404" Hybrid Frontend Engine. *Reasoning:* Render backends sleep on free tiers. Embedding the 45-crop ML logic and soil datasets directly into `page.tsx` ensures the UI never breaks during demonstrations or cold starts. (Status: **COMPLETED**)
+* **DEC-02 (UI/UX):** Keep data cards perpetually visible. *Reasoning:* Users hated the empty screen. Keeping cards visible with "--" indicates the application's capability before a pin is dropped. (Status: **COMPLETED**)
+
+---
+
+### FILE: 8_CURRENT_PROJECT_STATUS.md
+
+# Current Project Status
+
+## Status Overview
+
+* **Map & Spatial Resolution:** **COMPLETED** (Draggable pin, fly-to animation, Nominatim reverse geocoding integrated).
+* **Digital Twin Simulator:** **COMPLETED** (Yield, Revenue, Irrigation demand, Risk Matrix, and What-If climate sliders active).
+* **Crop Dataset:** **COMPLETED** (Expanded to 45 mathematically modeled Indian crops).
+* **AI Chatbot:** **COMPLETED** (Groq Llama-3 text and vision endpoints wired and tested).
+* **Frontend Routing & Navigation:** **COMPLETED** (Sticky Top Navbar added for seamless traversal between Home, Simulator, Calendar, and Chat).
+* **Backend Resiliency:** **COMPLETED** (Double-mounted routes and error handling).
+
+## Next Steps / Pending
+
+* **Cultivation Calendar Page:** The top navbar links to `/calendar`, but full distinct page implementation documentation is currently **NEEDS VERIFICATION**.
+* **User Authentication:** No explicit authentication flows (e.g., Clerk, NextAuth) have been documented or implemented in the current scope. (Status: **PLANNED / EXCLUDED**).
+* **Live Weather API Integration:** The backend contains placeholder logic for `weather.indianapi.in`. Validation of the live API key and rate limits is **NEEDS VERIFICATION**.

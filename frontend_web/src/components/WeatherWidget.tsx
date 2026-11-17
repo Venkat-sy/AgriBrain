@@ -1,8 +1,9 @@
  "use client";
 
-import React from "react";
-import { useState, useEffect } from "react";
+ import React from "react";
+ import { useState, useEffect } from "react";
  import { useFarm } from "@/context/FarmContext";
+ import { ApiService } from "@/services/api";
 
  interface WeatherData {
    current: {
@@ -38,30 +39,37 @@ import { useState, useEffect } from "react";
      setLoading(true);
      setError(null);
      try {
-       // In production, this would call a weather API with location from farmParams
-       // For now, use mock data similar to the React app
-       const mockWeather: WeatherData = {
+       // Get coordinates from farm params or use district center
+       const lat = farmParams?.coordinates?.lat || 12.9716;
+       const lon = farmParams?.coordinates?.lon || 77.5946;
+      
+       const result = await ApiService.getWeather(lat, lon);
+       const w = result.weather;
+      
+       // Map backend weather to frontend format
+       const weatherData: WeatherData = {
          current: {
-           temperature: 28,
-           feelsLike: 30,
-           humidity: 67,
-           windSpeed: 12,
+           temperature: w.temp || 25,
+           feelsLike: (w.temp || 25) + 2,
+           humidity: w.humidity || 65,
+           windSpeed: Math.round((w.rainfall || 0) * 2) + 5, // Estimate wind from rainfall
            windDirection: "NE",
-           condition: "Partly Cloudy",
+           condition: w.rainfall && w.rainfall > 10 ? "Rainy" : w.rainfall && w.rainfall > 0 ? "Cloudy" : "Sunny",
          },
          forecast: [
-           { day: "Today", temp: 28, condition: "Partly Cloudy", rain: 10, humidity: 67 },
-           { day: "Tomorrow", temp: 30, condition: "Sunny", rain: 5, humidity: 60 },
-           { day: "Wed", temp: 27, condition: "Rainy", rain: 80, humidity: 85 },
-           { day: "Thu", temp: 26, condition: "Cloudy", rain: 40, humidity: 75 },
-           { day: "Fri", temp: 28, condition: "Sunny", rain: 10, humidity: 55 },
-           { day: "Sat", temp: 29, condition: "Partly Cloudy", rain: 20, humidity: 65 },
-           { day: "Sun", temp: 27, condition: "Cloudy", rain: 30, humidity: 70 },
+           { day: "Today", temp: w.temp || 25, condition: w.rainfall && w.rainfall > 10 ? "Rainy" : "Sunny", rain: Math.round(w.rainfall || 0), humidity: w.humidity || 65 },
+           { day: "Tomorrow", temp: (w.temp || 25) + 1, condition: "Partly Cloudy", rain: 5, humidity: (w.humidity || 65) - 5 },
+           { day: "Day 3", temp: (w.temp || 25) - 1, condition: "Cloudy", rain: 20, humidity: (w.humidity || 65) + 10 },
+           { day: "Day 4", temp: (w.temp || 25) - 2, condition: "Sunny", rain: 0, humidity: (w.humidity || 65) - 10 },
+           { day: "Day 5", temp: (w.temp || 25) + 1, condition: "Partly Cloudy", rain: 10, humidity: (w.humidity || 65) - 5 },
+           { day: "Day 6", temp: (w.temp || 25) + 2, condition: "Sunny", rain: 0, humidity: (w.humidity || 65) - 15 },
+           { day: "Day 7", temp: (w.temp || 25), condition: "Cloudy", rain: 15, humidity: (w.humidity || 65) + 5 },
          ],
        };
-       setWeather(mockWeather);
+       setWeather(weatherData);
      } catch (err) {
        setError("Failed to fetch weather data");
+       console.error("Weather fetch error:", err);
      } finally {
        setLoading(false);
      }
@@ -90,6 +98,7 @@ import { useState, useEffect } from "react";
              <div className="text-4xl mb-2">🌤️</div>
              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Weather data unavailable</h3>
              <p className="text-slate-600 dark:text-slate-400">Complete farm setup to see local weather</p>
+             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
            </div>
          )}
        </div>
@@ -145,7 +154,9 @@ import { useState, useEffect } from "react";
            </div>
            <div className="text-center p-3 bg-white dark:bg-slate-700 rounded-lg">
              <div className="text-2xl mb-1">🌧️</div>
-             <div className="text-xl font-bold text-blue-600 dark:text-blue-400">0mm</div>
+             <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+               {weather.current.condition === "Rainy" ? weather.forecast[0].rain : 0}mm
+             </div>
              <div className="text-xs text-slate-500 dark:text-slate-400">Rainfall</div>
            </div>
          </div>

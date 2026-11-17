@@ -183,6 +183,8 @@ const MapUI = dynamic(() => import("@/components/MapUI"), {
   ),
 });
 
+import { ApiService } from "@/services/api";
+
 // 8 Standard Indian Soil Profiles for User Confirmation & Override
 const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: number; desc: string }> = {
   "Indo-Gangetic Alluvial": { N: 215, P: 58, K: 155, pH: 7.1, desc: "Fertile riverine silt; ideal for cereals, pulses & sugarcane" },
@@ -194,56 +196,6 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
   "Deltaic Clay Loam": { N: 195, P: 54, K: 170, pH: 6.6, desc: "Moisture-retentive delta soil; high yield for rice, jute, banana" },
   "Saline / Alkaline Usar": { N: 110, P: 32, K: 125, pH: 8.2, desc: "High salt profile; requires gypsum & salt-tolerant varieties" },
 };
-
-// 25 Short-Term Seasonal Crops + 20 Long-Term Orchard/Plantation Crops (45 Total)
-const CROP_DATABASE = [  // Short-Term (Seasonal)
-  { name: 'Rice (Paddy)', type: 'short-term', season: 'Kharif', days: 120, temp: 28, rain: 210, ph: 6.0, n: 180, yield_t: 2.4, msp: 23000, water: 1200 },
-  { name: 'Wheat (HD-2967)', type: 'short-term', season: 'Rabi', days: 115, temp: 20, rain: 80, ph: 7.1, n: 200, yield_t: 2.2, msp: 22750, water: 450 },
-  { name: 'Maize (Hybrid Corn)', type: 'short-term', season: 'Kharif/Rabi', days: 105, temp: 25, rain: 115, ph: 6.5, n: 165, yield_t: 2.6, msp: 20900, water: 550 },
-  { name: 'Blackgram (Urad Dal)', type: 'short-term', season: 'Kharif/Zaid', days: 80, temp: 29, rain: 95, ph: 6.6, n: 120, yield_t: 0.65, msp: 69500, water: 350 },
-  { name: 'Mungbean (Moong Dal)', type: 'short-term', season: 'Zaid/Kharif', days: 70, temp: 30, rain: 75, ph: 6.6, n: 110, yield_t: 0.6, msp: 85580, water: 320 },
-  { name: 'Chickpea (Bengal Gram)', type: 'short-term', season: 'Rabi', days: 100, temp: 21, rain: 65, ph: 7.3, n: 115, yield_t: 0.85, msp: 54400, water: 300 },
-  { name: 'Pigeonpea (Tur/Arhar)', type: 'short-term', season: 'Kharif', days: 150, temp: 27, rain: 110, ph: 6.8, n: 135, yield_t: 0.9, msp: 70000, water: 450 },
-  { name: 'Groundnut (Peanut)', type: 'short-term', season: 'Kharif/Rabi', days: 110, temp: 28, rain: 100, ph: 6.4, n: 130, yield_t: 1.2, msp: 63770, water: 500 },
-  { name: 'Soybean', type: 'short-term', season: 'Kharif', days: 95, temp: 26, rain: 125, ph: 6.8, n: 150, yield_t: 1.1, msp: 46000, water: 520 },
-  { name: 'Mustard (Rapiseed)', type: 'short-term', season: 'Rabi', days: 105, temp: 20, rain: 60, ph: 7.4, n: 140, yield_t: 0.95, msp: 56500, water: 280 },
-  { name: 'Sunflower', type: 'short-term', season: 'Rabi/Zaid', days: 90, temp: 27, rain: 80, ph: 6.9, n: 145, yield_t: 0.9, msp: 67600, water: 420 },
-  { name: 'Cotton (Bt Hybrid)', type: 'short-term', season: 'Kharif', days: 160, temp: 31, rain: 90, ph: 7.5, n: 160, yield_t: 1.15, msp: 66200, water: 700 },
-  { name: 'Jute', type: 'short-term', season: 'Kharif', days: 120, temp: 30, rain: 230, ph: 6.2, n: 170, yield_t: 1.8, msp: 50500, water: 900 },
-  { name: 'Potato (Kufri Jyoti)', type: 'short-term', season: 'Rabi', days: 95, temp: 18, rain: 90, ph: 5.8, n: 190, yield_t: 9.5, msp: 14000, water: 500 },
-  { name: 'Onion (Nasik Red)', type: 'short-term', season: 'Rabi/Kharif', days: 110, temp: 24, rain: 85, ph: 6.6, n: 155, yield_t: 7.5, msp: 18000, water: 450 },
-  { name: 'Tomato (Arka Rakshak)', type: 'short-term', season: 'All-Season', days: 90, temp: 25, rain: 95, ph: 6.4, n: 175, yield_t: 11.5, msp: 16000, water: 480 },
-  { name: 'Chilli (Byadgi/Guntur)', type: 'short-term', season: 'Kharif/Rabi', days: 135, temp: 28, rain: 105, ph: 6.6, n: 160, yield_t: 1.4, msp: 135000, water: 600 },
-  { name: 'Okra (Bhindi)', type: 'short-term', season: 'Zaid/Kharif', days: 65, temp: 30, rain: 110, ph: 6.5, n: 140, yield_t: 4.8, msp: 22000, water: 400 },
-  { name: 'Watermelon', type: 'short-term', season: 'Zaid', days: 80, temp: 32, rain: 55, ph: 6.3, n: 135, yield_t: 12.0, msp: 11500, water: 380 },
-  { name: 'Muskmelon', type: 'short-term', season: 'Zaid', days: 75, temp: 33, rain: 50, ph: 6.5, n: 125, yield_t: 8.5, msp: 16500, water: 350 },
-  { name: 'Ragi (Finger Millet)', type: 'short-term', season: 'Kharif', days: 105, temp: 27, rain: 95, ph: 6.2, n: 120, yield_t: 1.3, msp: 38460, water: 350 },
-  { name: 'Bajra (Pearl Millet)', type: 'short-term', season: 'Kharif', days: 85, temp: 33, rain: 50, ph: 7.7, n: 100, yield_t: 1.2, msp: 25000, water: 280 },
-  { name: 'Jowar (Sorghum)', type: 'short-term', season: 'Kharif/Rabi', days: 105, temp: 29, rain: 75, ph: 7.2, n: 115, yield_t: 1.25, msp: 31800, water: 350 },
-  { name: 'Lentil (Masoor Dal)', type: 'short-term', season: 'Rabi', days: 100, temp: 20, rain: 70, ph: 6.9, n: 115, yield_t: 0.75, msp: 64250, water: 310 },
-  { name: 'Cabbage / Cauliflower', type: 'short-term', season: 'Rabi', days: 85, temp: 19, rain: 85, ph: 6.3, n: 170, yield_t: 10.0, msp: 13500, water: 420 },
-  // Long-Term (Orchards, Plantations & Perennials)
-  { name: 'Coconut (West Coast Tall/Dwarf)', type: 'long-term', season: 'Perennial Plantation', days: 365, temp: 29, rain: 230, ph: 5.8, n: 155, yield_t: 4.5, msp: 32000, water: 1300 },
-  { name: 'Arecanut (Mangala/Supari)', type: 'long-term', season: 'Perennial Plantation', days: 365, temp: 28, rain: 245, ph: 5.7, n: 150, yield_t: 1.15, msp: 420000, water: 1400 },
-  { name: 'Mango (Alphonso/Kesar)', type: 'long-term', season: 'Perennial Orchard', days: 365, temp: 29, rain: 115, ph: 6.5, n: 165, yield_t: 4.2, msp: 55000, water: 750 },
-  { name: 'Banana (Grand Naine Tissue)', type: 'long-term', season: 'Annual/Perennial', days: 320, temp: 28, rain: 175, ph: 6.5, n: 205, yield_t: 18.0, msp: 14500, water: 1500 },
-  { name: 'Pomegranate (Bhagwa)', type: 'long-term', season: 'Perennial Orchard', days: 280, temp: 31, rain: 65, ph: 7.4, n: 125, yield_t: 5.5, msp: 85000, water: 550 },
-  { name: 'Coffee (Arabica/Robusta)', type: 'long-term', season: 'Shade Plantation', days: 365, temp: 23, rain: 200, ph: 5.9, n: 165, yield_t: 0.65, msp: 280000, water: 1100 },
-  { name: 'Black Pepper (Panniyur-1)', type: 'long-term', season: 'Perennial Vine', days: 365, temp: 27, rain: 235, ph: 5.8, n: 155, yield_t: 0.55, msp: 580000, water: 1250 },
-  { name: 'Cashew (Vengurla/Ullal)', type: 'long-term', season: 'Perennial Orchard', days: 365, temp: 29, rain: 190, ph: 5.6, n: 135, yield_t: 0.85, msp: 130000, water: 650 },
-  { name: 'Papaya (Red Lady 786)', type: 'long-term', season: 'Long-Duration Fruit', days: 270, temp: 29, rain: 125, ph: 6.3, n: 180, yield_t: 22.0, msp: 12500, water: 950 },
-  { name: 'Guava (Taiwan Pink/Allahabad)', type: 'long-term', season: 'Perennial Orchard', days: 300, temp: 27, rain: 95, ph: 6.9, n: 145, yield_t: 8.0, msp: 28000, water: 620 },
-  { name: 'Grapes (Thompson Seedless)', type: 'long-term', season: 'Perennial Vineyard', days: 330, temp: 26, rain: 80, ph: 6.9, n: 170, yield_t: 9.5, msp: 48000, water: 680 },
-  { name: 'Sweet Orange (Mosambi/Kinnow)', type: 'long-term', season: 'Perennial Citrus', days: 340, temp: 25, rain: 100, ph: 6.8, n: 160, yield_t: 7.5, msp: 34000, water: 720 },
-  { name: 'Apple (Royal Delicious/Gala)', type: 'long-term', season: 'Temperate Orchard', days: 365, temp: 16, rain: 125, ph: 6.0, n: 165, yield_t: 6.0, msp: 75000, water: 650 },
-  { name: 'Sugarcane (Co-86032)', type: 'long-term', season: 'Annual/Ratoon', days: 330, temp: 28, rain: 150, ph: 7.0, n: 220, yield_t: 42.0, msp: 3400, water: 1800 },
-  { name: 'Turmeric (Salem/Prathibha)', type: 'long-term', season: 'Long-Duration Spice', days: 260, temp: 27, rain: 145, ph: 6.3, n: 175, yield_t: 2.3, msp: 140000, water: 850 },
-  { name: 'Ginger (Rio-de-Janeiro)', type: 'long-term', season: 'Long-Duration Spice', days: 240, temp: 26, rain: 165, ph: 6.0, n: 170, yield_t: 5.5, msp: 65000, water: 900 },
-  { name: 'Rubber (RRII 105)', type: 'long-term', season: 'Perennial Plantation', days: 365, temp: 28, rain: 260, ph: 5.5, n: 145, yield_t: 0.75, msp: 175000, water: 1500 },
-  { name: 'Cardamom (Malabar Green)', type: 'long-term', season: 'Highland Plantation', days: 365, temp: 21, rain: 220, ph: 5.7, n: 160, yield_t: 0.22, msp: 1650000, water: 1350 },
-  { name: 'Sapota (Chikoo - Kalipatti)', type: 'long-term', season: 'Perennial Orchard', days: 340, temp: 29, rain: 130, ph: 6.8, n: 150, yield_t: 6.5, msp: 26000, water: 700 },
-  { name: 'Jackfruit (Siddu/Konkan)', type: 'long-term', season: 'Perennial Agroforestry', days: 365, temp: 28, rain: 185, ph: 6.0, n: 140, yield_t: 9.0, msp: 22000, water: 850 },
-];
 
 export default function SimulatePage() {
   const router = useRouter();
@@ -317,165 +269,110 @@ export default function SimulatePage() {
   };
 
   const handlePinDrop = async (lat: number, lng: number) => {
-    const cleanLat = Number(lat.toFixed(4));
-    const cleanLng = Number(lng.toFixed(4));
-    setPin({ lat: cleanLat, lng: cleanLng });
-    setManualLat(String(cleanLat));
-    setManualLng(String(cleanLng));
-    setStatusBanner(null);
+      const cleanLat = Number(lat.toFixed(4));
+      const cleanLng = Number(lng.toFixed(4));
+      setPin({ lat: cleanLat, lng: cleanLng });
+      setManualLat(String(cleanLat));
+      setManualLng(String(cleanLng));
+      setStatusBanner(null);
 
-    const { detectedSoil, zone, rain, temp, hum, sp } = inferRegionalProfile(cleanLat, cleanLng);
-    setSelectedSoilType(detectedSoil);
-    setAgroZone(zone);
-    setOverrides({ rainfall: rain, temp, humidity: hum, ph: sp.pH, N: sp.N, P: sp.P, K: sp.K });
-
-    // Reverse Geocode directly via OpenStreetMap Nominatim (Zero backend 404 risk)
-    try {
-      const nomRes = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${cleanLat}&lon=${cleanLng}&zoom=10`
-      );
-      if (nomRes.ok) {
-        const nom = await nomRes.json();
-        const addr = nom.address || {};
-        const dist = addr.state_district || addr.county || addr.city || addr.town || 'Selected District';
-        const st = addr.state || 'India';
-        setDistrictName(dist);
+      // Get spatial data from backend
+      try {
+        const spatialResult = await ApiService.lookupDistrict(cleanLat, cleanLng);
+        setSelectedSoilType(spatialResult?.soil_type || "Southern Red Loam");
+        setAgroZone(spatialResult?.agro_zone || "Central & Southern Deccan Plateau");
+        setDistrictName(spatialResult?.district || `${cleanLat}°N, ${cleanLng}°E`);
+        setOverrides({
+          rainfall: spatialResult?.weather?.rainfall || 100,
+          temp: spatialResult?.weather?.temp || 27,
+          humidity: spatialResult?.weather?.humidity || 65,
+          ph: spatialResult?.soil?.pH || 6.5,
+          N: spatialResult?.soil?.N || 150,
+          P: spatialResult?.soil?.P || 40,
+          K: spatialResult?.soil?.K || 150,
+        });
+      } catch {
+        // Fallback to basic values
+        setDistrictName(`${cleanLat}°N, ${cleanLng}°E`);
       }
-    } catch {
-      setDistrictName(`${cleanLat}°N, ${cleanLng}°E`);
-    }
-  };
+    };
 
   const handleSoilTypeChange = (newSoil: string) => {
-    setSelectedSoilType(newSoil);
-    const sp = SOIL_PROFILES[newSoil];
-    if (sp) {
-      setOverrides((prev) => ({ ...prev, ph: sp.pH, N: sp.N, P: sp.P, K: sp.K }));
-    }
-  };
-
-  const applyManualCoordinates = () => {
-    const parsedLat = parseFloat(manualLat);
-    const parsedLng = parseFloat(manualLng);
-    if (!isNaN(parsedLat) && !isNaN(parsedLng) && parsedLat >= 6 && parsedLat <= 38 && parsedLng >= 68 && parsedLng <= 98) {
-      handlePinDrop(parsedLat, parsedLng);
-    } else {
-      setStatusBanner('Please enter valid Indian coordinates (Lat: 6° to 38°N, Lng: 68° to 98°E).');
-    }
-  };
-
-  // Generate 6-Month Monsoon & Seasonal Rainfall Prediction Curve
-  const generateRainfallPrediction = (seasonalRainMm: number) => {
-    const months = ['Jun (Onset)', 'Jul (Peak)', 'Aug (Core)', 'Sep (Retreat)', 'Oct (NE Monsoon)', 'Nov (Rabi Base)'];
-    const weights = [0.65, 1.35, 1.25, 0.95, 0.55, 0.25];
-    return months.map((m, idx) => ({
-      month: m,
-      predicted_mm: Math.round(seasonalRainMm * weights[idx]),
-      anomaly_pct: Math.round(((idx * 7 + seasonalRainMm) % 18) - 6),
-    }));
-  };
-
-  // Self-Contained Digital Twin Inference Engine (Runs seamlessly even if backend 404s)
-  const executeDigitalTwinEngine = () => {
-    if (!pin) return;
-    setLoading(true);
-    setStatusBanner(null);
-
-    const activeSoil = SOIL_PROFILES[selectedSoilType] || SOIL_PROFILES['Southern Red Loam'];
-    const weather = {
-      temp: overrides.temp,
-      humidity: overrides.humidity,
-      rainfall: overrides.rainfall,
-    };
-    const soil = {
-      type: selectedSoilType,
-      N: useOverrides ? overrides.N : activeSoil.N,
-      P: useOverrides ? overrides.P : activeSoil.P,
-      K: useOverrides ? overrides.K : activeSoil.K,
-      pH: useOverrides ? overrides.ph : activeSoil.pH,
+      setSelectedSoilType(newSoil);
     };
 
-    const pool = CROP_DATABASE.filter((c) => c.type === setupType);
-
-    const scored = pool.map((c) => {
-      const tempDiff = Math.abs(weather.temp - c.temp) * 2.1;
-      const rainDiff = Math.abs(weather.rainfall - c.rain) * 0.22;
-      const phDiff = Math.abs(soil.pH - c.ph) * 11.5;
-      const nDiff = Math.abs(soil.N - c.n) * 0.14;
-
-      const penalty = tempDiff + rainDiff + phDiff + nDiff;
-      const score = Math.max(54.0, Math.min(98.9, Number((100.0 - penalty * 0.42).toFixed(1))));
-
-      const shapBreakdown = [
-        { feature: 'Seasonal Rainfall', value: `${weather.rainfall} mm`, optimal: `${c.rain} mm`, impact: Number(Math.max(-0.35, 0.36 - rainDiff * 0.015).toFixed(2)) },
-        { feature: 'Temperature', value: `${weather.temp} °C`, optimal: `${c.temp} °C`, impact: Number(Math.max(-0.35, 0.35 - tempDiff * 0.02).toFixed(2)) },
-        { feature: 'Confirmed Soil pH', value: `${soil.pH}`, optimal: `${c.ph}`, impact: Number(Math.max(-0.28, 0.28 - phDiff * 0.02).toFixed(2)) },
-        { feature: 'Soil Nitrogen (N)', value: `${soil.N} kg/ha`, optimal: `${c.n} kg/ha`, impact: Number(Math.max(-0.25, 0.25 - nDiff * 0.02).toFixed(2)) },
-      ].sort((a, b) => b.impact - a.impact);
-
-      const suitFactor = score / 100.0;
-      const yieldPerAcre = Number((c.yield_t * suitFactor).toFixed(2));
-      const totalYield = Number((yieldPerAcre * areaAcres).toFixed(2));
-      const grossRev = Math.round(totalYield * c.msp);
-
-      const effRain = weather.rainfall * 0.75;
-      const netIrrigMm = Math.max(110, Math.round(c.water - effRain));
-      const totalWaterM3 = Number((netIrrigMm * 4.047 * areaAcres).toFixed(1));
-      const dailyLiters = Math.round((totalWaterM3 * 1000) / Math.max(60, c.days));
-
-      const timeline = [
-        { stage_name: '1. Land Prep & Soil Amendment', days: 15, agronomy_advice: `Prepare ${areaAcres} acres of confirmed ${soil.type}. Apply basal NPK (${soil.N}:${soil.P}:${soil.K} kg/ha) and 5 tonnes/acre organic FYM.` },
-        { stage_name: '2. Sowing / Transplanting', days: 20, agronomy_advice: `Plant certified ${c.name} (${c.season}). Maintain optimal row spacing and treat seeds/saplings with Trichoderma.` },
-        { stage_name: '3. Vegetative Growth & Irrigation', days: Math.round(c.days * 0.38), agronomy_advice: `Supply ~${dailyLiters.toLocaleString('en-IN')} L/day across ${areaAcres} acres. Top-dress Urea/Nitrogen in 2 split doses.` },
-        { stage_name: '4. Flowering, Fruiting & Pest Shield', days: Math.round(c.days * 0.27), agronomy_advice: `Critical moisture stage at ${weather.temp}°C. Spray micronutrient mixture (Zn + B) and preventive neem oil.` },
-        { stage_name: '5. Maturity & Market Harvest', days: 20, agronomy_advice: `Projected harvest: ${totalYield} Tonnes (~₹${grossRev.toLocaleString('en-IN')} gross value). Harvest during dry weather.` },
-      ];
-
-      return {
-        ...c,
-        score_pct: score,
-        confidence: Number((score / 100).toFixed(2)),
-        shap_breakdown: shapBreakdown,
-        digital_twin: {
-          yield_per_acre_tonnes: yieldPerAcre,
-          total_yield_tonnes: totalYield,
-          estimated_revenue_inr: grossRev,
-          net_irrigation_mm: netIrrigMm,
-          total_water_m3: totalWaterM3,
-          daily_water_liters: dailyLiters,
-          risks: {
-            drought: weather.rainfall < 75 ? 'High (Drip Required)' : weather.rainfall < 130 ? 'Moderate' : 'Low',
-            pest_disease: weather.humidity > 75 && weather.temp > 27 ? 'High (Fungal/Pest Alert)' : 'Moderate-Low',
-            soil_reaction: soil.pH < 5.5 ? 'Acidic (Add Lime)' : soil.pH > 7.8 ? 'Alkaline (Add Gypsum)' : 'Optimal pH Balance',
-          },
-        },
-        timeline,
-      };
-    });
-
-    scored.sort((a, b) => b.score_pct - a.score_pct);
-    const rainfallForecast = generateRainfallPrediction(weather.rainfall);
-
-    const payload = {
-      district: districtName,
-      agro_zone: agroZone,
-      area_acres: areaAcres,
-      setup_type: setupType,
-      weather,
-      soil,
-      rainfall_forecast: rainfallForecast,
-      ranked_crops: scored.slice(0, 6),
-      recommended_crop: scored[0].name,
-      timeline: scored[0].timeline,
+    const applyManualCoordinates = () => {
+      const parsedLat = parseFloat(manualLat);
+      const parsedLng = parseFloat(manualLng);
+      if (!isNaN(parsedLat) && !isNaN(parsedLng) && parsedLat >= 6 && parsedLat <= 38 && parsedLng >= 68 && parsedLng <= 98) {
+        handlePinDrop(parsedLat, parsedLng);
+      } else {
+        setStatusBanner('Please enter valid Indian coordinates (Lat: 6° to 38°N, Lng: 68° to 98°E).');
+      }
     };
 
-    setSelectedCropIndex(0);
-    setData(payload);
-    localStorage.setItem('agribrain_last_simulation', JSON.stringify(payload));
-    setLoading(false);
-  };
+    // Run simulation via backend API
+    const runSimulation = async () => {
+      if (!pin) return;
+      setLoading(true);
+      setStatusBanner(null);
 
-  const activeCrop = data?.ranked_crops?.[selectedCropIndex] || null;
+      try {
+        // First get district info from spatial lookup
+        const spatialResult = await ApiService.lookupDistrict(pin.lat, pin.lng);
+        const districtId = spatialResult?.district_id || 1;
+      
+        // Determine planting season based on setup type and month
+        const currentMonth = new Date().getMonth() + 1;
+        let plantingSeason = "Kharif";
+        if (setupType === "perennial" || setupType === "long-term") {
+          plantingSeason = "Perennial";
+        } else if (currentMonth >= 6 && currentMonth <= 10) {
+          plantingSeason = "Kharif";
+        } else if (currentMonth >= 11 || currentMonth <= 2) {
+          plantingSeason = "Rabi";
+        } else {
+          plantingSeason = "Zaid";
+        }
+
+        // Call backend simulation API
+        const result = await ApiService.runSimulation({
+          district_id: districtId,
+          selected_crop: data?.ranked_crops?.[0]?.name || data?.recommended_crop || "Rice (Paddy)",
+          land_area_ha: areaAcres / 2.471, // Convert acres to hectares
+          budget_inr: 100000, // Default budget
+          confirmed_soil_type: selectedSoilType,
+          rainfall_override_mm: useOverrides ? overrides.rainfall : undefined,
+          planting_season: plantingSeason,
+          planned_start_date: new Date().toISOString().split('T')[0],
+        });
+
+        // Transform backend response to frontend format
+        const payload = {
+          district: result.district,
+          agro_zone: result.agro_zone,
+          area_acres: areaAcres,
+          setup_type: setupType,
+          weather: result.weather,
+          soil: result.soil,
+          rainfall_forecast: result.rainfall_forecast || [],
+          ranked_crops: result.ranked_crops || result.alternatives || [],
+          recommended_crop: result.recommended_crop,
+          timeline: result.timeline || [],
+        };
+
+        setSelectedCropIndex(0);
+        setData(payload);
+        localStorage.setItem('agribrain_last_simulation', JSON.stringify(payload));
+        setLoading(false);
+      } catch (error) {
+        console.error('Simulation error:', error);
+        setStatusBanner('Failed to run simulation. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    const activeCrop = data?.ranked_crops?.[selectedCropIndex] || null;
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -673,7 +570,7 @@ export default function SimulatePage() {
 
                 {/* Run Button */}
                 <Button
-                  onClick={executeDigitalTwinEngine}
+                  onClick={runSimulation}
                   disabled={loading || !pin}
                   className="w-full lg:w-auto py-3 text-lg gap-2"
                   size="lg"

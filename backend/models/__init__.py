@@ -4,8 +4,33 @@ SQLAlchemy ORM models for AgriSim backend.
 from sqlalchemy import Column, Integer, String, Float, DateTime, Date, ForeignKey, Text, Boolean, JSON
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
+import uuid
 
 Base = declarative_base()
+
+
+def generate_uuid() -> str:
+    """Generate a UUID string."""
+    return str(uuid.uuid4())
+
+
+class User(Base):
+    """User model for authentication."""
+    __tablename__ = "users"
+
+    id = Column(String(36), primary_key=True, index=True, default=generate_uuid)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(255), nullable=False)
+    full_name = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_login = Column(DateTime, nullable=True)
+
+    # Relationships
+    simulation_results = relationship("SimulationResult", back_populates="user")
+    soil_image_results = relationship("SoilImageResult", back_populates="user")
 
 
 class District(Base):
@@ -171,7 +196,7 @@ class SoilImageResult(Base):
     __tablename__ = "soil_image_results"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String(100), nullable=False, index=True)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     image_path = Column(String(500), nullable=False)
     predicted_soil = Column(String(100), nullable=False)
     confidence = Column(Float, nullable=False)
@@ -179,13 +204,16 @@ class SoilImageResult(Base):
     model_version = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    # Relationships
+    user = relationship("User", back_populates="soil_image_results")
+
 
 class SimulationResult(Base):
     """Simulation result for farming scenario."""
     __tablename__ = "simulation_results"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String(100), nullable=False, index=True)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     district_id = Column(Integer, ForeignKey("districts.id"), nullable=False)
     selected_crop = Column(String(100), nullable=False)
     land_area_ha = Column(Float, nullable=False)
@@ -209,11 +237,13 @@ class SimulationResult(Base):
 
     # Relationships
     district = relationship("District")
+    user = relationship("User", back_populates="simulation_results")
 
 
 # Export all models
 __all__ = [
     "Base",
+    "User",
     "District",
     "SoilType",
     "DistrictSoilType",

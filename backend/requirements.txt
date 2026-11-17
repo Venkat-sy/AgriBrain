@@ -27,3 +27,4 @@ scipy
 shap
 prophet
 mangum
+email-validator
