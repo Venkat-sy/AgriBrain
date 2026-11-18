@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Loader2, Sprout, AlertCircle, RefreshCw, WifiOff, Image, X } from "lucide-react";
+import { Send, Bot, User, Loader2, Sprout, RefreshCw, WifiOff, Image, X } from "lucide-react";
 import { useFarm } from "@/context/FarmContext";
 import { ApiService, withRetry } from "@/services/api";
 import ReactMarkdown from "react-markdown";

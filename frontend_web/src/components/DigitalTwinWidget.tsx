@@ -19,11 +19,10 @@ import { useState, useEffect } from "react";
  }
 
  export function DigitalTwinWidget() {
-   const { simulationResults, selectedCrop, farmParams } = useFarm();
+   const { simulationResults } = useFarm();
    const [metrics, setMetrics] = useState<TwinMetrics | null>(null);
    const [scenario, setScenario] = useState("normal");
    const [progress, setProgress] = useState(0);
-   const [loading, setLoading] = useState(false);
 
    const scenarios: SimulationScenario[] = [
      { name: "Normal", color: "#39ff14", risk: "Low" },
@@ -43,19 +42,24 @@ import { useState, useEffect } from "react";
    // Generate metrics from simulation results
    useEffect(() => {
      if (simulationResults) {
-       setMetrics({
-         soilTemp: 25 + Math.random() * 10,
-         moisture: 60 + Math.random() * 30,
-         nitrogenLevel: 70 + Math.random() * 30,
-         yieldEstimate: simulationResults.expected_yield_tons || 4.2,
-       });
+       // Defer setMetrics to avoid synchronous setState in effect
+       setTimeout(() => {
+         setMetrics({
+           soilTemp: 25 + Math.random() * 10,
+           moisture: 60 + Math.random() * 30,
+           nitrogenLevel: 70 + Math.random() * 30,
+           yieldEstimate: simulationResults.expected_yield_tons || 4.2,
+         });
+       }, 0);
      } else {
-       setMetrics({
-         soilTemp: 28.4,
-         moisture: 67,
-         nitrogenLevel: 85,
-         yieldEstimate: 4.2,
-       });
+       setTimeout(() => {
+         setMetrics({
+           soilTemp: 28.4,
+           moisture: 67,
+           nitrogenLevel: 85,
+           yieldEstimate: 4.2,
+         });
+       }, 0);
      }
    }, [simulationResults]);
 
@@ -201,7 +205,7 @@ import { useState, useEffect } from "react";
                  View Cost Breakdown
                </summary>
                <ul className="mt-2 space-y-1 text-sm text-slate-600 dark:text-slate-400">
-                 {simulationResults.cost_breakdown.map((item: any, idx: number) => (
+                 {simulationResults.cost_breakdown.map((item: { activity: string; quantity: number; unit: string; unit_cost: number; total_cost: number }, idx: number) => (
                    <li key={idx} className="flex justify-between">
                      <span>{item.activity}: {item.quantity} {item.unit} × ₹{item.unit_cost}</span>
                      <span className="font-medium">₹{item.total_cost}</span>

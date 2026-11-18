@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
   Button,
   Badge,
   Input,
@@ -28,156 +26,21 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TableCaption,
-  Separator,
-  ScrollArea,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
 } from "@/components/ui";
 import {
-  MapPin,
+  Leaf,
   ArrowLeft,
   AlertCircle,
   CloudRain,
   Cpu,
   Calendar,
   Droplets,
-  Sun,
-  Leaf,
-  Sparkles,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Plus,
-  CheckCircle,
-  XCircle,
-  Info,
-  Loader2,
-  Target,
-  BarChart3,
-  Zap,
-  Shield,
-  Search,
-  ChevronDown,
-  ChevronUp,
-  MoreHorizontal,
-  Download,
-  RefreshCw,
   Settings,
-  Eye,
-  EyeOff,
-  Copy,
-  Share2,
-  Printer,
-  FileText,
-  Image,
-  Mail,
-  Bell,
-  Flag,
-  Star,
-  Heart,
-  Bookmark,
-  Tag,
-  Filter,
-  X,
-  Maximize,
-  Minimize,
-  RotateCcw,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  Menu,
-  LogOut,
-  User,
-  Lock,
-  Unlock,
-  Key,
-  Database,
-  Server,
-  Globe,
-  Wifi,
-  WifiOff,
-  Signal,
-  Battery,
-  BatteryLow,
-  Volume2,
-  VolumeX,
-  Mic,
-  MicOff,
-  Camera,
-  CameraOff,
-  Send,
-  Paperclip,
-  Link2,
-  ExternalLink,
-  Anchor,
-  BookOpen,
-  GraduationCap,
-  Award,
-  Medal,
-  Trophy,
-  Crown,
-  Gem,
-  Diamond,
-  Circle,
-  Square,
-  Triangle,
-  Hexagon,
-  Octagon,
-  Pentagon,
-  Star as StarIcon,
-  Heart as HeartIcon,
-  Zap as ZapIcon,
-  Shield as ShieldIcon,
-  Check,
-  X as XIcon,
-  Minus as MinusIcon,
-  Plus as PlusIcon,
-  ArrowUp,
-  ArrowDown,
-  ArrowLeft as ArrowLeftIcon,
-  ArrowRight,
-  ArrowUpRight,
-  ArrowDownRight,
-  ArrowDownLeft,
-  ArrowUpLeft,
-  CornerUpLeft,
-  CornerUpRight,
-  CornerDownLeft,
-  CornerDownRight,
-  Move,
-  RotateCw,
-  FlipHorizontal,
-  FlipVertical,
-  Crop,
-  ZoomIn,
-  ZoomOut,
-    Maximize2,
-    Minimize2,
-    Fullscreen,
-    PanelLeft,
-    PanelRight,
-    PanelTop,
-    PanelBottom,
-    Sidebar,
-    Layout,
-    Grid,
-    List,
-    Columns,
-    Rows,
-    SplitSquareHorizontal,
-    SplitSquareVertical,
-    Tractor,
-    Package,
-    IndianRupee,
-    Brain,
-  } from "lucide-react";
+  Tractor,
+  Package,
+  IndianRupee,
+  Brain,
+} from "lucide-react";
 
 const MapUI = dynamic(() => import("@/components/MapUI"), {
   ssr: false,
@@ -231,67 +94,29 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
   const [agroZone, setAgroZone] = useState<string>('Central & Southern Deccan Plateau');
 
   const [selectedSoilType, setSelectedSoilType] = useState<string>('Southern Red Loam');
-  const [soilConfirmed, setSoilConfirmed] = useState<boolean>(true);
-  const [areaAcres, setAreaAcres] = useState<number>(3.0);
-  const [setupType, setSetupType] = useState<'seasonal' | 'perennial'>('seasonal');
+    const [areaAcres, setAreaAcres] = useState<number>(3.0);
+    const [setupType, setSetupType] = useState<'seasonal' | 'perennial'>('seasonal');
 
-  const [useOverrides, setUseOverrides] = useState<boolean>(false);
+    const [useOverrides, setUseOverrides] = useState<boolean>(false);
   const [overrides, setOverrides] = useState({ rainfall: 115, temp: 27, humidity: 64, ph: 6.4, N: 145, P: 42, K: 135 });
 
   const [loading, setLoading] = useState<boolean>(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
-  const [data, setData] = useState<any | null>(null);
+  interface SimulationData {
+    district: string | null;
+    agro_zone: string | null;
+    area_acres: number;
+    setup_type: 'seasonal' | 'perennial';
+    weather: unknown | null;
+    soil: unknown | null;
+    rainfall_forecast: unknown[];
+    ranked_crops: unknown[];
+    recommended_crop: string | null;
+    timeline: unknown[];
+  }
+
+  const [data, setData] = useState<SimulationData | null>(null);
   const [selectedCropIndex, setSelectedCropIndex] = useState<number>(0);
-
-  // Auto-detect regional zone & default soil from coordinates
-  const inferRegionalProfile = (lat: number, lon: number) => {
-    const isHimalayan = lat > 29.8;
-    const isCoastal = (lon < 76.2 && lat < 19.5) || (lon > 79.8 && lat < 21.0);
-    const isNorthern = lat > 25.5 && lon > 74.5;
-    const isArid = lon < 74.5 && lat > 22.0;
-    const isDeccanBlack = lat >= 16.5 && lat <= 23.5 && lon >= 73.5 && lon <= 79.5;
-
-    let detectedSoil = 'Southern Red Loam';
-    let zone = 'Southern Plateau & Hills Zone';
-    let rain = 120;
-    let temp = 27.5;
-    let hum = 65;
-
-    if (isHimalayan) {
-      detectedSoil = 'Mountain Forest / Podzolic';
-      zone = 'Western Himalayan Temperate Zone';
-      rain = Math.round(145 + (lon * 3) % 60);
-      temp = Number((16.5 + (lon % 4)).toFixed(1));
-      hum = 68;
-    } else if (isCoastal) {
-      detectedSoil = 'Coastal Lateritic / Alluvial';
-      zone = 'Coastal Alluvial & Lateritic Monsoon Zone';
-      rain = Math.round(240 + (lat * 5) % 90);
-      temp = Number((28.5 + (lat % 3)).toFixed(1));
-      hum = 82;
-    } else if (isNorthern) {
-      detectedSoil = 'Indo-Gangetic Alluvial';
-      zone = 'Indo-Gangetic Plains Zone';
-      rain = Math.round(105 + (lon * 3) % 55);
-      temp = Number((24.5 + (lon % 5)).toFixed(1));
-      hum = 60;
-    } else if (isArid) {
-      detectedSoil = 'Arid Sandy / Calcareous';
-      zone = 'Western Arid & Thar Zone';
-      rain = Math.round(48 + (lat * 2) % 35);
-      temp = Number((32.5 + (lat % 3.5)).toFixed(1));
-      hum = 38;
-    } else if (isDeccanBlack) {
-      detectedSoil = 'Deccan Black Cotton (Regur)';
-      zone = 'Central Deccan Plateau Zone';
-      rain = Math.round(110 + (lat * 3) % 65);
-      temp = Number((29.0 + (lon % 3.5)).toFixed(1));
-      hum = 56;
-    }
-
-    const sp = SOIL_PROFILES[detectedSoil];
-    return { detectedSoil, zone, rain, temp, hum, sp };
-  };
 
   const handlePinDrop = async (lat: number, lng: number) => {
       const cleanLat = Number(lat.toFixed(4));
@@ -319,20 +144,6 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
       } catch {
         // Fallback to basic values
         setDistrictName(`${cleanLat}°N, ${cleanLng}°E`);
-      }
-    };
-
-  const handleSoilTypeChange = (newSoil: string) => {
-      setSelectedSoilType(newSoil);
-    };
-
-    const applyManualCoordinates = () => {
-      const parsedLat = parseFloat(manualLat);
-      const parsedLng = parseFloat(manualLng);
-      if (!isNaN(parsedLat) && !isNaN(parsedLng) && parsedLat >= 6 && parsedLat <= 38 && parsedLng >= 68 && parsedLng <= 98) {
-        handlePinDrop(parsedLat, parsedLng);
-      } else {
-        setStatusBanner('Please enter valid Indian coordinates (Lat: 6° to 38°N, Lng: 68° to 98°E).');
       }
     };
 
@@ -716,7 +527,7 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {(data?.ranked_crops || []).map((crop: any, idx: number) => (
+                          {(data?.ranked_crops || []).map((crop: { name: string; variety: string; score_pct: number; digital_twin?: { yield_per_acre_tonnes?: number; estimated_revenue_inr?: number; daily_water_liters?: number } }, idx: number) => (
                             <TableRow
                                 key={`${crop.name}-${idx}`}
                               className={`cursor-pointer transition-colors ${selectedCropIndex === idx ? 'bg-emerald-50' : 'hover:bg-slate-50'}`}
@@ -763,7 +574,7 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {(activeCrop?.timeline || []).map((stage: any, idx: number) => (
+                      {(activeCrop?.timeline || []).map((stage: { stage_name: string; days: number; agronomy_advice: string }, idx: number) => (
                         <div key={idx} className="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
                           <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
                             <span className="text-2xl font-bold text-emerald-600">{idx + 1}</span>
@@ -778,7 +589,7 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
                     </div>
                     <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                       <p className="text-sm text-emerald-800">
-                        <strong>Total Cycle:</strong> {(activeCrop?.timeline || []).reduce((a: number, b: any) => a + (Number(b.days) || 0), 0)} days (~{Math.round((activeCrop?.timeline || []).reduce((a: number, b: any) => a + (Number(b.days) || 0), 0) / 30)} months)
+                        <strong>Total Cycle:</strong> {(activeCrop?.timeline || []).reduce((a: number, b: { days: number }) => a + (Number(b.days) || 0), 0)} days (~{Math.round((activeCrop?.timeline || []).reduce((a: number, b: { days: number }) => a + (Number(b.days) || 0), 0) / 30)} months)
                         {' | '}
                         <strong>Total Water:</strong> {(activeCrop?.digital_twin?.total_water_m3 || 0).toLocaleString('en-IN')} m³
                         {' | '}
@@ -799,7 +610,7 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                      {(data?.rainfall_forecast || []).map((m: any, idx: number) => (
+                      {(data?.rainfall_forecast || []).map((m: { month: string; predicted_mm: number; anomaly_pct: number }, idx: number) => (
                         <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-center">
                           <p className="text-xs text-slate-500">{m.month}</p>
                           <p className="text-2xl font-bold text-emerald-600 mt-1">{m.predicted_mm} mm</p>

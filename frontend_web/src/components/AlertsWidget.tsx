@@ -3,7 +3,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
  import { useFarm } from "@/context/FarmContext";
- import { CheckCircle, AlertCircle, Info, X } from "lucide-react";
+ import { CheckCircle, AlertCircle, X } from "lucide-react";
 
  interface Alert {
    id: number;
@@ -22,9 +22,75 @@ import { useState, useEffect } from "react";
    const [alerts, setAlerts] = useState<Alert[]>([]);
    const [loading, setLoading] = useState(true);
 
+   const generateContextualAlerts = () => {
+     const newAlerts: Alert[] = [];
+     const now = new Date();
+    
+     // Alert based on simulation results
+     if (simulationResults) {
+       if (simulationResults.water_sufficiency === false) {
+         newAlerts.push({
+           id: Date.now(),
+           type: "critical",
+           title: "Water Stress Detected",
+           message: `Your simulation shows insufficient water for ${selectedCrop}. Consider irrigation planning.`,
+           timestamp: new Date(now.getTime() - 1000 * 60 * 30),
+           read: false,
+           actionRequired: true,
+         });
+       }
+      
+       if (simulationResults.risk_level === "high") {
+         newAlerts.push({
+           id: Date.now() + 1,
+           type: "warning",
+           title: "High Risk Simulation",
+           message: `The simulation for ${selectedCrop} shows high risk level. Review parameters before planting.`,
+           timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 2),
+           read: false,
+           actionRequired: true,
+         });
+       }
+     }
+    
+     // Alert based on calendar stages
+     if (calendarStages && calendarStages.length > 0) {
+       const currentStage = calendarStages[0];
+       if (currentStage && currentStage.tasks) {
+         currentStage.tasks.forEach((task, index) => {
+           newAlerts.push({
+             id: Date.now() + 2 + index,
+             type: "info",
+             title: `Upcoming Task: ${currentStage.stage_name}`,
+             message: task,
+             timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 24),
+             read: false,
+             actionRequired: false,
+           });
+         });
+       }
+     }
+    
+     // Alert based on farm parameters
+     if (farmParams && farmParams.ph && (farmParams.ph < 5.5 || farmParams.ph > 8.0)) {
+       newAlerts.push({
+         id: Date.now() + 10,
+         type: "warning",
+         title: "Soil pH Alert",
+         message: `Soil pH of ${farmParams.ph} is outside optimal range for most crops. Consider soil amendment.`,
+         timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 48),
+         read: false,
+         actionRequired: true,
+       });
+     }
+    
+     setAlerts(newAlerts);
+   };
+
    useEffect(() => {
      generateContextualAlerts();
-     setLoading(false);
+     // Defer setLoading to avoid synchronous setState in effect
+     setTimeout(() => setLoading(false), 0);
    }, [farmParams, simulationResults, selectedCrop, calendarStages]);
 
    const getStatusColor = (type: string) => {
@@ -49,109 +115,7 @@ import { useState, useEffect } from "react";
      return `${days}d ago`;
    };
 
-   const generateContextualAlerts = () => {
-     const newAlerts: Alert[] = [];
-     const now = new Date();
-     
-     // Alert based on simulation results
-     if (simulationResults) {
-       if (simulationResults.water_sufficiency === false) {
-         newAlerts.push({
-           id: Date.now(),
-           type: "critical",
-           title: "Water Stress Detected",
-           message: `Your simulation shows insufficient water for ${selectedCrop}. Consider irrigation planning.`,
-           timestamp: new Date(now.getTime() - 1000 * 60 * 30),
-           read: false,
-           actionRequired: true,
-         });
-       }
-       
-       if (simulationResults.risk_level === "high") {
-         newAlerts.push({
-           id: Date.now() + 1,
-           type: "warning",
-           title: "High Risk Simulation",
-           message: `The simulation for ${selectedCrop} shows high risk level. Review parameters before planting.`,
-           timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 2),
-           read: false,
-           actionRequired: true,
-         });
-       }
-       
-       if (simulationResults.roi_percent && simulationResults.roi_percent < 10) {
-         newAlerts.push({
-           id: Date.now() + 2,
-           type: "warning",
-           title: "Low ROI Warning",
-           message: `Expected ROI of ${simulationResults.roi_percent?.toFixed(1)}% is below 10%. Consider alternative crops.`,
-           timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 5),
-           read: false,
-           actionRequired: false,
-         });
-       }
-     }
-     
-     // Alert based on calendar stage
-     if (calendarStages && calendarStages.length > 0) {
-       const currentStage = calendarStages[0];
-       if (currentStage.stage.toLowerCase() === "flowering") {
-         newAlerts.push({
-           id: Date.now() + 3,
-           type: "critical",
-           title: "Critical Irrigation Period",
-           message: `${selectedCrop} is in flowering stage - critical water period. Monitor soil moisture daily.`,
-           timestamp: new Date(now.getTime() - 1000 * 60 * 15),
-           read: false,
-           actionRequired: true,
-         });
-       }
-       
-       if (currentStage.stage.toLowerCase() === "harvest") {
-         newAlerts.push({
-           id: Date.now() + 4,
-           type: "info",
-           title: "Harvest Approaching",
-           message: `${selectedCrop} nearing harvest. Plan harvesting schedule and storage.`,
-           timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 24),
-           read: false,
-           actionRequired: false,
-         });
-       }
-     }
-     
-     // General farm alerts
-     if (farmParams) {
-       if (farmParams.ph < 5.5 || farmParams.ph > 8.0) {
-         newAlerts.push({
-           id: Date.now() + 5,
-           type: "warning",
-           title: "Soil pH Alert",
-           message: `Soil pH of ${farmParams.ph} may affect nutrient availability for ${selectedCrop || "your crop"}.`,
-           timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 2),
-           read: true,
-           actionRequired: false,
-         });
-       }
-     }
-     
-     // Default alerts if none generated
-     if (newAlerts.length === 0) {
-       newAlerts.push({
-         id: Date.now() + 6,
-         type: "info",
-         title: "System Ready",
-         message: "Complete your farm simulation to receive contextual alerts and recommendations.",
-         timestamp: new Date(now.getTime() - 1000 * 60 * 60),
-         read: false,
-         actionRequired: false,
-       });
-     }
-     
-     setAlerts(newAlerts);
-   };
-
-   const markAsRead = (id: number) => {
+      const markAsRead = (id: number) => {
      setAlerts(prev => prev.map(a => a.id === id ? { ...a, read: true } : a));
    };
 

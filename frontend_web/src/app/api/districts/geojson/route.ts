@@ -16,12 +16,12 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: "Failed to fetch district boundaries" },
-        { status: response.status }
-      );
-    }
+          await response.json().catch(() => ({}));
+          return NextResponse.json(
+            { error: "Failed to fetch district boundaries" },
+            { status: response.status }
+          );
+        }
 
     const data = await response.json();
     return NextResponse.json(data);

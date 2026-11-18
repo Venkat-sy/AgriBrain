@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    // Transform to match frontend expectations
-    const recommendations = data.recommendations.map((crop: any, index: number) => ({
+        // Transform to match frontend expectations
+        const recommendations = data.recommendations.map((crop: { crop_name: string; confidence: number; expected_yield_tons_per_ha: number; match_reasons: string[] }, index: number) => ({
       crop_id: index + 1,
       crop_name: crop.crop_name,
       confidence_score: crop.confidence,

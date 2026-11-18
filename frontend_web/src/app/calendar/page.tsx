@@ -31,12 +31,11 @@ import { useState, useEffect } from "react";
    } = useFarm();
    
    const [stages, setStages] = useState<CalendarStage[]>([]);
-   const [isLoading, setIsLoading] = useState(false);
 
    // Generate calendar stages from simulation results
    useEffect(() => {
      if (simulationResults && simulationResults.monthly_breakdown) {
-       const generatedStages: CalendarStage[] = simulationResults.monthly_breakdown.map((month: any, index: number) => {
+       const generatedStages: CalendarStage[] = simulationResults.monthly_breakdown.map((month: { month: number; growth_stage: string; irrigation_needed_mm?: number; rainfall_mm?: number }, index: number) => {
          const growthStages = ["Germination", "Vegetative", "Flowering", "Grain Filling", "Maturity", "Harvest"];
          const stageName = growthStages[index] || `Month ${month.month}`;
          
@@ -91,29 +90,34 @@ import { useState, useEffect } from "react";
          };
          
          return {
-           month: month.month,
-           stage: stageName,
-           description: `${stageName} phase - ${month.growth_stage}`,
-           water_needed_mm: month.irrigation_needed_mm || 0,
-           rainfall_mm: month.rainfall_mm || 0,
-           tasks: stageTasks[stageName] || [
-             "Monitor crop growth",
-             "Check water requirements",
-             "Scout for pests and diseases"
-           ],
-           start_date: formatDate(start),
-           end_date: formatDate(end)
-         };
-       });
-       
-       setStages(generatedStages);
-       setCalendarStages(generatedStages);
-       setCurrentStep(4);
-     } else if (calendarStages && calendarStages.length > 0) {
-       setStages(calendarStages);
-       setCurrentStep(4);
-     }
-   }, [simulationResults, calendarStages, farmParams, setCalendarStages, setCurrentStep]);
+                   month: month.month,
+                   stage: stageName,
+                   description: `${stageName} phase - ${month.growth_stage}`,
+                   water_needed_mm: month.irrigation_needed_mm || 0,
+                   rainfall_mm: month.rainfall_mm || 0,
+                   tasks: stageTasks[stageName] || [
+                     "Monitor crop growth",
+                     "Check water requirements",
+                     "Scout for pests and diseases"
+                   ],
+                   start_date: formatDate(start),
+                   end_date: formatDate(end)
+                 };
+               });
+      
+               // Defer state updates to avoid synchronous setState in effect
+               setTimeout(() => {
+                 setStages(generatedStages);
+                 setCalendarStages(generatedStages);
+                 setCurrentStep(4);
+               }, 0);
+             } else if (calendarStages && calendarStages.length > 0) {
+               setTimeout(() => {
+                 setStages(calendarStages);
+                 setCurrentStep(4);
+               }, 0);
+             }
+           }, [simulationResults, calendarStages, farmParams, setCalendarStages, setCurrentStep]);
 
    // Progress indicator
    const steps = [

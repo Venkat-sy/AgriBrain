@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
+      await response.json().catch(() => ({}));
       return NextResponse.json(
         { error: "Failed to fetch districts" },
         { status: response.status }
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const districts = Array.isArray(data) ? data : [];
 
     // Extract unique states
-    const states = [...new Set(districts.map((d: any) => d.state).filter(Boolean))].sort();
+    const states = [...new Set(districts.map((d: { state?: string }) => d.state).filter(Boolean))].sort();
 
     return NextResponse.json({ districts, states });
   } catch (error) {

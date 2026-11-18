@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
  import { WeatherWidget } from "@/components/WeatherWidget";
  import { AlertsWidget } from "@/components/AlertsWidget";
  import { DigitalTwinWidget } from "@/components/DigitalTwinWidget";
- import { Loader2, Sparkles, Trash2, AlertCircle, RefreshCw, Info } from "lucide-react";
+ import { Loader2, Sparkles, Info } from "lucide-react";
 
  export default function ExpertChatPage() {
    const { 
@@ -21,33 +21,35 @@ import { useState, useEffect } from "react";
    } = useFarm();
    
    const [contextSummary, setContextSummary] = useState<string>("");
-   const [userMessageCount, setUserMessageCount] = useState(0);
 
    // Generate context summary for display
    useEffect(() => {
-     if (simulationResults && selectedCrop && farmParams) {
-       const summary = `
- Farm Context:
- - Crop: ${selectedCrop}
- - Location: District ID ${farmParams.district_id}, ${farmParams.soil_type}
- - Land Area: ${farmParams.land_area_ha} ha
- - Planting Season: ${farmParams.planting_season}
- - Planting Date: ${farmParams.planned_start_date}
- 
- Simulation Results:
- - Expected Yield: ${simulationResults.expected_yield_tons?.toFixed(1) || 0} tons
- - Expected Revenue: ₹${simulationResults.expected_revenue_inr?.toLocaleString() || 0}
- - Total Cost: ₹${simulationResults.total_cost_inr?.toLocaleString() || 0}
- - ROI: ${simulationResults.roi_percent?.toFixed(1) || 0}%
- - Risk Level: ${simulationResults.risk_level || "Unknown"}
- 
- Calendar Stages: ${calendarStages?.length || 0} months planned
- Current Stage: ${calendarStages?.[0]?.stage || "Not started"}
-       `.trim();
-       setContextSummary(summary);
-       setCurrentStep(5);
-     }
-   }, [simulationResults, selectedCrop, farmParams, calendarStages, setCurrentStep]);
+       if (simulationResults && selectedCrop && farmParams) {
+         const summary = `
+   Farm Context:
+   - Crop: ${selectedCrop}
+   - Location: District ID ${farmParams.district_id}, ${farmParams.soil_type}
+   - Land Area: ${farmParams.land_area_ha} ha
+   - Planting Season: ${farmParams.planting_season}
+   - Planting Date: ${farmParams.planned_start_date}
+
+   Simulation Results:
+   - Expected Yield: ${simulationResults.expected_yield_tons?.toFixed(1) || 0} tons
+   - Expected Revenue: ₹${simulationResults.expected_revenue_inr?.toLocaleString() || 0}
+   - Total Cost: ₹${simulationResults.total_cost_inr?.toLocaleString() || 0}
+   - ROI: ${simulationResults.roi_percent?.toFixed(1) || 0}%
+   - Risk Level: ${simulationResults.risk_level || "Unknown"}
+
+   Calendar Stages: ${calendarStages?.length || 0} months planned
+   Current Stage: ${calendarStages?.[0]?.stage || "Not started"}
+         `.trim();
+         // Defer state updates to avoid synchronous setState in effect
+         setTimeout(() => {
+           setContextSummary(summary);
+           setCurrentStep(5);
+         }, 0);
+       }
+     }, [simulationResults, selectedCrop, farmParams, calendarStages, setCurrentStep]);
 
    // Progress indicator
    const steps = [
@@ -170,19 +172,19 @@ import { useState, useEffect } from "react";
                  Quick Questions
                </h3>
                <div className="space-y-2">
-                 <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
-                   "What's the optimal irrigation schedule for my current growth stage?"
-                 </button>
-                 <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
-                   "How can I improve my ROI based on current market conditions?"
-                 </button>
-                 <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
-                   "What pests should I watch for during the flowering stage?"
-                 </button>
-                 <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
-                   "When is the best time to harvest for maximum quality?"
-                 </button>
-               </div>
+                               <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
+                                 &ldquo;What&rsquo;s the optimal irrigation schedule for my current growth stage?&rdquo;
+                               </button>
+                               <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
+                                 &ldquo;How can I improve my ROI based on current market conditions?&rdquo;
+                               </button>
+                               <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
+                                 &ldquo;What pests should I watch for during the flowering stage?&rdquo;
+                               </button>
+                               <button className="w-full text-left p-3 glass-card border-white/10 hover:bg-white/10 transition-colors text-sm text-slate-300">
+                                 &ldquo;When is the best time to harvest for maximum quality?&rdquo;
+                               </button>
+                             </div>
              </div>
              
              {/* Context Summary Cards */}
