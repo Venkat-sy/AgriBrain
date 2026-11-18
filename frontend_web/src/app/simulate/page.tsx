@@ -24,6 +24,7 @@ import {
   AlertDescription,
   Table,
   TableHeader,
+  TableHead,
   TableBody,
   TableRow,
   TableCell,
@@ -157,22 +158,26 @@ import {
   Crop,
   ZoomIn,
   ZoomOut,
-  Maximize2,
-  Minimize2,
-  Fullscreen,
-  PanelLeft,
-  PanelRight,
-  PanelTop,
-  PanelBottom,
-  Sidebar,
-  Layout,
-  Grid,
-  List,
-  Columns,
-  Rows,
-  SplitSquareHorizontal,
-  SplitSquareVertical,
-} from "lucide-react";
+    Maximize2,
+    Minimize2,
+    Fullscreen,
+    PanelLeft,
+    PanelRight,
+    PanelTop,
+    PanelBottom,
+    Sidebar,
+    Layout,
+    Grid,
+    List,
+    Columns,
+    Rows,
+    SplitSquareHorizontal,
+    SplitSquareVertical,
+    Tractor,
+    Package,
+    IndianRupee,
+    Brain,
+  } from "lucide-react";
 
 const MapUI = dynamic(() => import("@/components/MapUI"), {
   ssr: false,
@@ -195,9 +200,29 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
   "Mountain Forest / Podzolic": { N: 185, P: 52, K: 150, pH: 6.0, desc: "Humus-rich temperate soil; ideal for apple, spices, potato" },
   "Deltaic Clay Loam": { N: 195, P: 54, K: 170, pH: 6.6, desc: "Moisture-retentive delta soil; high yield for rice, jute, banana" },
   "Saline / Alkaline Usar": { N: 110, P: 32, K: 125, pH: 8.2, desc: "High salt profile; requires gypsum & salt-tolerant varieties" },
-};
+  };
 
-export default function SimulatePage() {
+  interface MetricCardProps {
+    label: string;
+    value: string;
+    icon: React.ReactNode;
+  }
+
+  function MetricCard({ label, value, icon }: MetricCardProps) {
+    return (
+      <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">{icon}</div>
+          <div>
+            <p className="text-xs text-slate-500 font-medium">{label}</p>
+            <p className="text-lg font-bold text-slate-900">{value}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  export default function SimulatePage() {
   const router = useRouter();
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>({ lat: 12.9716, lng: 77.5946 });
   const [manualLat, setManualLat] = useState<string>('12.9716');
@@ -208,7 +233,7 @@ export default function SimulatePage() {
   const [selectedSoilType, setSelectedSoilType] = useState<string>('Southern Red Loam');
   const [soilConfirmed, setSoilConfirmed] = useState<boolean>(true);
   const [areaAcres, setAreaAcres] = useState<number>(3.0);
-  const [setupType, setSetupType] = useState<'short-term' | 'long-term'>('short-term');
+  const [setupType, setSetupType] = useState<'seasonal' | 'perennial'>('seasonal');
 
   const [useOverrides, setUseOverrides] = useState<boolean>(false);
   const [overrides, setOverrides] = useState({ rainfall: 115, temp: 27, humidity: 64, ph: 6.4, N: 145, P: 42, K: 135 });
@@ -325,8 +350,8 @@ export default function SimulatePage() {
         // Determine planting season based on setup type and month
         const currentMonth = new Date().getMonth() + 1;
         let plantingSeason = "Kharif";
-        if (setupType === "perennial" || setupType === "long-term") {
-          plantingSeason = "Perennial";
+                if (setupType === "perennial") {
+                  plantingSeason = "Perennial";
         } else if (currentMonth >= 6 && currentMonth <= 10) {
           plantingSeason = "Kharif";
         } else if (currentMonth >= 11 || currentMonth <= 2) {
@@ -341,7 +366,7 @@ export default function SimulatePage() {
           land_area_ha: areaAcres / 2.471, // Convert acres to hectares
           budget_inr: 100000, // Default budget
           confirmed_soil_type: selectedSoilType,
-          rainfall_override_mm: useOverrides ? overrides.rainfall : undefined,
+          rainfall_override_mm: useOverrides ? overrides.rainfall : 0,
           planting_season: plantingSeason,
           planned_start_date: new Date().toISOString().split('T')[0],
         });
@@ -497,8 +522,8 @@ export default function SimulatePage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">Farm Setup Type</Label>
-                    <Select value={setupType} onValueChange={setSetupType} className="mt-1">
-                      <SelectTrigger><SelectValue placeholder="Select setup" /></SelectTrigger>
+                    <Select value={setupType} onValueChange={(v: string) => setSetupType(v as 'seasonal' | 'perennial')}>
+                                          <SelectTrigger className="mt-1"><SelectValue placeholder="Select setup" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="seasonal">Seasonal Crops (25 varieties)</SelectItem>
                         <SelectItem value="perennial">Perennial Crops (20 varieties)</SelectItem>
@@ -514,8 +539,8 @@ export default function SimulatePage() {
                 {/* Soil Type */}
                 <div>
                   <Label className="text-sm font-medium">Confirmed Soil Profile</Label>
-                  <Select value={selectedSoilType} onValueChange={setSelectedSoilType} className="mt-1 w-full md:w-1/2">
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                  <Select value={selectedSoilType} onValueChange={setSelectedSoilType}>
+                                        <SelectTrigger className="mt-1 w-full md:w-1/2"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {Object.entries(SOIL_PROFILES).map(([key, v]) => (
                         <SelectItem key={key} value={key}>
@@ -605,7 +630,7 @@ export default function SimulatePage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <Badge variant="default" className="text-xs">Top Match</Badge>
-                          <Badge variant="secondary" className="text-xs">{data?.setup_type === 'seasonal' ? 'Seasonal' : 'Perennial'}</Badge>
+                          <Badge variant="secondary" className="text-xs">{data?.setup_type === 'seasonal' || data?.setup_type === 'short-term' ? 'Seasonal' : 'Perennial'}</Badge>
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900">{activeCrop?.name}</h2>
                                                 <p className="text-sm text-slate-500">{activeCrop?.variety} • {activeCrop?.season} • {activeCrop?.days} days</p>
@@ -620,9 +645,9 @@ export default function SimulatePage() {
                     {/* Key Metrics Row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <MetricCard label="Yield / Acre" value={`${activeCrop?.digital_twin?.yield_per_acre_tonnes || 0} t`} icon={<Tractor className="w-4 h-4" />} />
-                                            <MetricCard label="Total Yield" value={`${activeCrop?.digital_twin?.total_yield_tonnes || 0} t`} icon={<Package className="w-4 h-4" />} />
-                                            <MetricCard label="Est. Revenue" value={`₹${activeCrop?.digital_twin?.estimated_revenue_inr?.toLocaleString('en-IN') || 0}`} icon={<Rupee className="w-4 h-4" />} />
-                                            <MetricCard label="Water / Day" value={`${activeCrop?.digital_twin?.daily_water_liters?.toLocaleString('en-IN') || 0} L`} icon={<Droplets className="w-4 h-4" />} />
+                                                                  <MetricCard label="Total Yield" value={`${activeCrop?.digital_twin?.total_yield_tonnes || 0} t`} icon={<Package className="w-4 h-4" />} />
+                                                                  <MetricCard label="Est. Revenue" value={`₹${activeCrop?.digital_twin?.estimated_revenue_inr?.toLocaleString('en-IN') || 0}`} icon={<IndianRupee className="w-4 h-4" />} />
+                                                                  <MetricCard label="Water / Day" value={`${activeCrop?.digital_twin?.daily_water_liters?.toLocaleString('en-IN') || 0} L`} icon={<Droplets className="w-4 h-4" />} />
                     </div>
 
                     {/* SHAP Explainability */}
@@ -632,7 +657,7 @@ export default function SimulatePage() {
                         SHAP Feature Impact Breakdown
                       </h4>
                       <div className="space-y-2">
-                        {activeCrop?.shap_breakdown?.map((s, i) => (
+                        {activeCrop?.shap_breakdown?.map((s: { feature: string; impact: number }, i: number) => (
                           <div key={i} className="flex items-center gap-3">
                             <div className="w-36 text-xs text-slate-600 font-medium">{s.feature}</div>
                             <div className="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
@@ -656,12 +681,12 @@ export default function SimulatePage() {
                     <div className="border-t pt-4">
                       <h4 className="text-sm font-semibold text-slate-700 mb-3">Risk Assessment</h4>
                       <div className="grid grid-cols-3 gap-3">
-                        {Object.entries(activeCrop?.digital_twin?.risks || {}).map(([key, val]) => (
-                          <div key={key} className="p-3 bg-slate-50 rounded-lg text-center">
-                            <p className="text-xs text-slate-500 capitalize">{key.replace('_', ' ')}</p>
-                            <p className="text-sm font-medium text-slate-900 mt-1">{val}</p>
-                          </div>
-                        ))}
+                        {Object.entries(activeCrop?.digital_twin?.risks || {}).map(([key, val]: [string, unknown]) => (
+                                                  <div key={key} className="p-3 bg-slate-50 rounded-lg text-center">
+                                                    <p className="text-xs text-slate-500 capitalize">{key.replace('_', ' ')}</p>
+                                                    <p className="text-sm font-medium text-slate-900 mt-1">{String(val)}</p>
+                                                  </div>
+                                                ))}
                       </div>
                     </div>
                   </CardContent>
@@ -691,7 +716,7 @@ export default function SimulatePage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {(data?.ranked_crops || []).map((crop, idx) => (
+                          {(data?.ranked_crops || []).map((crop: any, idx: number) => (
                             <TableRow
                                 key={`${crop.name}-${idx}`}
                               className={`cursor-pointer transition-colors ${selectedCropIndex === idx ? 'bg-emerald-50' : 'hover:bg-slate-50'}`}
@@ -738,7 +763,7 @@ export default function SimulatePage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {(activeCrop?.timeline || []).map((stage, idx) => (
+                      {(activeCrop?.timeline || []).map((stage: any, idx: number) => (
                         <div key={idx} className="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
                           <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
                             <span className="text-2xl font-bold text-emerald-600">{idx + 1}</span>
@@ -753,7 +778,7 @@ export default function SimulatePage() {
                     </div>
                     <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                       <p className="text-sm text-emerald-800">
-                        <strong>Total Cycle:</strong> {(activeCrop?.timeline || []).reduce((a, b) => a + (Number(b.days) || 0), 0)} days (~{Math.round((activeCrop?.timeline || []).reduce((a, b) => a + (Number(b.days) || 0), 0) / 30)} months)
+                        <strong>Total Cycle:</strong> {(activeCrop?.timeline || []).reduce((a: number, b: any) => a + (Number(b.days) || 0), 0)} days (~{Math.round((activeCrop?.timeline || []).reduce((a: number, b: any) => a + (Number(b.days) || 0), 0) / 30)} months)
                         {' | '}
                         <strong>Total Water:</strong> {(activeCrop?.digital_twin?.total_water_m3 || 0).toLocaleString('en-IN')} m³
                         {' | '}
@@ -774,7 +799,7 @@ export default function SimulatePage() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                      {(data?.rainfall_forecast || []).map((m, idx) => (
+                      {(data?.rainfall_forecast || []).map((m: any, idx: number) => (
                         <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-center">
                           <p className="text-xs text-slate-500">{m.month}</p>
                           <p className="text-2xl font-bold text-emerald-600 mt-1">{m.predicted_mm} mm</p>

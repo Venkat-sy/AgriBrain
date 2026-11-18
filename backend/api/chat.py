@@ -1,5 +1,6 @@
 import os
 import base64
+import json
 import uuid
 from fastapi import APIRouter, Request, HTTPException
 from groq import Groq
@@ -46,8 +47,13 @@ async def troubleshoot_chat(request: Request):
         session_id = body.get('session_id')
     else:
         form = await request.form()
-        message = form.get('message') or form.get('query') or 'Analyze this agricultural query.'
+        message = form.get('message') or form.get('query') or form.get('user_question') or 'Analyze this agricultural query.'
         farm_context = form.get('context') or ''
+        if farm_context:
+            try:
+                farm_context = json.loads(farm_context)
+            except (TypeError, ValueError):
+                pass
         session_id = form.get('session_id')
         upload_file = form.get('file') or form.get('image')
         if upload_file and hasattr(upload_file, 'read'):

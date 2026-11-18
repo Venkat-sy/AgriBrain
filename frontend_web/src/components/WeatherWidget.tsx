@@ -24,7 +24,7 @@
  }
 
  export function WeatherWidget() {
-   const { farmParams } = useFarm();
+   const { farmParams, coordinates } = useFarm();
    const [weather, setWeather] = useState<WeatherData | null>(null);
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState<string | null>(null);
@@ -33,15 +33,15 @@
      if (farmParams?.district_id) {
        fetchWeather();
      }
-   }, [farmParams?.district_id]);
+   }, [farmParams?.district_id, coordinates]);
 
    const fetchWeather = async () => {
-     setLoading(true);
-     setError(null);
-     try {
-       // Get coordinates from farm params or use district center
-       const lat = farmParams?.coordinates?.lat || 12.9716;
-       const lon = farmParams?.coordinates?.lon || 77.5946;
+       setLoading(true);
+       setError(null);
+       try {
+         // Get coordinates from farm context or use district center
+         const lat = coordinates?.lat || 12.9716;
+         const lon = coordinates?.lon || 77.5946;
       
        const result = await ApiService.getWeather(lat, lon);
        const w = result.weather;

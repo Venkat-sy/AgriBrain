@@ -21,6 +21,7 @@ interface MapUIProps {
   onPinDrop: (lat: number, lng: number) => void;
   center?: [number, number];
   zoom?: number;
+  className?: string;
 }
 
 function ClickHandler({ onPinDrop }: { onPinDrop: (lat: number, lng: number) => void }) {
@@ -47,7 +48,7 @@ function MapFlyTo({ pin, center, zoom }: { pin: { lat: number; lng: number } | n
   return null;
 }
 
-export default function MapUI({ pin, onPinDrop, center, zoom }: MapUIProps) {
+export default function MapUI({ pin, onPinDrop, center, zoom, className }: MapUIProps) {
   const markerRef = useRef<any>(null);
   const defaultCenter: [number, number] = center || [20.5937, 78.9629];
   const defaultZoom: number = zoom || 5;
@@ -67,11 +68,12 @@ export default function MapUI({ pin, onPinDrop, center, zoom }: MapUIProps) {
   );
 
   return (
-    <div className="w-full h-[320px] sm:h-[390px] lg:h-[430px] rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative z-0">
+      <div className={`w-full h-[320px] sm:h-[390px] lg:h-[430px] rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative z-0 ${className || ''}`}>
       <MapContainer center={defaultCenter} className="w-full h-full z-0" scrollWheelZoom={true} zoom={defaultZoom}>
-        <TileLayer attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer
+                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
         <ClickHandler onPinDrop={onPinDrop}/>
         <MapFlyTo pin={pin} center={center} zoom={zoom}/>
         {markerPos && pin && (
