@@ -11,3 +11,6 @@ fastapi
 uvicorn[standard]
 mangum
 prophet
+python-jose[cryptography]
+passlib[bcrypt]
+pyyaml
