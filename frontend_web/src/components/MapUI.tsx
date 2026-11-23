@@ -35,23 +35,23 @@ function ClickHandler({ onPinDrop }: { onPinDrop: (lat: number, lng: number) => 
 
 function MapFlyTo({ pin, center, zoom }: { pin: { lat: number; lng: number } | null; center?: [number, number]; zoom?: number }) {
   const map = useMap();
-  const defaultCenter: [number, number] = center || [20.5937, 78.9629];
-  const defaultZoom: number = zoom || 5;
-  
+  const defaultZoom = zoom ?? 5;
+
   useEffect(() => {
+    const defaultCenter = center ?? [20.5937, 78.9629];
     if (pin) {
       map.flyTo([pin.lat, pin.lng], Math.max(map.getZoom(), 7), { duration: 0.75 });
     } else {
       map.flyTo(defaultCenter, defaultZoom, { duration: 0.75 });
     }
-  }, [pin, map, defaultCenter, defaultZoom]);
+  }, [pin, map, center, defaultZoom]);
   return null;
 }
 
 export default function MapUI({ pin, onPinDrop, center, zoom, className }: MapUIProps) {
-  const markerRef = useRef<any>(null);
-  const defaultCenter: [number, number] = center || [20.5937, 78.9629];
-  const defaultZoom: number = zoom || 5;
+  const markerRef = useRef<L.Marker | null>(null);
+  const defaultCenter: [number, number] = center ?? [20.5937, 78.9629];
+  const defaultZoom = zoom ?? 5;
   const markerPos: [number, number] | null = pin ? [pin.lat, pin.lng] : null;
 
   const eventHandlers = useMemo(

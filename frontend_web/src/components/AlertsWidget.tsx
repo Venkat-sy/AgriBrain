@@ -1,7 +1,7 @@
  "use client";
 
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
  import { useFarm } from "@/context/FarmContext";
  import { CheckCircle, AlertCircle, X } from "lucide-react";
 
@@ -22,7 +22,7 @@ import { useState, useEffect } from "react";
    const [alerts, setAlerts] = useState<Alert[]>([]);
    const [loading, setLoading] = useState(true);
 
-   const generateContextualAlerts = () => {
+   const generateContextualAlerts = useCallback(() => {
      const newAlerts: Alert[] = [];
      const now = new Date();
     
@@ -54,22 +54,22 @@ import { useState, useEffect } from "react";
      }
     
      // Alert based on calendar stages
-     if (calendarStages && calendarStages.length > 0) {
-       const currentStage = calendarStages[0];
-       if (currentStage && currentStage.tasks) {
-         currentStage.tasks.forEach((task, index) => {
-           newAlerts.push({
-             id: Date.now() + 2 + index,
-             type: "info",
-             title: `Upcoming Task: ${currentStage.stage_name}`,
-             message: task,
-             timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 24),
-             read: false,
-             actionRequired: false,
-           });
-         });
-       }
-     }
+         if (calendarStages && calendarStages.length > 0) {
+           const currentStage = calendarStages[0];
+           if (currentStage && currentStage.tasks) {
+             currentStage.tasks.forEach((task, index) => {
+               newAlerts.push({
+                 id: Date.now() + 2 + index,
+                 type: "info",
+                 title: `Upcoming Task: ${currentStage.stage}`,
+                 message: task,
+                 timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 24),
+                 read: false,
+                 actionRequired: false,
+               });
+             });
+           }
+         }
     
      // Alert based on farm parameters
      if (farmParams && farmParams.ph && (farmParams.ph < 5.5 || farmParams.ph > 8.0)) {
@@ -85,13 +85,15 @@ import { useState, useEffect } from "react";
      }
     
      setAlerts(newAlerts);
-   };
+     }, [farmParams, simulationResults, selectedCrop, calendarStages]);
 
    useEffect(() => {
-     generateContextualAlerts();
-     // Defer setLoading to avoid synchronous setState in effect
-     setTimeout(() => setLoading(false), 0);
-   }, [farmParams, simulationResults, selectedCrop, calendarStages]);
+       // Defer setState calls to avoid synchronous setState in effect
+       setTimeout(() => {
+         generateContextualAlerts();
+         setLoading(false);
+       }, 0);
+       }, [generateContextualAlerts]);
 
    const getStatusColor = (type: string) => {
      switch (type) {

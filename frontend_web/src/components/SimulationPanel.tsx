@@ -10,16 +10,41 @@ interface Recommendation {
   season: string | null;
 }
 
+interface SimulationResults {
+  expected_yield_tons?: number;
+  expected_revenue_inr?: number;
+  total_cost_inr?: number;
+  roi_percent?: number;
+  risk_level?: string;
+  water_sufficiency?: boolean;
+}
+
+interface FarmParameters {
+  district_id: number;
+  soil_type: string;
+  land_area_ha: number;
+  budget_inr: number;
+  rainfall_mm: number;
+  temperature_c: number;
+  humidity_percent: number;
+  ph: number;
+  n: number;
+  p: number;
+  k: number;
+  planting_season: string;
+  planned_start_date: string;
+}
+
 interface SimulationPanelProps {
   recommendations: Recommendation[];
-  onSimulationComplete?: (results: any) => void;
+  onSimulationComplete?: (results: SimulationResults) => void;
   selectedCrop?: string | null;
-  farmParams?: any;
+  farmParams?: FarmParameters;
 }
 
 export function SimulationPanel({ recommendations }: SimulationPanelProps) {
   const [selectedCrop, setSelectedCrop] = useState<Recommendation | null>(null);
-  const [simulationResults, setSimulationResults] = useState<any>(null);
+  const [simulationResults, setSimulationResults] = useState<SimulationResults | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
 
   if (!recommendations || recommendations.length === 0) {

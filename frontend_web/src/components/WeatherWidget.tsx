@@ -1,7 +1,7 @@
  "use client";
 
  import React from "react";
- import { useState, useEffect } from "react";
+ import { useState, useEffect, useCallback } from "react";
  import { useFarm } from "@/context/FarmContext";
  import { ApiService } from "@/services/api";
 
@@ -29,53 +29,55 @@
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState<string | null>(null);
 
-   useEffect(() => {
-     if (farmParams?.district_id) {
-       fetchWeather();
-     }
-   }, [farmParams?.district_id, coordinates]);
-
-   const fetchWeather = async () => {
-       setLoading(true);
-       setError(null);
-       try {
-         // Get coordinates from farm context or use district center
-         const lat = coordinates?.lat || 12.9716;
-         const lon = coordinates?.lon || 77.5946;
-      
+       const fetchWeather = useCallback(async () => {
+           await Promise.resolve();
+           setError(null);
+           try {
+       const lat = coordinates?.lat || 12.9716;
+       const lon = coordinates?.lon || 77.5946;
        const result = await ApiService.getWeather(lat, lon);
        const w = result.weather;
-      
-       // Map backend weather to frontend format
-       const weatherData: WeatherData = {
+       const temperature = w.temp ?? 25;
+       const humidity = w.humidity ?? 65;
+       const rainfall = w.rainfall ?? 0;
+       const condition = rainfall > 10 ? "Rainy" : rainfall > 0 ? "Cloudy" : "Sunny";
+       setWeather({
          current: {
-           temperature: w.temp || 25,
-           feelsLike: (w.temp || 25) + 2,
-           humidity: w.humidity || 65,
-           windSpeed: Math.round((w.rainfall || 0) * 2) + 5, // Estimate wind from rainfall
+           temperature,
+           feelsLike: temperature + 2,
+           humidity,
+           windSpeed: Math.round(rainfall * 2) + 5,
            windDirection: "NE",
-           condition: w.rainfall && w.rainfall > 10 ? "Rainy" : w.rainfall && w.rainfall > 0 ? "Cloudy" : "Sunny",
+           condition,
          },
          forecast: [
-           { day: "Today", temp: w.temp || 25, condition: w.rainfall && w.rainfall > 10 ? "Rainy" : "Sunny", rain: Math.round(w.rainfall || 0), humidity: w.humidity || 65 },
-           { day: "Tomorrow", temp: (w.temp || 25) + 1, condition: "Partly Cloudy", rain: 5, humidity: (w.humidity || 65) - 5 },
-           { day: "Day 3", temp: (w.temp || 25) - 1, condition: "Cloudy", rain: 20, humidity: (w.humidity || 65) + 10 },
-           { day: "Day 4", temp: (w.temp || 25) - 2, condition: "Sunny", rain: 0, humidity: (w.humidity || 65) - 10 },
-           { day: "Day 5", temp: (w.temp || 25) + 1, condition: "Partly Cloudy", rain: 10, humidity: (w.humidity || 65) - 5 },
-           { day: "Day 6", temp: (w.temp || 25) + 2, condition: "Sunny", rain: 0, humidity: (w.humidity || 65) - 15 },
-           { day: "Day 7", temp: (w.temp || 25), condition: "Cloudy", rain: 15, humidity: (w.humidity || 65) + 5 },
+           { day: "Today", temp: temperature, condition, rain: Math.round(rainfall), humidity },
+           { day: "Tomorrow", temp: temperature + 1, condition: "Partly Cloudy", rain: 5, humidity: humidity - 5 },
+           { day: "Day 3", temp: temperature - 1, condition: "Cloudy", rain: 20, humidity: humidity + 10 },
+           { day: "Day 4", temp: temperature - 2, condition: "Sunny", rain: 0, humidity: humidity - 10 },
+           { day: "Day 5", temp: temperature + 1, condition: "Partly Cloudy", rain: 10, humidity: humidity - 5 },
+           { day: "Day 6", temp: temperature + 2, condition: "Sunny", rain: 0, humidity: humidity - 15 },
+           { day: "Day 7", temp: temperature, condition: "Cloudy", rain: 15, humidity: humidity + 5 },
          ],
-       };
-       setWeather(weatherData);
-     } catch (err) {
+       });
+       } catch (err) {
        setError("Failed to fetch weather data");
        console.error("Weather fetch error:", err);
-     } finally {
+       } finally {
        setLoading(false);
-     }
-   };
+       }
+       }, [coordinates]);
 
-   const getWeatherIcon = (condition: string) => {
+       useEffect(() => {
+               if (farmParams?.district_id) {
+                 setTimeout(() => {
+                   setLoading(true);
+                   void fetchWeather();
+                 }, 0);
+               }
+             }, [farmParams?.district_id, fetchWeather]);
+
+       const getWeatherIcon = (condition: string) => {
      const icons: Record<string, string> = {
        Sunny: "☀️",
        "Partly Cloudy": "⛅",

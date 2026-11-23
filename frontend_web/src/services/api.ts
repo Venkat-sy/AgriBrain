@@ -5,6 +5,63 @@ export interface ApiError extends Error {
   retryable?: boolean;
 }
 
+interface ChatFarmContext {
+  is_context_aware?: boolean;
+  coordinates?: { lat: number; lon: number };
+  soilParams?: { ph: number; texture: string; organic_carbon: number; n: number; p: number; k: number };
+  annualRainfall?: number;
+  selectedCrop?: string | null;
+  farmParams?: Record<string, unknown> | null;
+  simulationResults?: Record<string, unknown> | null;
+  calendarStages?: unknown[] | null;
+  image?: string;
+  endpoint?: string;
+}
+
+interface CropRecommendationItem {
+  crop_name: string;
+  confidence_score?: number;
+  expected_yield_tons_per_ha?: number;
+  [key: string]: unknown;
+}
+
+interface SimulationApiResult {
+  district?: string | null;
+  agro_zone?: string | null;
+  area_acres?: number;
+  setup_type?: 'seasonal' | 'perennial';
+  weather?: Record<string, unknown> | null;
+  soil?: Record<string, unknown> | null;
+  rainfall_forecast?: unknown[];
+  ranked_crops?: unknown[];
+  recommended_crop?: string | null;
+  timeline?: unknown[];
+  alternatives?: unknown[];
+  [key: string]: unknown;
+}
+
+interface DistrictLookupResult {
+  district_id?: number;
+  district?: string;
+  soil_type?: string;
+  agro_zone?: string;
+  weather?: { temp?: number; rainfall?: number; humidity?: number };
+  soil?: { pH?: number; N?: number; P?: number; K?: number };
+  [key: string]: unknown;
+}
+
+interface WeatherApiResult {
+  weather: { temp?: number; humidity?: number; rainfall?: number };
+  [key: string]: unknown;
+}
+
+interface DistrictItem {
+  id: number;
+  name: string;
+  state: string;
+  [key: string]: unknown;
+}
+
 // Adjusted API structure for sending correctly; payload includes prompt, coordinates.
 let sessionId: string | null = null;
 
@@ -63,26 +120,15 @@ export class ApiService {
 
   static async sendChatMessage(
       message: string,
-      context?: {
-        is_context_aware?: boolean;
-        coordinates?: { lat: number; lon: number };
-        soilParams?: { ph: number; texture: string; organic_carbon: number; n: number; p: number; k: number };
-        annualRainfall?: number;
-        selectedCrop?: string | null;
-        farmParams?: any;
-        simulationResults?: any;
-        calendarStages?: any[];
-        image?: string | undefined; // base64 encoded image
-        endpoint?: string; // override endpoint
-      }
+      context?: ChatFarmContext
     ) {
       const hasImage = context?.image != null && context.image.startsWith("data:image/");
       const endpoint = context?.endpoint || (hasImage ? "/api/v1/chat/troubleshoot-vision" : "/api/v1/chat/troubleshoot");
-    
+   
       const currentSessionId = getSessionId();
 
-      let body: any;
-      let headers: Record<string, string> = {
+      let body: BodyInit;
+      const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
 
@@ -100,7 +146,7 @@ export class ApiService {
           simulationResults: context?.simulationResults,
           calendarStages: context?.calendarStages,
         }));
-      
+     
         // Convert base64 to blob
         const base64Data = context.image!.split(",")[1];
         const mimeType = context.image!.split(",")[0].split(":")[1].split(";")[0];
@@ -112,7 +158,7 @@ export class ApiService {
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: mimeType });
         body.append("image", blob, "image.jpg");
-      
+     
         // Don't set Content-Type for FormData - browser will set it with boundary
         delete headers["Content-Type"];
       } else {
@@ -150,7 +196,7 @@ export class ApiService {
     k?: number;
     top_k?: number;
   }) {
-    return this.request<{ recommendations: any[] }>("/api/v1/crop/recommend", {
+    return this.request<{ recommendations: CropRecommendationItem[] }>("/api/v1/crop/recommend", {
       method: "POST",
       body: JSON.stringify({ ...params, top_k: params.top_k || 5 }),
     });
@@ -166,21 +212,21 @@ export class ApiService {
     planting_season: string;
     planned_start_date: string;
   }) {
-    return this.request<any>("/api/v1/simulation/run", {
+    return this.request<SimulationApiResult>("/api/v1/simulation/run", {
       method: "POST",
       body: JSON.stringify(params),
     });
   }
 
   static async lookupDistrict(lat: number, lon: number) {
-      return this.request<any>(
+      return this.request<DistrictLookupResult>(
         `/api/v1/spatial/lookup?lat=${lat}&lon=${lon}`,
         { method: "GET" }
       );
     }
 
     static async getWeather(lat: number, lon: number) {
-      return this.request<any>(
+      return this.request<WeatherApiResult>(
         `/api/v1/spatial/weather?lat=${lat}&lon=${lon}`,
         { method: "GET" }
       );
@@ -188,7 +234,7 @@ export class ApiService {
 
     static async getDistricts(state?: string) {
     const query = state ? `?state=${encodeURIComponent(state)}` : "";
-    return this.request<any[]>(`/api/v1/map/districts${query}`, { method: "GET" });
+    return this.request<DistrictItem[]>(`/api/v1/map/districts${query}`, { method: "GET" });
   }
 }
 

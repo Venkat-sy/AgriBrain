@@ -1,8 +1,9 @@
 "use client";
 
+import NextImage from "next/image";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Loader2, Sprout, AlertCircle, RefreshCw, WifiOff, Image, X } from "lucide-react";
+import { Send, Bot, User, Loader2, Sprout, RefreshCw, WifiOff, Image as LucideImage, X } from "lucide-react";
 import { ApiService, withRetry } from "@/services/api";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -281,12 +282,15 @@ export default function HomeChatbot() {
       <div className="px-4 py-3 border-t border-white/10 bg-white/5">
         {/* Image preview */}
         {imagePreview && (
-          <div className="mb-2 flex items-center gap-2">
-            <img 
-              src={imagePreview} 
-              alt="Upload preview" 
-              className="w-16 h-16 rounded-lg object-cover border border-white/20"
-            />
+                  <div className="mb-2 flex items-center gap-2">
+                    <NextImage
+                      src={imagePreview}
+                      alt="Upload preview"
+                      width={64}
+                      height={64}
+                      unoptimized
+                      className="w-16 h-16 rounded-lg object-cover border border-white/20"
+                    />
             <span className="text-sm text-slate-400 flex-1">Image attached - will be analyzed</span>
             <button
               onClick={removeImage}
@@ -300,7 +304,7 @@ export default function HomeChatbot() {
         
         <div className="flex gap-2 items-end">
           <label className="flex-shrink-0 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" htmlFor="home-chat-image-upload">
-            <Image className="w-5 h-5 text-slate-400 hover:text-green-400 transition-colors" />
+            <LucideImage aria-hidden="true" className="w-5 h-5 text-slate-400 hover:text-green-400 transition-colors" />
             <input
               id="home-chat-image-upload"
               ref={fileInputRef}

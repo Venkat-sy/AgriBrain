@@ -23,6 +23,56 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+interface SimulationResults {
+  expected_yield_tons?: number;
+  expected_revenue_inr?: number;
+  total_cost_inr?: number;
+  roi_percent?: number;
+  risk_level?: string;
+  water_sufficiency?: boolean;
+  monthly_breakdown?: Array<{
+    month: number;
+    growth_stage: string;
+    irrigation_needed_mm?: number;
+    rainfall_mm?: number;
+  }>;
+  cost_breakdown?: Array<{
+    activity: string;
+    quantity: number;
+    unit: string;
+    unit_cost: number;
+    total_cost: number;
+  }>;
+  [key: string]: unknown;
+}
+
+interface FarmParameters {
+  district_id: number;
+  soil_type: string;
+  land_area_ha: number;
+  budget_inr: number;
+  rainfall_mm: number;
+  temperature_c: number;
+  humidity_percent: number;
+  ph: number;
+  n: number;
+  p: number;
+  k: number;
+  planting_season: string;
+  planned_start_date: string;
+}
+
+interface CalendarStage {
+  month: number;
+  stage: string;
+  description: string;
+  water_needed_mm: number;
+  rainfall_mm: number;
+  tasks: string[];
+  start_date: string;
+  end_date: string;
+}
+
 interface FarmContextType {
   // Core farm state
   selectedCrop: string | null;
@@ -41,30 +91,16 @@ interface FarmContextType {
   setAnnualRainfall: (rainfall: number | null) => void;
 
   // Simulation state
-  simulationResults: any | null;
-  setSimulationResults: (results: any) => void;
+  simulationResults: SimulationResults | null;
+  setSimulationResults: (results: SimulationResults | null) => void;
 
   // Farm parameters
-  farmParams: {
-    district_id: number;
-    soil_type: string;
-    land_area_ha: number;
-    budget_inr: number;
-    rainfall_mm: number;
-    temperature_c: number;
-    humidity_percent: number;
-    ph: number;
-    n: number;
-    p: number;
-    k: number;
-    planting_season: string;
-    planned_start_date: string;
-  } | null;
-  setFarmParams: (params: any) => void;
+  farmParams: FarmParameters | null;
+  setFarmParams: (params: FarmParameters | null) => void;
 
   // Calendar state
-  calendarStages: any[] | null;
-  setCalendarStages: (stages: any[]) => void;
+  calendarStages: CalendarStage[] | null;
+  setCalendarStages: (stages: CalendarStage[] | null) => void;
   currentCalendarStage: string | null;
   setCurrentCalendarStage: (stage: string | null) => void;
 
@@ -88,9 +124,9 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [soilParams, setSoilParams] = useState<SoilParameters | null>(null);
   const [annualRainfall, setAnnualRainfall] = useState<number | null>(null);
-  const [simulationResults, setSimulationResults] = useState<any | null>(null);
-  const [farmParams, setFarmParams] = useState<any | null>(null);
-  const [calendarStages, setCalendarStages] = useState<any[] | null>(null);
+  const [simulationResults, setSimulationResults] = useState<SimulationResults | null>(null);
+  const [farmParams, setFarmParams] = useState<FarmParameters | null>(null);
+  const [calendarStages, setCalendarStages] = useState<CalendarStage[] | null>(null);
   const [currentCalendarStage, setCurrentCalendarStage] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);

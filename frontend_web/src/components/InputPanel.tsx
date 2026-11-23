@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, ChevronDown, ChevronUp, MapPin, Sprout, Eye, EyeOff, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp, MapPin, Sprout, ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface District {
   id: number;
@@ -83,39 +83,49 @@ export function InputPanel({ onSubmit, isLoading, hasRecommendations }: InputPan
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Fetch all districts + states on mount
-  useEffect(() => {
-    setLocationLoading(true);
-    fetch("/api/districts")
-      .then((res) => res.json())
-      .then((data) => {
-        const districts: District[] = data.districts || [];
-        const stateList: string[] = data.states || [];
-        setAllDistricts(districts);
-        setStates(stateList);
-        if (stateList.length > 0) {
-          setSelectedState(stateList[0]);
-        }
-      })
-      .catch(() => setLocationError("Failed to load districts. Using defaults."))
-      .finally(() => setLocationLoading(false));
-  }, []);
+    useEffect(() => {
+      // Defer setState to avoid synchronous setState in effect
+      setTimeout(() => {
+        setLocationLoading(true);
+        fetch("/api/districts")
+          .then((res) => res.json())
+          .then((data) => {
+            const districts: District[] = data.districts || [];
+            const stateList: string[] = data.states || [];
+            // Defer setState to avoid synchronous setState in effect
+            setTimeout(() => {
+              setAllDistricts(districts);
+              setStates(stateList);
+              if (stateList.length > 0) {
+                setSelectedState(stateList[0]);
+              }
+            }, 0);
+          })
+          .catch(() => setLocationError("Failed to load districts. Using defaults."))
+          .finally(() => setLocationLoading(false));
+      }, 0);
+    }, []);
 
   // Filter districts when state changes
-  useEffect(() => {
-    if (!selectedState) {
-      setFilteredDistricts(allDistricts);
-      return;
-    }
-    const filtered = allDistricts.filter((d) => d.state === selectedState);
-    setFilteredDistricts(filtered);
-    if (filtered.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        district_id: filtered[0].id,
-        rainfall_mm: filtered[0].rainfall_mm || prev.rainfall_mm,
-      }));
-    }
-  }, [selectedState, allDistricts]);
+    useEffect(() => {
+      if (!selectedState) {
+        // Defer setState to avoid synchronous setState in effect
+        setTimeout(() => setFilteredDistricts(allDistricts), 0);
+        return;
+      }
+      const filtered = allDistricts.filter((d) => d.state === selectedState);
+      // Defer setState to avoid synchronous setState in effect
+      setTimeout(() => {
+        setFilteredDistricts(filtered);
+        if (filtered.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            district_id: filtered[0].id,
+            rainfall_mm: filtered[0].rainfall_mm || prev.rainfall_mm,
+          }));
+        }
+      }, 0);
+    }, [selectedState, allDistricts]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>

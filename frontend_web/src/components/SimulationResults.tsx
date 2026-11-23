@@ -1,6 +1,6 @@
 "use client";
 
-interface SimulationResult {
+export interface SimulationResult {
   crop_name: string;
   land_area_ha: number;
   water_availability_liters: number;
@@ -25,7 +25,7 @@ interface SimulationResult {
   }>;
 }
 
-interface CropRecommendation {
+export interface CropRecommendation {
   crop_id: number;
   crop_name: string;
   confidence_score: number;
@@ -40,34 +40,5 @@ interface CropRecommendation {
   land_area_ha?: number;
 }
 
-interface SimulationResultsProps {
-  crop: CropRecommendation;
-  results: SimulationResult | null;
-  isLoading: boolean;
-  onBack: () => void;
-}
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
-function formatNumber(value: number): string {
-  return new Intl.NumberFormat("en-IN").format(value);
-}
-
-function getRiskColor(level: string): string {
-  switch (level.toLowerCase()) {
-    case "low":
-      return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30";
-    case "medium":
-      return "text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30";
-    case "high":
-      return "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30";
-    default:
-      return "text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/50";
-  }
-}

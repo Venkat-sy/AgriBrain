@@ -2,22 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight, Calendar, Droplets, Leaf, AlertTriangle } from "lucide-react";
+import { ChevronRight, Calendar, AlertTriangle } from "lucide-react";
 
-interface TimelineStage {
-  stage_name: string;
-  estimated_days: number;
-  agronomy_advice: string;
-}
 
-interface TimelineResponse {
-  crop_name: string;
-  stages: Array<{
-    stage_name: string;
-    estimated_days: number;
-    agronomy_advice: string;
-  }>;
-}
 
 interface SimulationCalendarProps {
   cropName: string | null;
@@ -35,32 +22,34 @@ export function SimulationCalendar({ cropName, className = "" }: SimulationCalen
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!cropName) {
-      setTimeline(null);
-      return;
-    }
-
-    const fetchTimeline = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-backend.onrender.com";
-        const response = await fetch(`${backendUrl}/api/v1/simulation/timeline?crop_name=${encodeURIComponent(cropName)}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch timeline: ${response.status}`);
+        if (!cropName) {
+          // Defer setState to avoid synchronous setState in effect
+          setTimeout(() => setTimeline(null), 0);
+          return;
         }
-        const data = await response.json();
-        setTimeline(data.stages);
-      } catch (err: any) {
-        console.error("Failed to fetch cultivation timeline:", err);
-        setError(err.message || "Failed to load cultivation timeline");
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    fetchTimeline();
-  }, [cropName]);
+      const fetchTimeline = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-backend.onrender.com";
+          const response = await fetch(`${backendUrl}/api/v1/simulation/timeline?crop_name=${encodeURIComponent(cropName)}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch timeline: ${response.status}`);
+          }
+          const data = await response.json();
+          // Defer setTimeline to avoid synchronous setState in effect
+          setTimeout(() => setTimeline(data.stages), 0);
+        } catch (err) {
+          console.error("Failed to fetch cultivation timeline:", err);
+          setError(err instanceof Error ? err.message : "Failed to load cultivation timeline");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchTimeline();
+    }, [cropName]);
 
   if (!cropName) {
     return (

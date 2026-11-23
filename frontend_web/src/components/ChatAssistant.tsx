@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
+import NextImage from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Loader2, Sprout, RefreshCw, WifiOff, Image, X } from "lucide-react";
+import { Send, Bot, User, Loader2, Sprout, RefreshCw, WifiOff, Image as LucideImage, X } from "lucide-react";
 import { useFarm } from "@/context/FarmContext";
 import { ApiService, withRetry } from "@/services/api";
 import ReactMarkdown from "react-markdown";
@@ -63,25 +64,25 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
     setConnectionError(null);
 
     const contextPayload = is_context_aware
-      ? {
-          selectedCrop,
-          farmParams,
-          simulationResults,
-          calendarStages: calendarStages?.slice(0, 3),
-          coordinates: coordinates ? { lat: coordinates.lat, lon: coordinates.lon } : undefined,
-          soilParams: soilParams
-            ? {
-                ph: soilParams.ph,
-                texture: soilParams.texture,
-                organic_carbon: soilParams.organic_carbon,
-                n: soilParams.n,
-                p: soilParams.p,
-                k: soilParams.k,
-              }
-            : undefined,
-          annualRainfall: annualRainfall ?? undefined,
-        }
-      : undefined;
+          ? {
+              selectedCrop,
+              farmParams: farmParams as Record<string, unknown> | null | undefined,
+              simulationResults: simulationResults as Record<string, unknown> | null | undefined,
+              calendarStages: calendarStages?.slice(0, 3),
+              coordinates: coordinates ? { lat: coordinates.lat, lon: coordinates.lon } : undefined,
+              soilParams: soilParams
+                ? {
+                    ph: soilParams.ph,
+                    texture: soilParams.texture,
+                    organic_carbon: soilParams.organic_carbon,
+                    n: soilParams.n,
+                    p: soilParams.p,
+                    k: soilParams.k,
+                  }
+                : undefined,
+              annualRainfall: annualRainfall ?? undefined,
+            }
+          : undefined;
 
     // Use vision endpoint if image is provided
     const endpoint = userImage ? "/api/v1/chat/troubleshoot-vision" : "/api/v1/chat/troubleshoot";
@@ -314,9 +315,12 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
         {/* Image preview */}
         {imagePreview && (
           <div className="mb-2 flex items-center gap-2">
-            <img 
+            <NextImage 
               src={imagePreview} 
               alt="Upload preview" 
+              width={64}
+              height={64}
+              unoptimized
               className="w-16 h-16 rounded-lg object-cover border border-white/20"
             />
             <span className="text-sm text-slate-400 flex-1">Image attached - will be analyzed</span>
@@ -332,7 +336,7 @@ export default function ChatAssistant({ is_context_aware = false }: ChatAssistan
         
         <div className="flex gap-2 items-end">
           <label className="flex-shrink-0 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" htmlFor="chat-image-upload">
-            <Image className="w-5 h-5 text-slate-400 hover:text-green-400 transition-colors" />
+            <LucideImage aria-hidden="true" className="w-5 h-5 text-slate-400 hover:text-green-400 transition-colors" />
             <input
               id="chat-image-upload"
               ref={fileInputRef}

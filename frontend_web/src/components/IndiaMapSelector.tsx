@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import L from "leaflet";
 // leaflet CSS loaded dynamically in useEffect to avoid Turbopack SSR crash
 
 const MapContainer = dynamic(
@@ -91,13 +92,13 @@ const DistrictLayer = ({
   selectedDistrictId: number | null;
 }) => {
   const handleFeatureClick = useCallback(
-    (e: any) => {
-      const feature = e.target.feature;
-      if (feature && feature.properties) {
-        onDistrictClick(feature);
-      }
-    },
-    [onDistrictClick]
+      (e: { target: { feature?: DistrictFeature } }) => {
+        const feature = e.target.feature;
+        if (feature && feature.properties) {
+          onDistrictClick(feature);
+        }
+      },
+      [onDistrictClick]
   );
 
   if (!geojsonData) return null;
@@ -147,7 +148,7 @@ const SelectedMarker = ({
 }: {
   position: [number, number] | null;
   districtName: string;
-  icon: any;
+  icon: L.Icon | null;
 }) => {
   if (!position || !icon) return null;
 
@@ -173,7 +174,7 @@ export function IndiaMapSelector({
   const [lookupResult, setLookupResult] = useState<SpatialLookupResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
-  const [iconClass, setIconClass] = useState<any>(null);
+  const [iconClass, setIconClass] = useState<typeof L.Icon | null>(null);
 
   // Load Icon class on client side + inject Leaflet CSS dynamically
   useEffect(() => {
@@ -223,53 +224,50 @@ export function IndiaMapSelector({
     fetchGeoJSON();
   }, []);
 
-  // Handle district click on map
-  const handleDistrictClick = useCallback(
-    async (feature: DistrictFeature) => {
-      const { name, state, state_code, district_code, soil_type, id } = feature.properties;
-      setSelectedDistrict(feature);
-      setError(null);
-
-      // Perform spatial lookup to get detailed parameters
-      if (feature.geometry?.type === "Point") {
-        const [lon, lat] = feature.geometry.coordinates;
-        await performLookup(lat, lon);
-      } else if (feature.geometry?.type === "Polygon" || feature.geometry?.type === "MultiPolygon") {
-        // Calculate centroid for polygon
-        const coords = feature.geometry.coordinates[0][0] as number[][]; // First ring of first polygon
-        const centroid = coords.reduce(
-          (acc: [number, number], coord: number[]): [number, number] => [acc[0] + coord[0], acc[1] + coord[1]],
-          [0, 0] as [number, number]
-        );
-        const lat = centroid[1] / coords.length;
-        const lon = centroid[0] / coords.length;
-        await performLookup(lat, lon);
-      }
-    },
-    []
-  );
-
-// Perform spatial lookup
-  const performLookup = async (lat: number, lon: number) => {
-    setIsLookingUp(true);
-    try {
-      const res = await fetch(`/api/v1/spatial/lookup?lat=${lat}&lon=${lon}`);
-      if (res.ok) {
-        const data = await res.json();
-        setLookupResult(data);
-        if (onDistrictSelect) {
-          onDistrictSelect(data);
+  // Perform spatial lookup
+    const performLookup = useCallback(async (lat: number, lon: number) => {
+      setIsLookingUp(true);
+      try {
+        const res = await fetch(`/api/v1/spatial/lookup?lat=${lat}&lon=${lon}`);
+        if (res.ok) {
+          const data = await res.json();
+          setLookupResult(data);
+          if (onDistrictSelect) {
+            onDistrictSelect(data);
+          }
+        } else {
+          setError("Failed to lookup district details");
         }
-      } else {
+      } catch (err) {
+        console.error("Lookup error:", err);
         setError("Failed to lookup district details");
+      } finally {
+        setIsLookingUp(false);
       }
-    } catch (err) {
-      console.error("Lookup error:", err);
-      setError("Failed to lookup district details");
-    } finally {
-      setIsLookingUp(false);
-    }
-  };
+    }, [onDistrictSelect]);
+
+    // Handle district click on map
+    const handleDistrictClick = useCallback(
+      async (feature: DistrictFeature) => {
+        setSelectedDistrict(feature);
+        setError(null);
+
+        // Perform spatial lookup to get detailed parameters
+        if (feature.geometry?.type === "Point") {
+          const [lon, lat] = feature.geometry.coordinates;
+          await performLookup(lat, lon);
+        } else if (feature.geometry?.type === "Polygon" || feature.geometry?.type === "MultiPolygon") {
+          // Calculate centroid for polygon
+          const coords = feature.geometry.coordinates[0][0] as number[][]; // First ring of first polygon
+          const centroid = coords.reduce(
+            (acc: [number, number], coord: number[]): [number, number] => [acc[0] + coord[0], acc[1] + coord[1]],
+            [0, 0] as [number, number]
+          );
+          const lat = centroid[1] / coords.length;
+          const lon = centroid[0] / coords.length;
+          await performLookup(lat, lon);
+        }
+      }, [performLookup]);
 
   // Get selected district centroid for marker
   const getSelectedCentroid = (): [number, number] | null => {

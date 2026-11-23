@@ -88,8 +88,6 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
   export default function SimulatePage() {
   const router = useRouter();
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>({ lat: 12.9716, lng: 77.5946 });
-  const [manualLat, setManualLat] = useState<string>('12.9716');
-  const [manualLng, setManualLng] = useState<string>('77.5946');
   const [districtName, setDistrictName] = useState<string>('Bengaluru Urban, Karnataka');
   const [agroZone, setAgroZone] = useState<string>('Central & Southern Deccan Plateau');
 
@@ -102,50 +100,72 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
 
   const [loading, setLoading] = useState<boolean>(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
-  interface SimulationData {
-    district: string | null;
-    agro_zone: string | null;
-    area_acres: number;
-    setup_type: 'seasonal' | 'perennial';
-    weather: unknown | null;
-    soil: unknown | null;
-    rainfall_forecast: unknown[];
-    ranked_crops: unknown[];
-    recommended_crop: string | null;
-    timeline: unknown[];
-  }
+  interface RankedCrop {
+      name: string;
+      variety: string;
+      season: string;
+      days: number;
+      score_pct: number;
+      digital_twin?: {
+        yield_per_acre_tonnes?: number;
+        total_yield_tonnes?: number;
+        estimated_revenue_inr?: number;
+        daily_water_liters?: number;
+        total_water_m3?: number;
+        risks?: Record<string, unknown>;
+      };
+      shap_breakdown?: { feature: string; impact: number }[];
+      timeline?: { stage_name: string; days: number; agronomy_advice: string }[];
+    }
+
+    interface RainfallMonth {
+      month: string;
+      predicted_mm: number;
+      anomaly_pct: number;
+    }
+
+    interface SimulationData {
+      district: string | null;
+      agro_zone: string | null;
+      area_acres: number;
+      setup_type: 'seasonal' | 'perennial';
+      weather: unknown | null;
+      soil: unknown | null;
+      rainfall_forecast: RainfallMonth[];
+      ranked_crops: RankedCrop[];
+      recommended_crop: string | null;
+      timeline: { stage_name: string; days: number; agronomy_advice: string }[];
+    }
 
   const [data, setData] = useState<SimulationData | null>(null);
   const [selectedCropIndex, setSelectedCropIndex] = useState<number>(0);
 
   const handlePinDrop = async (lat: number, lng: number) => {
-      const cleanLat = Number(lat.toFixed(4));
-      const cleanLng = Number(lng.toFixed(4));
-      setPin({ lat: cleanLat, lng: cleanLng });
-      setManualLat(String(cleanLat));
-      setManualLng(String(cleanLng));
-      setStatusBanner(null);
+        const cleanLat = Number(lat.toFixed(4));
+        const cleanLng = Number(lng.toFixed(4));
+        setPin({ lat: cleanLat, lng: cleanLng });
+        setStatusBanner(null);
 
-      // Get spatial data from backend
-      try {
-        const spatialResult = await ApiService.lookupDistrict(cleanLat, cleanLng);
-        setSelectedSoilType(spatialResult?.soil_type || "Southern Red Loam");
-        setAgroZone(spatialResult?.agro_zone || "Central & Southern Deccan Plateau");
-        setDistrictName(spatialResult?.district || `${cleanLat}°N, ${cleanLng}°E`);
-        setOverrides({
-          rainfall: spatialResult?.weather?.rainfall || 100,
-          temp: spatialResult?.weather?.temp || 27,
-          humidity: spatialResult?.weather?.humidity || 65,
-          ph: spatialResult?.soil?.pH || 6.5,
-          N: spatialResult?.soil?.N || 150,
-          P: spatialResult?.soil?.P || 40,
-          K: spatialResult?.soil?.K || 150,
-        });
-      } catch {
-        // Fallback to basic values
-        setDistrictName(`${cleanLat}°N, ${cleanLng}°E`);
-      }
-    };
+        // Get spatial data from backend
+        try {
+          const spatialResult = await ApiService.lookupDistrict(cleanLat, cleanLng);
+          setSelectedSoilType(spatialResult?.soil_type || "Southern Red Loam");
+          setAgroZone(spatialResult?.agro_zone || "Central & Southern Deccan Plateau");
+          setDistrictName(spatialResult?.district || `${cleanLat}°N, ${cleanLng}°E`);
+          setOverrides({
+            rainfall: spatialResult?.weather?.rainfall || 100,
+            temp: spatialResult?.weather?.temp || 27,
+            humidity: spatialResult?.weather?.humidity || 65,
+            ph: spatialResult?.soil?.pH || 6.5,
+            N: spatialResult?.soil?.N || 150,
+            P: spatialResult?.soil?.P || 40,
+            K: spatialResult?.soil?.K || 150,
+          });
+        } catch {
+          // Fallback to basic values
+          setDistrictName(`${cleanLat}°N, ${cleanLng}°E`);
+        }
+      };
 
     // Run simulation via backend API
     const runSimulation = async () => {
@@ -192,17 +212,17 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
             ? result.alternatives
             : [];
         const payload = {
-          district: result.district ?? null,
-          agro_zone: result.agro_zone ?? null,
-          area_acres: areaAcres,
-          setup_type: setupType,
-          weather: result.weather ?? null,
-          soil: result.soil ?? null,
-          rainfall_forecast: Array.isArray(result.rainfall_forecast) ? result.rainfall_forecast : [],
-          ranked_crops: rankedCrops,
-          recommended_crop: result.recommended_crop ?? null,
-          timeline: Array.isArray(result.timeline) ? result.timeline : [],
-        };
+                  district: result.district ?? null,
+                  agro_zone: result.agro_zone ?? null,
+                  area_acres: areaAcres,
+                  setup_type: setupType,
+                  weather: result.weather ?? null,
+                  soil: result.soil ?? null,
+                  rainfall_forecast: (Array.isArray(result.rainfall_forecast) ? result.rainfall_forecast : []) as RainfallMonth[],
+                  ranked_crops: rankedCrops as RankedCrop[],
+                  recommended_crop: result.recommended_crop ?? null,
+                  timeline: (Array.isArray(result.timeline) ? result.timeline : []) as { stage_name: string; days: number; agronomy_advice: string }[],
+                };
 
         setSelectedCropIndex(0);
         setData(payload);
@@ -431,7 +451,7 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
 
           {/* Right Panel - Results */}
           <div className="space-y-6">
-            {data?.ranked_crops?.length > 0 && activeCrop ? (
+            {data?.ranked_crops && data.ranked_crops.length > 0 && activeCrop ? (
               <>
                 {/* Top Crop Card */}
                 <Card className="border-emerald-300 bg-gradient-to-br from-emerald-50 to-white relative overflow-hidden">
@@ -440,9 +460,9 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="default" className="text-xs">Top Match</Badge>
-                          <Badge variant="secondary" className="text-xs">{data?.setup_type === 'seasonal' || data?.setup_type === 'short-term' ? 'Seasonal' : 'Perennial'}</Badge>
-                        </div>
+                                                  <Badge variant="default" className="text-xs">Top Match</Badge>
+                                                  <Badge variant="secondary" className="text-xs">{data?.setup_type === 'perennial' ? 'Perennial' : 'Seasonal'}</Badge>
+                                                </div>
                         <h2 className="text-2xl font-bold text-slate-900">{activeCrop?.name}</h2>
                                                 <p className="text-sm text-slate-500">{activeCrop?.variety} • {activeCrop?.season} • {activeCrop?.days} days</p>
                       </div>
@@ -510,7 +530,7 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
                       <Table className="w-5 h-5" />
                       Ranked Crop Suitability (Top 6)
                     </CardTitle>
-                    <CardDescription>All {setupType === 'seasonal' ? 25 : 20} crops scored • Click row for details</CardDescription>
+                    <CardDescription>All {setupType === 'perennial' ? 20 : 25} crops scored • Click row for details</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
