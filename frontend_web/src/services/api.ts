@@ -1,8 +1,9 @@
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-backend.onrender.com";
+export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") || "https://agribrain-backend.onrender.com";
 
 export interface ApiError extends Error {
   status?: number;
   retryable?: boolean;
+  isColdStart?: boolean;
 }
 
 interface ChatFarmContext {
@@ -16,6 +17,31 @@ interface ChatFarmContext {
   calendarStages?: unknown[] | null;
   image?: string;
   endpoint?: string;
+}
+
+// Cold-start handling
+let coldStartNotified = false;
+
+async function checkBackendHealth(): Promise<boolean> {
+  try {
+    const res = await fetch(`${BACKEND_URL}/health`, {
+      method: "GET",
+      cache: "no-store",
+      signal: AbortSignal.timeout(5000),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function warmUpBackend(): Promise<void> {
+  if (coldStartNotified) return;
+  coldStartNotified = true;
+  console.log("[API] Waking up backend on Render free tier...");
+  await fetch(`${BACKEND_URL}/health`, { method: "GET", cache: "no-store" }).catch(() => {});
+  // Wait a bit for the service to start
+  await new Promise(resolve => setTimeout(resolve, 2000));
 }
 
 interface CropRecommendationItem {
@@ -98,11 +124,28 @@ export class ApiService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const error: ApiError = new Error(
-          `API Error: ${response.status} ${response.statusText}`
-        );
+        let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+        let isColdStart = false;
+        
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) {
+            errorMessage = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+          }
+          // Check for cold start indicators
+          if (response.status === 503 || response.status === 502 || 
+              errorMessage.toLowerCase().includes("cold start") ||
+              errorMessage.toLowerCase().includes("waking up")) {
+            isColdStart = true;
+          }
+        } catch {
+          // If we can't parse the error response, use the default message
+        }
+
+        const error: ApiError = new Error(errorMessage);
         error.status = response.status;
-        error.retryable = response.status >= 500 || response.status === 429;
+        error.retryable = response.status >= 500 || response.status === 429 || isColdStart;
+        error.isColdStart = isColdStart;
         throw error;
       }
 
@@ -113,6 +156,10 @@ export class ApiService {
         const error: ApiError = new Error("Request timeout - please try again");
         error.retryable = true;
         throw error;
+      }
+      // If it's a cold start error, trigger warm-up for next request
+      if (err instanceof Error && (err as ApiError).isColdStart) {
+        warmUpBackend();
       }
       throw err;
     }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import {
@@ -80,10 +80,10 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
             <p className="text-xs text-slate-500 font-medium">{label}</p>
             <p className="text-lg font-bold text-slate-900">{value}</p>
           </div>
-        </div>
-      </div>
-    );
-  }
+              </div>
+            </div>
+              );
+            }
 
   export default function SimulatePage() {
   const router = useRouter();
@@ -99,8 +99,43 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
   const [overrides, setOverrides] = useState({ rainfall: 115, temp: 27, humidity: 64, ph: 6.4, N: 145, P: 42, K: 135 });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [statusBanner, setStatusBanner] = useState<string | null>(null);
-  interface RankedCrop {
+    const [statusBanner, setStatusBanner] = useState<string | null>(null);
+    const [warmingUp, setWarmingUp] = useState<boolean>(false);
+
+    // Warm up backend on mount to handle Render cold starts
+    useEffect(() => {
+      let cancelled = false;
+      const warmUp = async () => {
+        setWarmingUp(true);
+        setStatusBanner("Waking up AI simulation engine (may take ~40s)...");
+        try {
+          // Ping health endpoint to wake up Render
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "https://agribrain-backend.onrender.com"}/health`, {
+            method: "GET",
+            cache: "no-store",
+          });
+          if (!cancelled) {
+            if (res.ok) {
+              setStatusBanner(null);
+            } else {
+              setStatusBanner("Backend still warming up... please wait a moment");
+            }
+          }
+        } catch {
+          if (!cancelled) {
+            setStatusBanner("Backend still warming up... please wait a moment");
+          }
+        } finally {
+          if (!cancelled) {
+            setWarmingUp(false);
+          }
+        }
+      };
+      warmUp();
+      return () => { cancelled = true; };
+    }, []);
+
+    interface RankedCrop {
       name: string;
       variety: string;
       season: string;
@@ -250,34 +285,9 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
     const activeCrop = data?.ranked_crops?.[selectedCropIndex] || null;
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">AgriBrain Simulate</h1>
-              <p className="text-xs text-slate-500">Digital Twin Crop Suitability Engine</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Engine Active
-            </Badge>
-            <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Dashboard
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Status Banner */}
-      {statusBanner && (
+      <div className="min-h-screen bg-canvas">
+        {/* Status Banner */}
+        {(statusBanner || warmingUp) && (
         <div className="max-w-7xl mx-auto px-4 py-2 animate-slide-down">
                 <Alert variant="destructive" className="mb-0 rounded-none border-x-0 border-t-0 border-b-0">
                   <AlertCircle className="w-4 h-4" />
@@ -684,6 +694,6 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
           </div>
         </div>
       </div>
-    </main>
-  );
-}
+    </div>
+      );
+    }

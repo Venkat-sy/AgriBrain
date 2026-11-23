@@ -128,55 +128,33 @@ import { useState, useEffect } from "react";
    ];
 
    if (!simulationResults && (!calendarStages || calendarStages.length === 0)) {
-     return (
-       <div className="min-h-screen bg-digital-twin transition-colors">
-         <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
-           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-             <div className="flex items-center justify-between h-16">
-               <div className="flex items-center gap-3">
-                 <Link href="/" className="flex items-center gap-3">
-                   <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                     <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
-                     </svg>
-                   </div>
-                   <h1 className="text-2xl font-bold text-white">AgriBrain</h1>
-                 </Link>
+       return (
+         <div className="min-h-screen bg-canvas transition-colors">
+           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1">
+             <div className="text-center">
+               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                 <svg className="w-10 h-10 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
+                 </svg>
                </div>
-               <nav className="flex gap-4">
-                 <Link href="/" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Home</Link>
-                 <Link href="/simulate" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Simulation</Link>
-                 <Link href="/calendar" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-blue-500/20 rounded-lg">Calendar</Link>
-                 <Link href="/expert-chat" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Expert Chat</Link>
-               </nav>
+               <h1 className="text-4xl font-bold text-primary mb-4">No Simulation Data</h1>
+               <p className="text-xl text-secondary mb-8 max-w-2xl mx-auto">
+                 Please complete a simulation first to view your cultivation calendar. The calendar is generated based on your digital twin simulation results.
+               </p>
+               <Link
+                 href="/simulate"
+                 className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all"
+               >
+                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                 </svg>
+                 Run Simulation First
+               </Link>
              </div>
-           </div>
-         </header>
-         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1">
-           <div className="text-center">
-             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-               <svg className="w-10 h-10 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
-               </svg>
-             </div>
-             <h1 className="text-4xl font-bold text-white mb-4">No Simulation Data</h1>
-             <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-               Please complete a simulation first to view your cultivation calendar. The calendar is generated based on your digital twin simulation results.
-             </p>
-             <Link 
-               href="/simulate"
-               className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all"
-             >
-               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-               </svg>
-               Run Simulation First
-             </Link>
-           </div>
-         </main>
-       </div>
-     );
-   }
+           </main>
+         </div>
+       );
+     }
 
    const getStageColor = (stage: string) => {
      switch (stage.toLowerCase()) {
@@ -191,31 +169,8 @@ import { useState, useEffect } from "react";
    };
 
    return (
-     <div className="min-h-screen bg-digital-twin transition-colors">
-       <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="flex items-center justify-between h-16">
-             <div className="flex items-center gap-3">
-               <Link href="/" className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                   <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
-                   </svg>
-                 </div>
-                 <h1 className="text-2xl font-bold text-white">AgriBrain</h1>
-               </Link>
-             </div>
-             <nav className="flex gap-4">
-               <Link href="/" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Home</Link>
-               <Link href="/simulate" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Simulation</Link>
-               <Link href="/calendar" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-blue-500/20 rounded-lg">Calendar</Link>
-               <Link href="/expert-chat" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Expert Chat</Link>
-             </nav>
-           </div>
-         </div>
-       </header>
-
-       {/* Progress Indicator */}
+       <div className="min-h-screen bg-canvas transition-colors">
+         {/* Progress Indicator */}
        <div className="glass-card border-b border-white/10">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
            <div className="flex items-center justify-between">

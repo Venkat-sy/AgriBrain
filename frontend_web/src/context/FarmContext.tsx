@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect, useRef } from "react";
 
 interface Coordinates {
   lat: number;
@@ -73,6 +72,16 @@ interface CalendarStage {
   end_date: string;
 }
 
+// Extended state for the design spec
+interface FarmOverrides {
+  rainfallOverride?: number;
+  tempOverride?: number;
+}
+
+interface IrrigationType {
+  type: "Rainfed" | "Canal" | "Drip" | "Sprinkler";
+}
+
 interface FarmContextType {
   // Core farm state
   selectedCrop: string | null;
@@ -81,6 +90,12 @@ interface FarmContextType {
   // Location & coordinates
   coordinates: Coordinates | null;
   setCoordinates: (coords: Coordinates | null) => void;
+  district: string | null;
+  setDistrict: (district: string | null) => void;
+  state: string | null;
+  setState: (state: string | null) => void;
+  icarZone: string | null;
+  setIcarZone: (zone: string | null) => void;
 
   // Auto-fetched soil parameters
   soilParams: SoilParameters | null;
@@ -97,6 +112,18 @@ interface FarmContextType {
   // Farm parameters
   farmParams: FarmParameters | null;
   setFarmParams: (params: FarmParameters | null) => void;
+
+  // Overrides
+  overrides: FarmOverrides;
+  setOverrides: (overrides: FarmOverrides) => void;
+
+  // Irrigation type
+  irrigationType: IrrigationType["type"] | null;
+  setIrrigationType: (type: IrrigationType["type"] | null) => void;
+
+  // Soil override
+  soilOverride: string | null;
+  setSoilOverride: (soil: string | null) => void;
 
   // Calendar state
   calendarStages: CalendarStage[] | null;
@@ -115,68 +142,175 @@ interface FarmContextType {
 
   // Reset function
   resetFarm: () => void;
+
+  // Hydration state
+  isHydrated: boolean;
+}
+
+const STORAGE_KEY = "agribrain-farm-context";
+
+const defaultState = {
+  selectedCrop: null,
+  coordinates: null,
+  district: null,
+  state: null,
+  icarZone: null,
+  soilParams: null,
+  annualRainfall: null,
+  simulationResults: null,
+  farmParams: null,
+  overrides: {},
+  irrigationType: null,
+  soilOverride: null,
+  calendarStages: null,
+  currentCalendarStage: null,
+  currentStep: 1,
+  chatHistory: [],
+};
+
+function loadFromStorage(): Partial<FarmContextType> {
+  if (typeof window === "undefined") return {};
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Convert date strings back to Date objects for chatHistory
+      if (parsed.chatHistory) {
+        parsed.chatHistory = parsed.chatHistory.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        }));
+      }
+      return parsed;
+    }
+  } catch (e) {
+    console.warn("Failed to load farm context from localStorage:", e);
+  }
+  return {};
 }
 
 const FarmContext = createContext<FarmContextType | undefined>(undefined);
 
 export function FarmProvider({ children }: { children: ReactNode }) {
-  const [selectedCrop, setSelectedCrop] = useState<string | null>(null);
-  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
-  const [soilParams, setSoilParams] = useState<SoilParameters | null>(null);
-  const [annualRainfall, setAnnualRainfall] = useState<number | null>(null);
-  const [simulationResults, setSimulationResults] = useState<SimulationResults | null>(null);
-  const [farmParams, setFarmParams] = useState<FarmParameters | null>(null);
-  const [calendarStages, setCalendarStages] = useState<CalendarStage[] | null>(null);
-  const [currentCalendarStage, setCurrentCalendarStage] = useState<string | null>(null);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [state, setState] = useState<Partial<FarmContextType>>({});
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
+    const loaded = loadFromStorage();
+    setState(loaded);
+    setIsHydrated(true);
+  }, []);
+
+  // Debounced save to localStorage
+  const saveToStorage = useCallback((newState: Partial<FarmContextType>) => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        try {
+          const toStore = { ...state, ...newState };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+        } catch (e) {
+          console.warn("Failed to save farm context to localStorage:", e);
+        }
+      }
+    }, 300);
+  }, [state]);
+
+  const updateState = useCallback(<K extends keyof FarmContextType>(key: K, value: FarmContextType[K]) => {
+    setState(prev => {
+      const newState = { ...prev, [key]: value };
+      saveToStorage(newState);
+      return newState;
+    });
+  }, [saveToStorage]);
+
+  const setSelectedCrop = useCallback((crop: string | null) => updateState("selectedCrop", crop), [updateState]);
+  const setCoordinates = useCallback((coords: Coordinates | null) => updateState("coordinates", coords), [updateState]);
+  const setDistrict = useCallback((district: string | null) => updateState("district", district), [updateState]);
+  const setState_ = useCallback((state: string | null) => updateState("state", state), [updateState]);
+  const setIcarZone = useCallback((zone: string | null) => updateState("icarZone", zone), [updateState]);
+  const setSoilParams = useCallback((params: SoilParameters | null) => updateState("soilParams", params), [updateState]);
+  const setAnnualRainfall = useCallback((rainfall: number | null) => updateState("annualRainfall", rainfall), [updateState]);
+  const setSimulationResults = useCallback((results: SimulationResults | null) => updateState("simulationResults", results), [updateState]);
+  const setFarmParams = useCallback((params: FarmParameters | null) => updateState("farmParams", params), [updateState]);
+  const setOverrides = useCallback((overrides: FarmOverrides) => updateState("overrides", overrides), [updateState]);
+  const setIrrigationType = useCallback((type: IrrigationType["type"] | null) => updateState("irrigationType", type), [updateState]);
+  const setSoilOverride = useCallback((soil: string | null) => updateState("soilOverride", soil), [updateState]);
+  const setCalendarStages = useCallback((stages: CalendarStage[] | null) => updateState("calendarStages", stages), [updateState]);
+  const setCurrentCalendarStage = useCallback((stage: string | null) => updateState("currentCalendarStage", stage), [updateState]);
+  const setCurrentStep = useCallback((step: number) => updateState("currentStep", step), [updateState]);
 
   const addChatMessage = useCallback((message: ChatMessage) => {
-    setChatHistory(prev => [...prev, message]);
-  }, []);
+    setState(prev => {
+      const newHistory = [...(prev.chatHistory || []), message];
+      saveToStorage({ ...prev, chatHistory: newHistory });
+      return { ...prev, chatHistory: newHistory };
+    });
+  }, [saveToStorage]);
 
   const clearChatHistory = useCallback(() => {
-    setChatHistory([]);
+    updateState("chatHistory", []);
+  }, [updateState]);
+
+  const resetFarm = useCallback(() => {
+    const resetState = { ...defaultState, isHydrated: true };
+    setState(resetState);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   }, []);
 
-  const resetFarm = () => {
-    setSelectedCrop(null);
-    setCoordinates(null);
-    setSoilParams(null);
-    setAnnualRainfall(null);
-    setSimulationResults(null);
-    setFarmParams(null);
-    setCalendarStages(null);
-    setCurrentCalendarStage(null);
-    setCurrentStep(1);
-    // Note: chatHistory is NOT reset - persists across sessions
+  // Provide default values for unhydrated state
+  const contextValue: FarmContextType = {
+    selectedCrop: state.selectedCrop ?? null,
+    setSelectedCrop,
+    coordinates: state.coordinates ?? null,
+    setCoordinates,
+    district: state.district ?? null,
+    setDistrict,
+    state: state.state ?? null,
+    setState: setState_,
+    icarZone: state.icarZone ?? null,
+    setIcarZone,
+    soilParams: state.soilParams ?? null,
+    setSoilParams,
+    annualRainfall: state.annualRainfall ?? null,
+    setAnnualRainfall,
+    simulationResults: state.simulationResults ?? null,
+    setSimulationResults,
+    farmParams: state.farmParams ?? null,
+    setFarmParams,
+    overrides: state.overrides ?? {},
+    setOverrides,
+    irrigationType: state.irrigationType ?? null,
+    setIrrigationType,
+    soilOverride: state.soilOverride ?? null,
+    setSoilOverride,
+    calendarStages: state.calendarStages ?? null,
+    setCalendarStages,
+    currentCalendarStage: state.currentCalendarStage ?? null,
+    setCurrentCalendarStage,
+    currentStep: state.currentStep ?? 1,
+    setCurrentStep,
+    chatHistory: state.chatHistory ?? [],
+    addChatMessage,
+    clearChatHistory,
+    resetFarm,
+    isHydrated,
   };
 
+  if (!isHydrated) {
+    return (
+      <FarmContext.Provider value={contextValue}>
+        {children}
+      </FarmContext.Provider>
+    );
+  }
+
   return (
-    <FarmContext.Provider value={{
-      selectedCrop,
-      setSelectedCrop,
-      coordinates,
-      setCoordinates,
-      soilParams,
-      setSoilParams,
-      annualRainfall,
-      setAnnualRainfall,
-      simulationResults,
-      setSimulationResults,
-      farmParams,
-      setFarmParams,
-      calendarStages,
-      setCalendarStages,
-      currentCalendarStage,
-      setCurrentCalendarStage,
-      currentStep,
-      setCurrentStep,
-      chatHistory,
-      addChatMessage,
-      clearChatHistory,
-      resetFarm,
-    }}>
+    <FarmContext.Provider value={contextValue}>
       {children}
     </FarmContext.Provider>
   );

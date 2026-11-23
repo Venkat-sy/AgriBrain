@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { FarmProvider } from "@/context/FarmContext";
+import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "AgriBrain - Smart Agriculture Platform",
@@ -15,9 +16,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-canvas text-primary">
         <FarmProvider>
-          {children}
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
         </FarmProvider>
       </body>
     </html>

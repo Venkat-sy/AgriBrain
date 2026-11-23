@@ -61,31 +61,8 @@ import { useState, useEffect } from "react";
    ];
 
    return (
-     <div className="min-h-screen bg-digital-twin transition-colors">
-       <header className="bg-white/5 dark:bg-slate-900/50 backdrop-blur-md border-b border-white/10 dark:border-slate-800/50 sticky top-0 z-50">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="flex items-center justify-between h-16">
-             <div className="flex items-center gap-3">
-               <Link href="/" className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                   <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100 4m0-4a2 2 0 110 4m0 4v2m0-6V4" />
-                   </svg>
-                 </div>
-                 <h1 className="text-2xl font-bold text-white">AgriBrain</h1>
-               </Link>
-             </div>
-             <nav className="flex gap-4">
-               <Link href="/" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Home</Link>
-               <Link href="/simulate" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Simulation</Link>
-               <Link href="/calendar" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 dark:hover:bg-white/5 rounded-lg transition-colors">Calendar</Link>
-               <Link href="/expert-chat" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-purple-500/20 rounded-lg">Expert Chat</Link>
-             </nav>
-           </div>
-         </div>
-       </header>
-
-       {/* Progress Indicator */}
+       <div className="min-h-screen bg-canvas transition-colors">
+         {/* Progress Indicator */}
        <div className="glass-card border-b border-white/10">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
            <div className="flex items-center justify-between">
