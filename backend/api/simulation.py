@@ -1,10 +1,12 @@
 import os
 import json
 import requests
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from sqlalchemy.orm import Session
 from groq import Groq
 from backend.api.spatial import lookup_spatial, fetch_live_weather
 from backend.ml.inference.crop_recommendation import compute_shap_values, _get_xgboost_bundle, XGBOOST_FEATURE_COLUMNS
+from backend.core.config import get_db
 
 router = APIRouter()
 
