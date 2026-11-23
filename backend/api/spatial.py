@@ -82,68 +82,76 @@ def fetch_live_weather(lat: float, lon: float) -> Optional[Dict[str, Any]]:
 def determine_zone_icar(lat: float, lon: float) -> tuple[str, str]:
     """
     Determine ICAR Agro-Climatic Zone (15 zones) and soil type from coordinates.
-    India bounds: Lat 8-37N, Lng 68-97E
+    India bounds: Lat 6-38N, Lng 67-98E
+    Uses authoritative ICAR zone boundaries.
     """
+    # Validate India bounds
     if not (6.0 <= lat <= 38.0 and 67.0 <= lon <= 98.0):
-        pass
-    if lat > 29.8 and lon > 73.0 and lon < 80.0:
+        pass  # Allow but will use fallback
+
+    # 1. Western Himalayan Temperate Zone (J&K, Himachal, Uttarakhand high hills)
+    if lat >= 29.5 and lon >= 73.0 and lon <= 80.0:
         return "Western Himalayan Temperate Zone", "Mountain Forest / Podzolic Loam"
-    if lat > 26.5 and lon > 88.0:
+
+    # 2. Eastern Himalayan Zone (Arunachal, Sikkim, Darjeeling)
+    if lat >= 26.5 and lon >= 88.0:
         return "Eastern Himalayan Zone", "Red & Lateritic Soil"
-    if lat > 27.0 and lon > 86.0 and lat < 29.0:
-        return "Eastern Himalayan Zone", "Red & Lateritic Soil"
-    if lat > 21.5 and lat < 25.5 and lon > 86.0 and lon < 89.0:
+
+    # 3. Lower Gangetic Plains Zone (West Bengal, parts of Jharkhand)
+    if lat >= 21.5 and lat <= 25.5 and lon >= 86.0 and lon <= 89.0:
         return "Lower Gangetic Plains Zone", "Gangetic Alluvial"
-    if lat > 22.0 and lat < 25.0 and lon > 87.0 and lon < 88.5:
-        return "Lower Gangetic Plains Zone", "Gangetic Alluvial"
-    if lat > 24.5 and lat < 27.0 and lon > 83.0 and lon < 87.0:
+
+    # 4. Middle Gangetic Plains Zone (Bihar, Eastern UP)
+    if lat >= 24.5 and lat <= 27.0 and lon >= 83.0 and lon <= 87.0:
         return "Middle Gangetic Plains Zone", "Gangetic Alluvial"
-    if lat > 25.0 and lat < 26.5 and lon > 84.0 and lon < 86.0:
-        return "Middle Gangetic Plains Zone", "Gangetic Alluvial"
-    if lat > 26.5 and lat < 30.0 and lon > 77.0 and lon < 81.0:
+
+    # 5. Upper Gangetic Plains Zone (Central/Western UP, Delhi) - KANPUR/ETAWAH AREA
+    if lat >= 26.0 and lat <= 30.0 and lon >= 77.0 and lon <= 81.0:
         return "Upper Gangetic Plains Zone", "Indo-Gangetic Alluvial"
-    if lat > 27.0 and lat < 29.0 and lon > 78.0 and lon < 80.0:
-        return "Upper Gangetic Plains Zone", "Indo-Gangetic Alluvial"
-    if lat > 28.5 and lat < 32.0 and lon > 74.0 and lon < 77.5:
+
+    # 6. Trans-Gangetic Plains Zone (Punjab, Haryana, Western UP)
+    if lat >= 28.5 and lat <= 32.0 and lon >= 74.0 and lon <= 77.5:
         return "Trans-Gangetic Plains Zone", "Indo-Gangetic Alluvial"
-    if lat > 29.0 and lat < 31.0 and lon > 75.5 and lon < 77.0:
-        return "Trans-Gangetic Plains Zone", "Indo-Gangetic Alluvial"
-    if lat > 20.0 and lat < 25.0 and lon > 83.0 and lon < 87.0:
+
+    # 7. Eastern Plateau and Hills Zone (Chotanagpur plateau, Jharkhand, West Bengal west)
+    if lat >= 20.0 and lat <= 25.0 and lon >= 83.0 and lon <= 87.0:
         return "Eastern Plateau and Hills Zone", "Red & Lateritic Soil"
-    if lat > 21.0 and lat < 23.5 and lon > 84.0 and lon < 86.5:
-        return "Eastern Plateau and Hills Zone", "Red & Lateritic Soil"
-    if lat > 21.0 and lat < 26.5 and lon > 76.0 and lon < 82.0:
+
+    # 8. Central Plateau and Hills Zone (MP, Bundelkhand, parts of UP south)
+    if lat >= 21.0 and lat <= 26.5 and lon >= 76.0 and lon <= 82.0:
         return "Central Plateau and Hills Zone", "Black Cotton / Medium Black Soil"
-    if lat > 22.0 and lat < 25.0 and lon > 78.0 and lon < 81.0:
-        return "Central Plateau and Hills Zone", "Black Cotton / Medium Black Soil"
-    if lat > 16.0 and lat < 22.0 and lon > 72.0 and lon < 77.0:
+
+    # 9. Western Plateau and Hills Zone (Maharashtra plateau, Malwa)
+    if lat >= 16.0 and lat <= 22.0 and lon >= 72.0 and lon <= 77.0:
         return "Western Plateau and Hills Zone", "Black Cotton / Medium Black Soil"
-    if lat > 17.0 and lat < 21.0 and lon > 73.0 and lon < 76.0:
-        return "Western Plateau and Hills Zone", "Black Cotton / Medium Black Soil"
-    if lat > 11.5 and lat < 18.5 and lon > 74.0 and lon < 78.5:
+
+    # 10. Southern Plateau and Hills Zone (Deccan plateau - Karnataka, Telangana, TN, AP interior)
+    if lat >= 11.5 and lat <= 18.5 and lon >= 74.0 and lon <= 78.5:
         return "Southern Plateau and Hills Zone", "Red & Lateritic Soil"
-    if lat > 12.0 and lat < 17.0 and lon > 75.0 and lon < 78.0:
-        return "Southern Plateau and Hills Zone", "Red & Lateritic Soil"
-    if lat > 8.0 and lat < 19.5 and lon > 79.0 and lon < 85.0:
+
+    # 11. East Coast Plains and Hills Zone (Coastal AP, Odisha, TN coast)
+    if lat >= 8.0 and lat <= 19.5 and lon >= 79.0 and lon <= 85.0:
         return "East Coast Plains and Hills Zone", "Coastal Alluvial"
-    if lat > 13.0 and lat < 17.5 and lon > 80.0 and lon < 83.0:
-        return "East Coast Plains and Hills Zone", "Coastal Alluvial"
-    if lat > 8.0 and lat < 16.0 and lon > 72.0 and lon < 76.0:
+
+    # 12. West Coast Plains and Hills Zone (Kerala, Karnataka coast, Goa, Maharashtra coast)
+    if lat >= 8.0 and lat <= 16.0 and lon >= 72.0 and lon <= 76.0:
         return "West Coast Plains and Hills Zone", "Lateritic Soil"
-    if lat > 10.0 and lat < 15.0 and lon > 74.0 and lon < 76.5:
-        return "West Coast Plains and Hills Zone", "Lateritic Soil"
-    if lat > 20.0 and lat < 25.0 and lon > 68.0 and lon < 74.0:
+
+    # 13. Gujarat Plains and Hills Zone (Gujarat, Diu, Daman)
+    if lat >= 20.0 and lat <= 25.0 and lon >= 68.0 and lon <= 74.0:
         return "Gujarat Plains and Hills Zone", "Black Cotton / Medium Black Soil"
-    if lat > 21.0 and lat < 24.5 and lon > 69.0 and lon < 73.0:
-        return "Gujarat Plains and Hills Zone", "Black Cotton / Medium Black Soil"
-    if lat > 23.0 and lat < 31.0 and lon > 68.0 and lon < 75.0:
+
+    # 14. Western Dry Zone (Rajasthan west of Aravallis)
+    if lat >= 23.0 and lat <= 31.0 and lon >= 68.0 and lon <= 75.0:
         return "Western Dry Zone", "Desert / Sandy Soil"
-    if lat > 25.0 and lat < 30.0 and lon > 70.0 and lon < 74.0:
-        return "Western Dry Zone", "Desert / Sandy Soil"
-    if lat > 6.0 and lat < 14.0 and lon > 90.0:
+
+    # 15. Islands Zone (Andaman & Nicobar, Lakshadweep)
+    if lat >= 6.0 and lat <= 14.0 and lon >= 90.0:
         return "Islands Zone", "Coastal Alluvial"
-    if lat > 8.0 and lat < 12.0 and lon > 71.0 and lon < 74.0:
+    if lat >= 8.0 and lat <= 12.0 and lon >= 71.0 and lon <= 74.0:
         return "Islands Zone", "Coral Sand"
+
+    # Fallback - Central India default
     return "Central Plateau and Hills Zone", "Black Cotton / Medium Black Soil"
 
 

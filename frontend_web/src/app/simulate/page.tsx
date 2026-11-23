@@ -149,8 +149,8 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
         // Get spatial data from backend
         try {
           const spatialResult = await ApiService.lookupDistrict(cleanLat, cleanLng);
-          setSelectedSoilType(spatialResult?.soil_type || "Southern Red Loam");
-          setAgroZone(spatialResult?.agro_zone || "Central & Southern Deccan Plateau");
+          setSelectedSoilType(spatialResult?.soil_type || "Indo-Gangetic Alluvial");
+          setAgroZone(spatialResult?.agro_zone || "Upper Gangetic Plains Zone");
           setDistrictName(spatialResult?.district || `${cleanLat}°N, ${cleanLng}°E`);
           setOverrides({
             rainfall: spatialResult?.weather?.rainfall || 100,
@@ -162,7 +162,14 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
             K: spatialResult?.soil?.K || 150,
           });
         } catch {
-          // Fallback to basic values
+          // Fallback to coordinate-based zone determination for Uttar Pradesh region
+          if (cleanLat >= 26.0 && cleanLat <= 30.0 && cleanLng >= 77.0 && cleanLng <= 81.0) {
+            setAgroZone("Upper Gangetic Plains Zone");
+            setSelectedSoilType("Indo-Gangetic Alluvial");
+          } else {
+            setAgroZone("Central Plateau and Hills Zone");
+            setSelectedSoilType("Black Cotton / Medium Black Soil");
+          }
           setDistrictName(`${cleanLat}°N, ${cleanLng}°E`);
         }
       };
@@ -233,10 +240,11 @@ const SOIL_PROFILES: Record<string, { N: number; P: number; K: number; pH: numbe
         }
         setLoading(false);
       } catch (error) {
-        console.error('Simulation error:', error);
-        setStatusBanner('Failed to run simulation. Please try again.');
-        setLoading(false);
-      }
+              console.error('Simulation error:', error);
+              const errorMessage = error instanceof Error ? error.message : 'Failed to run simulation. Please try again.';
+              setStatusBanner(errorMessage);
+              setLoading(false);
+            }
     };
 
     const activeCrop = data?.ranked_crops?.[selectedCropIndex] || null;

@@ -58,27 +58,65 @@ LONG_TERM_CROPS = [
 
 @router.post("/run")
 @router.post("/run-from-location")
-async def run_simulation(request: Request):
+async def run_simulation(request: Request, db: Session = Depends(get_db)):
     body = await request.json()
-    lat = float(body.get("lat", 12.9716))
-    lng = float(body.get("lng") or body.get("lon") or 77.5946)
-    area_acres = max(0.1, float(body.get("area_acres") or body.get("land_area") or 2.5))
-    pref = (
-        body.get("setup_type")
-        or body.get("crop_duration_preference")
-        or body.get("crop_duration")
-        or "short-term"
-    ).lower()
-
-    spatial_data = lookup_spatial(lat, lng)
+    
+    # Support both payload formats:
+    # Format 1 (new frontend): district_id, selected_crop, land_area_ha, budget_inr, confirmed_soil_type, rainfall_override_mm, planting_season, planned_start_date
+    # Format 2 (legacy): lat, lng, area_acres, setup_type, overrides
+    
+    district_id = body.get("district_id")
+    selected_crop = body.get("selected_crop") or body.get("crop")
+    land_area_ha = body.get("land_area_ha") or body.get("land_area")
+    area_acres = body.get("area_acres")
+    budget_inr = body.get("budget_inr", 100000)
+    confirmed_soil_type = body.get("confirmed_soil_type")
+    rainfall_override_mm = body.get("rainfall_override_mm", 0)
+    planting_season = body.get("planting_season") or body.get("setup_type") or "short-term"
+    planned_start_date = body.get("planned_start_date")
+    overrides = body.get("overrides") or {}
+    lat = body.get("lat")
+    lng = body.get("lng") or body.get("lon")
+    
+    # Determine coordinates and spatial data
+    spatial_data = None
+    
+    if district_id:
+        # Look up district by ID to get coordinates
+        from backend.models import District
+        district = db.query(District).filter(District.id == district_id).first()
+        if district and district.latitude and district.longitude:
+            lat = float(district.latitude)
+            lng = float(district.longitude)
+            spatial_data = lookup_spatial(lat, lng, db)
+        else:
+            # Fallback to coordinate-based lookup
+            if lat is None or lng is None:
+                lat, lng = 12.9716, 77.5946  # Default Bengaluru
+            spatial_data = lookup_spatial(lat, lng, db)
+    elif lat is not None and lng is not None:
+        spatial_data = lookup_spatial(lat, lng, db)
+    else:
+        # Default to Bengaluru
+        spatial_data = lookup_spatial(12.9716, 77.5946, db)
+        lat, lng = 12.9716, 77.5946
+    
     district = spatial_data["district"]
     state = spatial_data["state"]
     agro_zone = spatial_data["agro_zone"]
     soil = dict(spatial_data["soil"])
     weather = dict(spatial_data["weather"])
-
-    # Apply Digital Twin "What-If" Scenario Overrides if provided by sliders
-    overrides = body.get("overrides") or {}
+    
+    # Convert area to acres if needed
+    if land_area_ha is not None:
+        area_acres = float(land_area_ha) * 2.471
+    elif area_acres is None:
+        area_acres = 2.5
+    
+    # Apply Digital Twin "What-If" Scenario Overrides
+    if rainfall_override_mm:
+        weather["rainfall"] = float(rainfall_override_mm)
+        overrides["rainfall"] = float(rainfall_override_mm)
     if overrides.get("rainfall") is not None:
         weather["rainfall"] = float(overrides["rainfall"])
     if overrides.get("temp") is not None:
@@ -87,8 +125,11 @@ async def run_simulation(request: Request):
         soil["pH"] = float(overrides["ph"])
     if overrides.get("N") is not None:
         soil["N"] = int(overrides["N"])
+    if confirmed_soil_type:
+        soil["type"] = confirmed_soil_type
 
-    pool = LONG_TERM_CROPS if ("long" in pref or "orchard" in pref or "tree" in pref) else SHORT_TERM_CROPS
+    pref = planting_season.lower()
+    pool = LONG_TERM_CROPS if ("long" in pref or "orchard" in pref or "tree" in pref or "perennial" in pref) else SHORT_TERM_CROPS
 
     scored_crops = []
     for c in pool:
